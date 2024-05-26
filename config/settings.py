@@ -38,12 +38,16 @@ THIRD_PARTY_APPS = [
 ]
 
 PROJECT_APPS = [
-    'sales',
-    'installations',
-    'purchasing',
+    'customers',
     'orders',
+    'engineers',
+    'dispatch',
     'accounts',
-    'customer_care'
+    'products',
+    'services',
+    'stock',
+    'settings',
+    'utilities'
 ]
 
 INSTALLED_APPS = THIRD_PARTY_APPS + DJANGO_DEFAULT_APPS + PROJECT_APPS
@@ -86,7 +90,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# AUTH_USER_MODEL = 'accounts.User'
+AUTH_USER_MODEL = 'accounts.User'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases

@@ -1,12 +1,16 @@
 import os
 
 apps = [
-    'sales',
-    'installations',
-    'purchasing',
+    'customers',
     'orders',
+    'engineers',
+    'dispatch',
     'accounts',
-    'customer_care'
+    'products',
+    'services',
+    'stock',
+    'settings',
+    'utilities'
 ]
 
 for app in apps:
