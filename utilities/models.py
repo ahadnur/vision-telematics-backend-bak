@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 
 
 class TimeStamp(models.Model):
@@ -23,9 +22,9 @@ class Bulletin(TimeStamp):
 class Credit(TimeStamp):
     name = models.CharField(max_length=255, blank=True, null=True)
     date = models.DateField(blank=True, null=True)
-    original_invoice = models.CharField(max_length=100, blank=True, null=True)
+    original_invoice = models.ForeignKey('Invoice', on_delete=models.CASCADE, null=True, blank=True)
     credit_note_number = models.CharField(max_length=100, blank=True, null=True)
-    account = models.ForeignKey('InvoiceAccount', on_delete=models.SET_NULL, blank=True, null=True)
+    account = models.ForeignKey('Account', on_delete=models.SET_NULL, blank=True, null=True)
     contact_name = models.CharField(max_length=100, blank=True, null=True)
     invoice_address = models.TextField(blank=True, null=True)
     payment_method = models.CharField(max_length=100, blank=True, null=True)
@@ -98,3 +97,17 @@ class Company(TimeStamp):
 
     def __str__(self):
         return self.company_name
+
+
+class WarrantyCallType(models.Model):
+    warranty_call_type = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return self.warranty_call_type
+
+
+class OrderType(TimeStamp):
+    install_type = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return self.install_type

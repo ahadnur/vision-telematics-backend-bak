@@ -2,49 +2,43 @@ from django.db import models
 
 
 class Service(models.Model):
-    ref_id = models.CharField(max_length=100)
     service_ref = models.CharField(max_length=100)
     purchase_date = models.DateField()
     first_return_visit = models.DateField(null=True, blank=True)
     fault_reported_date = models.DateField(null=True, blank=True)
-    account = models.ForeignKey('Account', on_delete=models.CASCADE)
-    contact = models.CharField(max_length=100)
+    contact = models.CharField(max_length=100)  # Stores the contact name associated with the service.
     service_call_date = models.DateField()
     time = models.TimeField()
-    nature_of_fault = models.TextField()
+    nature_of_fault = models.CharField(max_length=255, null=True, blank=True)
     equipment_details = models.TextField()
-    engineer = models.ForeignKey('Engineer', on_delete=models.SET_NULL)
     notes = models.TextField(null=True, blank=True)
-    date_resolved = models.DateField(null=True, blank=True)
+    date_resolved = models.DateField(null=True, blank=True)  # Records the date when the service issue was resolved.
     customer_satisfied = models.BooleanField(default=False)
-    service_reference = models.CharField(max_length=100, null=True, blank=True)
     invoice_received_date = models.DateField(null=True, blank=True)
     invoice_authorised_date = models.DateField(null=True, blank=True)
     maintenance = models.BooleanField(default=False)
+    engineer = models.ForeignKey('Engineer', on_delete=models.SET_NULL, null=True, blank=True)
+    order = models.ForeignKey('Order', on_delete=models.SET_NULL, null=True, blank=True)
+    customer = models.ForeignKey('Customer', on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return self.service_ref
 
 
 class CustomerCare(models.Model):
     invoice_reference = models.CharField(max_length=100, blank=True, null=True)
-    actioned_by = models.CharField(max_length=100, blank=True, null=True)
+    actioned_by = models.ForeignKey('User', on_delete=models.SET_NULL, null=True, blank=True)  # who initiate or perform action first.
     date = models.DateField(blank=True, null=True)
     action_title = models.CharField(max_length=255, blank=True, null=True)
     detail = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=100, blank=True, null=True)
-    resolved_by = models.CharField(max_length=100, blank=True, null=True)
+    resolved_by = models.ForeignKey('User', on_delete=models.SET_NULL, null=True, blank=True)  # who resolve this issue
     service_call = models.CharField(max_length=100, blank=True, null=True)
     service_call_date = models.DateField(blank=True, null=True)
     action_required = models.CharField(max_length=255, blank=True, null=True)
-    id = models.AutoField(primary_key=True)
     call_back_reason = models.CharField(max_length=100, blank=True, null=True)
-    taken_by = models.CharField(max_length=100, blank=True, null=True)
+    taken_by = models.ForeignKey('User', on_delete=models.SET_NULL)  # responsible for handle this issue
     tag = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return self.invoice_reference
-
-
-class WarrantyCallType(models.Model):
-    warranty_call_type = models.CharField(max_length=100, blank=True, null=True)
-
-    def __str__(self):
-        return self.warranty_call_type
