@@ -17,9 +17,10 @@ class Service(models.Model):
     invoice_received_date = models.DateField(null=True, blank=True)
     invoice_authorised_date = models.DateField(null=True, blank=True)
     maintenance = models.BooleanField(default=False)
-    engineer = models.ForeignKey('Engineer', on_delete=models.SET_NULL, null=True, blank=True)
-    order = models.ForeignKey('Order', on_delete=models.SET_NULL, null=True, blank=True)
-    customer = models.ForeignKey('Customer', on_delete=models.SET_NULL)
+    engineer = models.ForeignKey('engineers.Engineer', on_delete=models.SET_NULL, null=True, blank=True)
+    order = models.ForeignKey('orders.Order', on_delete=models.SET_NULL, null=True, blank=True)
+    customer = models.ForeignKey('customers.Customer', related_name='customer_services',
+                                 on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.service_ref
@@ -27,17 +28,17 @@ class Service(models.Model):
 
 class CustomerCare(models.Model):
     invoice_reference = models.CharField(max_length=100, blank=True, null=True)
-    actioned_by = models.ForeignKey('User', on_delete=models.SET_NULL, null=True, blank=True)  # who initiate or perform action first.
+    actioned_by = models.ForeignKey('accounts.User', related_name='actions_occured_by', on_delete=models.SET_NULL, null=True, blank=True)  # who initiate or perform action first.
     date = models.DateField(blank=True, null=True)
     action_title = models.CharField(max_length=255, blank=True, null=True)
     detail = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=100, blank=True, null=True)
-    resolved_by = models.ForeignKey('User', on_delete=models.SET_NULL, null=True, blank=True)  # who resolve this issue
+    resolved_by = models.ForeignKey('accounts.User', related_name='actions_resolved_by', on_delete=models.SET_NULL, null=True, blank=True)  # who resolve this issue
     service_call = models.CharField(max_length=100, blank=True, null=True)
     service_call_date = models.DateField(blank=True, null=True)
     action_required = models.CharField(max_length=255, blank=True, null=True)
     call_back_reason = models.CharField(max_length=100, blank=True, null=True)
-    taken_by = models.ForeignKey('User', on_delete=models.SET_NULL)  # responsible for handle this issue
+    taken_by = models.ForeignKey('accounts.User', related_name='actions_taken_by', on_delete=models.SET_NULL, null=True, blank=True)  # responsible for handle this issue
     tag = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):

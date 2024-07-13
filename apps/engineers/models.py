@@ -24,10 +24,10 @@ class Engineer(models.Model):
     comments = models.TextField(null=True, blank=True)
     current_sla = models.CharField(max_length=255, null=True, blank=True)
     performance_rating = models.CharField(max_length=2, choices=[('1', 1), ('2', 2), ('3', 3), ('4', 4)])
-    confirm_by = models.ForeignKey('User', on_delete=models.SET_NULL, null=True, blank=True)
-    engineer_priority = models.ForeignKey('EngineerPriority', on_delete=models.SET_NULL, null=True, blank=True)
-    job = models.ForeignKey('InstallType', on_delete=models.SET_NULL, null=True, blank=True)
-    company = models.ForeignKey('Company', on_delete=models.SET_NULL, null=True, blank=True)
+    confirm_by = models.ForeignKey('accounts.User', on_delete=models.SET_NULL, null=True, blank=True)
+    engineer_priority = models.ForeignKey('engineers.EngineerPriority', on_delete=models.SET_NULL, null=True, blank=True)
+    job = models.ForeignKey('settings.InstallType', on_delete=models.SET_NULL, null=True, blank=True)
+    company = models.ForeignKey('customers.Company', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.contact_name

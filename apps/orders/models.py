@@ -8,9 +8,9 @@ class Order(TimeStamp):
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     quantity = models.IntegerField(null=True, blank=True)
     current_route = models.TextField(blank=True, null=True)
-    engineer = models.ForeignKey('Engineer', on_delete=models.SET_NULL, null=True, blank=True)
-    created_by = models.ForeignKey('User', on_delete=models.CASCADE, related_name='user_order')
-    customer = models.ForeignKey('Customer', on_delete=models.SET_NULL, null=True, blank=True)
+    engineer = models.ForeignKey('engineers.Engineer', on_delete=models.SET_NULL, null=True, blank=True)
+    created_by = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='user_order')
+    customer = models.ForeignKey('customers.Customer', related_name='order_customers', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return f"order created for {self.customer.contact_name}"
@@ -23,12 +23,12 @@ class KIF(models.Model):
 
     """KIF means Kit Instalation Field"""
 
-    order = models.ForeignKey('Order', on_delete=models.SET_NULL, null=True, blank=True)
-    product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, blank=True)
+    order = models.ForeignKey('orders.Order', on_delete=models.SET_NULL, null=True, blank=True)
+    product = models.ForeignKey('products.Product', on_delete=models.SET_NULL, null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     qty = models.PositiveIntegerField()
     discount = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    credit_note = models.ForeignKey('Credit', on_delete=models.CASCADE, null=True, blank=True)
+    credit_note = models.ForeignKey('customers.Credit', on_delete=models.CASCADE, null=True, blank=True)
     # `returned` means kit back, so credit note should add why returned. otherwise `credit_note` will become null.
     returned = models.BooleanField(default=False)
     description = models.TextField(null=True, blank=True)

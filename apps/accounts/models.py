@@ -53,7 +53,7 @@ class User(AbstractBaseUser, TimeStamp):
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    role = models.ManyToManyField('UserRole', null=True, blank=True)
+    role = models.ManyToManyField('UserRole')
 
     USERNAME_FIELD = 'email'
 
@@ -76,11 +76,11 @@ class Account(TimeStamp):
     contact_number = models.CharField(max_length=20, null=True, blank=True)
     in_add = models.CharField(max_length=255, null=True, blank=True)
     post_code = models.CharField(max_length=20, null=True, blank=True)
-    install_level = models.ForeignKey('InstallLevel', on_delete=models.SET_NULL, related_name='install_level',
-                                      null=True, blank=True)
+    install_level = models.ForeignKey('InstallLevel', related_name='install_levels',
+                                      on_delete=models.SET_NULL, null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
     discount = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    invoice_terms = models.CharField(null=True, blank=True)  # maybe days.
+    invoice_terms = models.CharField(max_length=50, null=True, blank=True,)  # maybe days.
     opened = models.DateTimeField(null=True, blank=True)
     opened_by = models.ForeignKey('User', on_delete=models.SET_NULL, null=True, blank=True)
     freeze_account = models.BooleanField(default=False)
@@ -97,50 +97,49 @@ class Account(TimeStamp):
         return self.account_name
 
 
-class Invoice(TimeStamp):
-    invoice_number = models.CharField(max_length=100)
-    customer = models.ForeignKey('Customer', on_delete=models.CASCADE)
-    account = models.ForeignKey('Account', on_delete=models.CASCADE)
-    order = models.ForeignKey('Invoice', on_delete=models.SET_NULL, null=True, blank=True)
-    paid = models.BooleanField(default=False)
-    payment_date = models.DateField(blank=True, null=True)
-    payment_method = models.CharField(max_length=100, blank=True, null=True)
-    status = models.CharField(max_length=50, default='Pending')  # e.g., Pending, Paid, Overdue
-    notes = models.TextField(blank=True, null=True)
+class NotifiedBy(models.Model):
+    notified_by = models.ForeignKey('User', on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
-        return self.invoice_number
-
-    class Meta:
-        ordering = ['-date']
-        indexes = [
-            models.Index(fields=['invoice_number']),
-            models.Index(fields=['date']),
-            models.Index(fields=['customer']),
-        ]
+        return self.notified_by
 
 
-class InvoiceServiceLog(TimeStamp):
-    LOG_REQ_TYPE = [('create_invoice', 'Create Invoice'),
-                    ('create_customer', 'Create Customer'),
-                    ('update_customer', 'Update Customer'),
-                    ('other', 'Other'),]
-
-    account_invoice = models.ForeignKey('Invoice', models.DO_NOTHING, blank=True, null=True)
-    status_code = models.IntegerField(null=False, blank=False)
-    description = models.CharField(max_length=2000, null=True, blank=True)
-    request_data = models.TextField(null=True, blank=True)
-    response_data = models.TextField(null=True, blank=True)
-    invoice_number = models.CharField(max_length=50, null=True, blank=True)  # DocumentNumber in Fortnox
-    retry_count = models.IntegerField(null=False, blank=False, default=0)
-    request_type = models.CharField(max_length=100, choices=LOG_REQ_TYPE, default='create_invoice',
-                                    null=False, blank=False)
-    customer_number = models.CharField(max_length=60, null=True, blank=True)
-
-    class Meta:
-        managed = True
-        db_table = 'invoice_service_log'
+class InstallLevel(models.Model):
+    install_level = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
-        return str(self.id)
+        return self.install_level
 
+
+class Bulletin(TimeStamp):
+    created_by = models.ForeignKey('User', on_delete=models.SET_NULL, null=True)
+    date = models.DateField(blank=True, null=True)
+    published = models.BooleanField(default=False)
+    bulletin = models.TextField(blank=True, null=True)
+    subject = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.date} - {self.subject}"
+
+
+class AuditTrail(models.Model):
+    """Track who responsible for certain action"""
+    ACTION_CHOICES = (
+        ('INSERT', 'Insert'),
+        ('UPDATE', 'Update'),
+        ('DELETE', 'Delete'),
+    )
+
+    timestamp = models.DateTimeField(auto_now_add=True)
+    actioned_by = models.ForeignKey('User', on_delete=models.SET_NULL, null=True)
+    action = models.CharField(max_length=10, choices=ACTION_CHOICES)
+    table_name = models.CharField(max_length=100)
+    record_id = models.IntegerField()
+    details = models.TextField()
+
+    def __str__(self):
+        return f'{self.timestamp} - {self.user} - {self.action} - {self.table_name}'
+
+    class Meta:
+        verbose_name = 'Audit Trail'
+        verbose_name_plural = 'Audit Trail'

@@ -34,16 +34,16 @@ THIRD_PARTY_APPS = [
 
 
 PROJECT_APPS = [
-    'accounts',
-    'customers',
-    'orders',
-    'engineers',
-    'dispatch',
-    'products',
-    'services',
-    'stock',
-    'settings',
-    'utilities'
+    'apps.settings',
+    'apps.utilities',
+    'apps.accounts',
+    'apps.customers',
+    'apps.orders',
+    'apps.engineers',
+    'apps.dispatch',
+    'apps.products',
+    'apps.services',
+    'apps.stock',
 ]
 
 INSTALLED_APPS = THIRD_PARTY_APPS + DJANGO_DEFAULT_APPS + PROJECT_APPS
@@ -88,13 +88,8 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 AUTH_USER_MODEL = 'accounts.User'
 
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-
 
 # Password validation
-# https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -113,8 +108,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/5.0/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -124,18 +117,11 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
-
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_URL = '/static/'
 
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 
 # Third party configuration
 
@@ -201,7 +187,7 @@ SIMPLE_JWT = {
 }
 
 SWAGGER_SETTINGS = {
-    'DEFAULT_INFO': 'vision_telematics-backend.urls.swagger_info',  # Replace 'your_project' with your actual project name
+    'DEFAULT_INFO': 'vision_telematics-backend.urls.swagger_info',
     'DEFAULT_PERMISSION_CLASSES': [
         AllowAny,
     ],
