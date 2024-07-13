@@ -17,17 +17,19 @@ class Order(TimeStamp):
 
 
 class KIF(models.Model):
-    """The KIF table in your database appears to be a key table for managing order details,
-     particularly related to individual items within an order. KIF likely stands for "Key
-     Item File" or a similar term that signifies detailed information about items ordered,
-      including their pricing, quantities, and status (e.g., returned, credited)"""
+    """KIF means Kit Instalation Field. Imagine a scenario where a customer buys a toolkit for vehicle installation
+    from your store. The KIF table would be used to track details about this purchase and any subsequent returns or
+    credits."""
+
+    """KIF means Kit Instalation Field"""
 
     order = models.ForeignKey('Order', on_delete=models.SET_NULL, null=True, blank=True)
     product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     qty = models.PositiveIntegerField()
     discount = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    credit_note = models.CharField(max_length=100, null=True, blank=True)
+    credit_note = models.ForeignKey('Credit', on_delete=models.CASCADE, null=True, blank=True)
+    # `returned` means kit back, so credit note should add why returned. otherwise `credit_note` will become null.
     returned = models.BooleanField(default=False)
     description = models.TextField(null=True, blank=True)
 

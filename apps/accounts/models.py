@@ -35,6 +35,13 @@ class UserManager(BaseUserManager):
         return user
 
 
+class UserRole(TimeStamp):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
 class User(AbstractBaseUser, TimeStamp):
     """Custom user model"""
     email = models.EmailField(
@@ -43,9 +50,10 @@ class User(AbstractBaseUser, TimeStamp):
         unique=True,
     )
     password = models.CharField(max_length=50)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    role = models.ManyToManyField('UserRole', null=True, blank=True)
 
     USERNAME_FIELD = 'email'
 
@@ -59,13 +67,6 @@ class User(AbstractBaseUser, TimeStamp):
 
     def __str__(self):
         return self.email
-
-    @property
-    def groups(self):
-        return self.user_groups.all()
-
-    def user_permissions(self):
-        return self.user_permissions.all()
 
 
 class Account(TimeStamp):

@@ -38,8 +38,6 @@ class CarData(models.Model):
     spec_notes = models.TextField(blank=True, null=True)
     telemute = models.BooleanField(default=False)
     kram = models.BooleanField(default=False)
-    bracket = models.BooleanField(default=False)
-    brodit = models.BooleanField(default=False)
     mounting_notes = models.TextField(blank=True, null=True)
     mute_pin = models.CharField(max_length=100, blank=True, null=True)
     vehicle_notes = models.TextField(blank=True, null=True)
