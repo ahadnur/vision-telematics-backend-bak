@@ -9,7 +9,7 @@ class EngineerPriority(models.Model):
 
 
 class Engineer(models.Model):
-    engineer_id = models.CharField(max_length=50, unique=True)
+    engineer_id = models.CharField(max_length=50, unique=True, null=True, blank=True)
     contact_name = models.CharField(max_length=255, null=True, blank=True)
     postcode_coverage = models.CharField(max_length=255, null=True, blank=True)
     # service and pricing
@@ -24,7 +24,7 @@ class Engineer(models.Model):
     comments = models.TextField(null=True, blank=True)
     current_sla = models.CharField(max_length=255, null=True, blank=True)
     performance_rating = models.CharField(max_length=2, choices=[('1', 1), ('2', 2), ('3', 3), ('4', 4)])
-    confirm_by = models.ForeignKey('accounts.User', on_delete=models.SET_NULL, null=True, blank=True)
+    confirm_by = models.CharField(max_length=50, null=True, blank=True)  # mail or fax
     engineer_priority = models.ForeignKey('engineers.EngineerPriority', on_delete=models.SET_NULL, null=True, blank=True)
     job = models.ForeignKey('settings.InstallType', on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey('customers.Company', on_delete=models.SET_NULL, null=True, blank=True)
@@ -43,9 +43,3 @@ class EngineerInvoice(models.Model):
     def __str__(self):
         return self.sp_comms_ref
 
-
-class Staff(models.Model):
-    staff_name = models.CharField(max_length=255, null=True, blank=True)
-
-    def __str__(self):
-        return self.staff_name

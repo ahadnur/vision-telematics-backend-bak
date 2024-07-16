@@ -17,7 +17,8 @@ class SpeedUp(TimeStamp):
 
 
 class PasteError(TimeStamp):
-    sku = models.CharField(max_length=100, blank=True, null=True)
+    # sku means `Stock Keeping Unit`
+    sku = models.ForeignKey('products.Product', on_delete=models.CASCADE, null=True, blank=True)
     description = models.TextField(blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     qty = models.IntegerField(blank=True, null=True)

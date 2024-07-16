@@ -76,8 +76,9 @@ class Customer(TimeStamp):
     has_multi_site_link = models.BooleanField(default=False)
     is_purchasing_complete = models.BooleanField(default=False)
     purchasing_complete_time = models.DateTimeField(blank=True, null=True)
+    # sales person
     sold_by = models.ForeignKey('accounts.User', related_name='sales', on_delete=models.SET_NULL, blank=True, null=True)
-    customer_confirmed_by = models.ForeignKey('accounts.User',related_name='confirmed_customers',
+    customer_confirmed_by = models.ForeignKey('accounts.User', related_name='confirmed_customers',
                                               on_delete=models.SET_NULL, blank=True, null=True)
     customer_confirmed_time = models.DateTimeField(blank=True, null=True)
     acc_inv_raised_date = models.DateField(blank=True, null=True)
@@ -103,11 +104,11 @@ class Customer(TimeStamp):
     is_hot = models.BooleanField(default=False)
     jcd = models.DateField(blank=True, null=True)
     sat = models.BooleanField(default=False)
-    late = models.BooleanField(default=False)
+    late = models.IntegerField(blank=True, null=True)
     consignment = models.CharField(max_length=100, blank=True, null=True)
-    dispute_eng_inv = models.BooleanField(default=False)
+    is_dispute_eng_inv = models.BooleanField(default=False)
     dispute_eng_reason = models.CharField(max_length=100, blank=True, null=True)
-    dispute_by = models.CharField(max_length=100, blank=True, null=True)
+    dispute_by = models.ForeignKey('accounts.User', on_delete=models.SET_NULL, blank=True, null=True)
     back_order = models.BooleanField(default=False)
     existing_kit = models.BooleanField(default=False)
     package = models.CharField(max_length=100, blank=True, null=True)
@@ -126,8 +127,7 @@ class Customer(TimeStamp):
 class Invoice(TimeStamp):
     STATUS_CHOICE = [('pending', 'Pending'), ('paid', 'Paid'), ('overdue', 'Overdue')]
     invoice_number = models.CharField(max_length=100)
-    customer = models.ForeignKey('Customer', related_name='customer_invoices', on_delete=models.SET_NULL,
-                                 null=True, blank=True)
+    customer = models.ManyToManyField('Customer', related_name='customer_invoices')
     account = models.ForeignKey('accounts.Account', on_delete=models.CASCADE)
     paid = models.BooleanField(default=False)
     payment_date = models.DateField(blank=True, null=True)

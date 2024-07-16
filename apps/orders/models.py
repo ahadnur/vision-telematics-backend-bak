@@ -3,10 +3,11 @@ from apps.utilities.models import TimeStamp
 
 
 class Order(TimeStamp):
-    order_ref_number = models.CharField(max_length=100)
+    order_ref_number = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=255, null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     quantity = models.IntegerField(null=True, blank=True)
+    discount = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     current_route = models.TextField(blank=True, null=True)
     engineer = models.ForeignKey('engineers.Engineer', on_delete=models.SET_NULL, null=True, blank=True)
     created_by = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='user_order')

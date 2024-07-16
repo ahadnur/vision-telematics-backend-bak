@@ -38,7 +38,6 @@ class POSupplierRef(models.Model):
         return self.po_supplier_ref
 
 
-
 class InstallType(models.Model):
     install_type = models.CharField(max_length=100, blank=True, null=True)
 

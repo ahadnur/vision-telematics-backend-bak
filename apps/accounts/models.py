@@ -69,6 +69,16 @@ class User(AbstractBaseUser, TimeStamp):
         return self.email
 
 
+# In lagacy system this is a staff
+class Staff(TimeStamp):
+    first_name = models.CharField(max_length=255, null=True, blank=True)
+    last_name = models.CharField(max_length=255, null=True, blank=True)
+    user = models.OneToOneField('User', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.first_name
+
+
 class Account(TimeStamp):
     # account_name and company_name same
     account_name = models.CharField(max_length=255)  # invoice account
