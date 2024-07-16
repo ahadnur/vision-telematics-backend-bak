@@ -15,7 +15,7 @@ class UserManager(BaseUserManager):
             email=self.normalize_email(email),
         )
         user.set_password(password)
-        user.save(self._db)
+        user.save()
         return user
 
     def create_superuser(self, email: str, password: str):
@@ -31,7 +31,7 @@ class UserManager(BaseUserManager):
         user.is_superuser = True
         user.is_staff = True
         user.set_password(password)
-        user.save(self._db)
+        user.save()
         return user
 
 
