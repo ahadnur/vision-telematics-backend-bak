@@ -54,6 +54,7 @@ class User(AbstractBaseUser, TimeStamp):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     role = models.ManyToManyField('UserRole')
+    email_verfication_code = models.CharField(max_length=100, unique=True, null=True, blank=True)
 
     USERNAME_FIELD = 'email'
 
