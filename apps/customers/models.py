@@ -142,8 +142,7 @@ class Invoice(TimeStamp):
         ordering = ['-created_at']
         indexes = [
             models.Index(fields=['invoice_number']),
-            models.Index(fields=['created_at']),
-            models.Index(fields=['customer']),
+            models.Index(fields=['created_at'])
         ]
 
 

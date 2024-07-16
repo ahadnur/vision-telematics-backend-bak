@@ -15,7 +15,7 @@ class Product(models.Model):
     unit_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     note = models.TextField(null=True, blank=True)
-    stock_code = models.ForeignKey('stocks.StockControlCode', on_delete=models.SET_NULL, null=True, blank=True)
+    stock_code = models.ForeignKey('stock.StockControlCode', on_delete=models.SET_NULL, null=True, blank=True)
     category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True, blank=True)
     pkg0 = models.CharField(max_length=255, null=True, blank=True)
     pkg1 = models.CharField(max_length=255, null=True, blank=True)
