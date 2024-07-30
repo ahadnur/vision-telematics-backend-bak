@@ -27,7 +27,8 @@ class Engineer(models.Model):
     confirm_by = models.CharField(max_length=50, null=True, blank=True)  # mail or fax
     engineer_priority = models.ForeignKey('engineers.EngineerPriority', on_delete=models.SET_NULL, null=True, blank=True)
     job = models.ForeignKey('settings.InstallType', on_delete=models.SET_NULL, null=True, blank=True)
-    company = models.ForeignKey('customers.Company', on_delete=models.SET_NULL, null=True, blank=True)
+    # company = models.ForeignKey('customers.CustomerCompany', related_name="e_company", related_query_name="company",
+    #                             on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.contact_name
@@ -38,7 +39,7 @@ class EngineerInvoice(models.Model):
     eng_invoice_received = models.DateField(null=True, blank=True)
     eng_invoice_paid = models.DateField(null=True, blank=True)
     invoice_notes = models.TextField(null=True, blank=True)
-    engineer = models.ForeignKey('Engineer', on_delete=models.CASCADE, null=True, blank=True)
+    engineer = models.ForeignKey(Engineer, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.sp_comms_ref

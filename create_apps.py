@@ -8,7 +8,7 @@ apps = [
     'accounts',
     'products',
     'services',
-    'stock',
+    # 'stock',
     'settings',
     'utilities'
 ]

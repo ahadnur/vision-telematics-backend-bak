@@ -1,5 +1,12 @@
 from django.db import models
-from .models import TimeStamp
+from apps.utilities.models import TimeStamp
+
+
+class InstallLevel(models.Model):
+    install_levl = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return self.install_levl
 
 
 class Account(TimeStamp):

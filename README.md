@@ -62,3 +62,8 @@
 ├── pytest.ini
 └── README.md
 ```
+
+
+Migration order:
+
+settings --> engineer --> products --> orders --> services

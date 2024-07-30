@@ -1,5 +1,5 @@
 from django.db import models
-from .models import TimeStamp
+from apps.utilities.models import TimeStamp
 
 
 # In lagacy system this is a staff

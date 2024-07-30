@@ -1,6 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-from .models import TimeStamp
+
+from apps.utilities.models import TimeStamp
+
+
+# from account import
 
 
 class UserManager(BaseUserManager):
