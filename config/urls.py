@@ -7,7 +7,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
 swagger_url_patterns = None
-
+'rest_framework_swagger',
 if settings.DEBUG:
     schema_view = get_schema_view(
         openapi.Info(
