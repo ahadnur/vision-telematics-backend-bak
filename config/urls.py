@@ -1,13 +1,12 @@
 from django.contrib import admin
 from django.conf import settings
-from django.urls import path
+from django.urls import path, include
 from rest_framework import permissions
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
 swagger_url_patterns = None
-'rest_framework_swagger',
 if settings.DEBUG:
     schema_view = get_schema_view(
         openapi.Info(
@@ -30,7 +29,8 @@ if settings.DEBUG:
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh')
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/account/', include('apps.accounts.api.v1.urls')),
 ]
 
 if settings.DEBUG and swagger_url_patterns:

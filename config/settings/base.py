@@ -19,6 +19,7 @@ SECRET_KEY = env.str('SECRET_KEY')
 
 # Application definition
 DJANGO_DEFAULT_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,7 +48,7 @@ PROJECT_APPS = [
     # 'apps.stock',
 ]
 
-INSTALLED_APPS = THIRD_PARTY_APPS + DJANGO_DEFAULT_APPS + PROJECT_APPS
+INSTALLED_APPS = DJANGO_DEFAULT_APPS + THIRD_PARTY_APPS + PROJECT_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -72,7 +73,7 @@ PASSWORD_HASHERS = [
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -118,7 +119,7 @@ USE_I18N = True
 USE_TZ = True
 
 
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+# STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_URL = '/static/'
 
 
@@ -200,3 +201,23 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'freelancersifat380@gmail.com'
 EMAIL_HOST_PASSWORD = 'wnda hshm dtns snkx'
 # DEFAULT_FROM_EMAIL = 'webmaster@example.com'
+
+
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'static'),
+# ]
+#
+# # Directory where static files will be collected
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+
+JAZZMIN_SETTINGS = {
+    # title of the window (Will default to current_admin_site.site_title if absent or None)
+    "site_title": "Vision Telematics",
+
+    # Title on the login screen (19 chars max) (defaults to current_admin_site.site_header if absent or None)
+    "site_header": "Vision Telematics",
+
+    # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
+    "site_brand": "Vision Telematics",
+}

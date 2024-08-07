@@ -1,10 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 from apps.utilities.models import TimeStamp
-
-
-# from account import
 
 
 class UserManager(BaseUserManager):
@@ -47,7 +44,7 @@ class UserRole(TimeStamp):
         return self.name
 
 
-class User(AbstractBaseUser, TimeStamp):
+class User(AbstractBaseUser, PermissionsMixin, TimeStamp):
     """Custom user model"""
     email = models.EmailField(
         verbose_name='Email address',
