@@ -25,11 +25,6 @@ account_write_request_schema = openapi.Schema(
     properties=base_account_schema.properties
 )
 
-# account_update_request_schema = openapi.Schema(
-#     type=openapi.TYPE_OBJECT,
-#     properties=base_account_schema.properties
-# )
-
 
 account_response_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
@@ -39,5 +34,35 @@ account_response_schema = openapi.Schema(
     }
 )
 
+user_base_schema = {
+    'email': openapi.Schema(type=openapi.TYPE_STRING),
+    'role': openapi.Schema(type=openapi.TYPE_INTEGER)
+}
+
+user_create_request_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        **user_base_schema,
+        'password1': openapi.Schema(type=openapi.TYPE_STRING,),
+        'password2': openapi.Schema(type=openapi.TYPE_STRING),
+    }
+)
+
+reset_user_password_request_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'email': openapi.Schema(type=openapi.TYPE_STRING),
+        'password1': openapi.Schema(type=openapi.TYPE_STRING),
+        'password2': openapi.Schema(type=openapi.TYPE_STRING),
+    }
+)
+
+get_user_response_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'id': openapi.Schema(type=openapi.TYPE_INTEGER),
+        **user_base_schema
+    }
+)
 
 

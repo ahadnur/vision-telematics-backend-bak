@@ -4,12 +4,108 @@ from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from rest_framework import status, views
 from rest_framework import generics
+from rest_framework.response import Response
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from apps.accounts.api.v1.serializers import AccountWriteSerializer
-from .schemas.accounts_schema import account_write_request_schema, account_response_schema
+from rest_framework.permissions import AllowAny, IsAuthenticated
+
+from apps.accounts.api.v1.serializers import (AccountWriteSerializer, UserWriteSerializer, ResetPasswordSerializer,
+                                              GetUserSerializer)
+from .schemas.accounts_schema import (account_write_request_schema, account_response_schema, user_create_request_schema,
+                                      reset_user_password_request_schema, get_user_response_schema)
+
+import logging
+
+from ...services import UserService
+
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
+
+
+class UserCreateAPIView(views.APIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UserWriteSerializer
+
+    @swagger_auto_schema(
+        request_body=user_create_request_schema,
+        responses={
+            status.HTTP_201_CREATED: openapi.Response(
+                description='Account created successfully',
+                schema=account_response_schema
+            ),
+        }
+    )
+    def post(self, request):
+        try:
+            data = request.data
+            serializer = self.serializer_class(data=data)
+            serializer.is_valid(raise_exception=True)
+            user = serializer.save()
+            return Response({
+                'message': 'Account     created successfully',
+                'user_id': user.id,
+            }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            logger.error(str(e))
+            return Response({
+                'message': str(e),
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetUserAPIView(views.APIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = GetUserSerializer
+
+    def __init__(self):
+        super().__init__()
+        self.user_service = UserService()
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: openapi.Response(
+                description='Account created successfully',
+                schema=get_user_response_schema
+            ),
+        }
+    )
+    def get(self, request, _id):
+        get_user = self.user_service.get_user(_id)
+        serializer = self.serializer_class(get_user)
+        return Response({
+            'user': serializer.data,
+        }, status=status.HTTP_200_OK)
+
+
+class ResetUserPasswordAPIView(views.APIView):
+    permission_classes = (AllowAny,)
+    serializer_class = ResetPasswordSerializer
+
+    @swagger_auto_schema(
+        request_body=reset_user_password_request_schema,
+        responses={
+            status.HTTP_201_CREATED: openapi.Response(
+                description='Account created successfully',
+                schema=account_response_schema
+            ),
+        }
+    )
+    def put(self, request, _id):
+        try:
+            data = request.data
+            data['id'] = _id
+            user_instance = User.objects.get(pk=data['id'])
+            serializer = self.serializer_class(instance=user_instance, data=data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response({
+                'message': 'Reset password successfully',
+            }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            logger.error(str(e))
+            return Response({
+                'message': str(e),
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CreateAccountAPIView(generics.CreateAPIView):
@@ -20,7 +116,7 @@ class CreateAccountAPIView(generics.CreateAPIView):
         responses={
             status.HTTP_201_CREATED: openapi.Response(
                 description='Account created successfully',
-                schema=account_response_schema
+                schema=get_user_response_schema
             ),
         }
     )
@@ -29,7 +125,6 @@ class CreateAccountAPIView(generics.CreateAPIView):
 
 
 class UpdateAccountAPIView(views.APIView):
-
     @swagger_auto_schema(
         request_body=account_write_request_schema,
         responses={

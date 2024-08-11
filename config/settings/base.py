@@ -131,7 +131,13 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "verbose": {
+        "verbose": {'SECURITY_DEFINITIONS': {
+        'api_key': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization'
+        }
+    },
             "format": "%(levelname)s %(name)-12s %(asctime)s %(module)s "
                       "%(process)d %(thread)d %(message)s"
         }
@@ -191,6 +197,25 @@ SWAGGER_SETTINGS = {
     'DEFAULT_PERMISSION_CLASSES': [
         AllowAny,
     ],
+    'api_key': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'Authorization'
+    },
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': 'JWT Bearer token authentication'
+        }
+    },
+    'SECURITY': [
+        {
+            'Bearer': []
+        }
+    ],
+    'USE_SESSION_AUTH': False,
 }
 
 # Email Backend
