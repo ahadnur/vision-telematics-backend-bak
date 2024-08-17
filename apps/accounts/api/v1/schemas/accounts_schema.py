@@ -3,28 +3,29 @@ from drf_yasg import openapi
 base_account_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
-        'account_name': openapi.Schema(type=openapi.TYPE_STRING),
+        'account_name': openapi.Schema(type=openapi.TYPE_STRING, description="company name"),
+        'in_add': openapi.Schema(type=openapi.TYPE_STRING, description="invoice address"),
+        'accounts_contact_name': openapi.Schema(type=openapi.TYPE_STRING, description="This is company name"),
         'contact_number': openapi.Schema(type=openapi.TYPE_STRING),
-        'in_add': openapi.Schema(type=openapi.TYPE_STRING),
         'notes': openapi.Schema(type=openapi.TYPE_STRING),
         'discount': openapi.Schema(type=openapi.TYPE_NUMBER),
         'invoice_terms': openapi.Schema(type=openapi.TYPE_STRING),
         'opened': openapi.Schema(type=openapi.TYPE_STRING),
         'opened_by': openapi.Schema(type=openapi.TYPE_INTEGER),
         'confirmation_email': openapi.Schema(type=openapi.TYPE_STRING),
-        'send_confirmation': openapi.Schema(type=openapi.TYPE_BOOLEAN),
+        'send_confirmation': openapi.Schema(type=openapi.TYPE_BOOLEAN, default=False),
         'sales_contact': openapi.Schema(type=openapi.TYPE_STRING),
         'sales_contact_number': openapi.Schema(type=openapi.TYPE_STRING),
-        'sales_email': openapi.Schema(type=openapi.TYPE_STRING)
+        'sales_email': openapi.Schema(type=openapi.TYPE_STRING),
+        'freeze_account': openapi.Schema(type=openapi.TYPE_BOOLEAN, default=False),
+        'hot_account': openapi.Schema(type=openapi.TYPE_BOOLEAN, default=False)
     },
 )
-
 
 account_write_request_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties=base_account_schema.properties
 )
-
 
 account_response_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,

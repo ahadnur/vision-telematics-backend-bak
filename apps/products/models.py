@@ -96,6 +96,7 @@ class CarData(models.Model):
         return f"{self.marque} - {self.range}"
 
 
+# ProductSKU
 class PasteError(TimeStamp):
     # sku means `Stock Keeping Unit`
     sku = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True)

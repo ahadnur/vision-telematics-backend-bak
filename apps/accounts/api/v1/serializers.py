@@ -75,7 +75,7 @@ class AccountWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = ('account_name', 'contact_number', 'in_add', 'notes', 'discount',
-                  'invoice_terms', 'opened', 'opened_by', 'confirmation_email',
+                  'invoice_terms', 'opened_by', 'confirmation_email', 'freeze_account', 'hot_account',
                   'send_confirmation', 'sales_contact', 'sales_contact_number', 'sales_email')
 
     def create(self, validated_data):
@@ -83,7 +83,7 @@ class AccountWriteSerializer(serializers.ModelSerializer):
         return account
 
     def update(self, instance, validated_data):
-        instance.email = validated_data.get('email', instance.email)
-        instance.content = validated_data.get('content', instance.content)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
         instance.save()
         return instance

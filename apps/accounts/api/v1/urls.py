@@ -12,5 +12,5 @@ urlpatterns = [
     path('reset-password/<_id>/', ResetUserPasswordAPIView.as_view(), name='reset-password'),
 ]+[
     path('create-new-account/', CreateAccountAPIView.as_view(), name='create-account'),
-    path('update-new-account/<int:id>/', UpdateAccountAPIView.as_view(), name='update-account'),
+    path('update-new-account/<int:_id>/', UpdateAccountAPIView.as_view(), name='update-account'),
 ]

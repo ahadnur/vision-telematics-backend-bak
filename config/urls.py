@@ -8,6 +8,9 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
+
+admin.site.site_header = 'Vision Telematics'
+
 swagger_url_patterns = None
 if settings.DEBUG:
     schema_view = get_schema_view(

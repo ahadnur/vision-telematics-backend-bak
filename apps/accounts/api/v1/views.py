@@ -16,7 +16,7 @@ from .schemas.accounts_schema import (account_write_request_schema, account_resp
 
 import logging
 
-from ...services import UserService
+from ...services import UserService, AccountService
 
 logger = logging.getLogger(__name__)
 
@@ -134,8 +134,20 @@ class UpdateAccountAPIView(views.APIView):
             ),
         },
     )
-    def put(self, request, *args, **kwargs):
-        pass
+    def put(self, request, _id):
+        try:
+            account = AccountService.get_account(_id)
+            serializer = AccountWriteSerializer(account, data=request.data, partial=True)  # `partial=True` allows partial updates
+            if serializer.is_valid():
+                updated_account = serializer.save()
+                response_serializer = AccountWriteSerializer(updated_account)
+                return Response(response_serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            logger.error(str(e))
+            return Response({
+                'message': str(e),
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 def activate(request, uidb64, token):

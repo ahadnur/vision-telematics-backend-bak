@@ -1,8 +1,10 @@
 from django.contrib import admin
-from .models import Account, User, UserRole, Profile
+from .models import Account, User, UserRole, Profile, AuditTrail, NotifiedBy, Bulletin, Staff, InstallLevel
 
 
-# from .models
+@admin.register(Account)
+class AccountAdmin(admin.ModelAdmin):
+    list_display = ('account_name', 'id', 'accounts_contact_name')
 
 
 @admin.register(User)
@@ -20,4 +22,9 @@ class ProfileAdmin(admin.ModelAdmin):
     list_display = ('id', 'first_name', 'last_name')
 
 
-admin.site.register(Account)
+admin.site.register(AuditTrail)
+admin.site.register(NotifiedBy)
+admin.site.register(Bulletin)
+admin.site.register(Staff)
+admin.site.register(InstallLevel)
+

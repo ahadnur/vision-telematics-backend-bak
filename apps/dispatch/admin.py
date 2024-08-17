@@ -1,3 +1,5 @@
 from django.contrib import admin
+from apps.dispatch.models import Dispatch, DeliveryRoute
 
-# Register your models here.
+admin.site.register(Dispatch)
+admin.site.register(DeliveryRoute)

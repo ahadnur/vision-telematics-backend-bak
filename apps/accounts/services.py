@@ -5,6 +5,9 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.conf import settings
+from rest_framework.exceptions import NotFound
+
+from .models import Account
 from .models.user import User
 import logging
 
@@ -19,6 +22,18 @@ class UserService:
 
     def get_user(self, _id):
         return self.user.objects.filter(id=_id).first()
+
+
+class AccountService:
+    def __init__(self, email_service=None):
+        pass
+
+    @staticmethod
+    def get_account(_id):
+        try:
+            return Account.objects.filter(id=_id).first()
+        except Account.DoesNotExist:
+            raise NotFound(detail="Account not found")
 
 
 class EmailVerificationService:
