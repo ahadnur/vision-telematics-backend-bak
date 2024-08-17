@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (activate, CreateAccountAPIView, UpdateAccountAPIView, UserCreateAPIView, ResetUserPasswordAPIView,
-                    GetUserAPIView)
+                    GetUserAPIView, AccountListAPIView)
 
 app_name = 'accounts'
 
@@ -13,4 +13,5 @@ urlpatterns = [
 ]+[
     path('create-new-account/', CreateAccountAPIView.as_view(), name='create-account'),
     path('update-new-account/<int:_id>/', UpdateAccountAPIView.as_view(), name='update-account'),
+    path('account-list/', AccountListAPIView.as_view(), name='account-list'),
 ]

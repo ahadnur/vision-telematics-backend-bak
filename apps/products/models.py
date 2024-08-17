@@ -58,12 +58,11 @@ class Category(TimeStamp):
 
 
 class Product(models.Model):
-    product_name = models.CharField(max_length=255, null=True, blank=True)
     description = models.CharField(max_length=255, null=True, blank=True)
     unit_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     note = models.TextField(null=True, blank=True)
-    stock_code = models.ForeignKey(StockControlCode, on_delete=models.SET_NULL, null=True, blank=True)
+    # stock_code = models.ForeignKey(StockControlCode, on_delete=models.SET_NULL, null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     pkg0 = models.CharField(max_length=255, null=True, blank=True)
     pkg1 = models.CharField(max_length=255, null=True, blank=True)
@@ -77,7 +76,7 @@ class Product(models.Model):
     pkg9 = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
-        return self.product_name
+        return self.description
 
 
 class CarData(models.Model):
@@ -107,6 +106,18 @@ class PasteError(TimeStamp):
     total = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
     def __str__(self):
-        return self.sku
+        return self.sku.description
+
+    def save(self, *args, **kwargs):
+        if self.sku:
+            self.description = self.sku.description
+        if self.sku and self.qty:
+            self.price = self.sku.unit_price * self.qty
+        if self.price:
+            if self.discount:
+                self.total = self.price - (self.price * self.discount / 100)
+            else:
+                self.total = self.price
+        super().save(*args, **kwargs)
 
 

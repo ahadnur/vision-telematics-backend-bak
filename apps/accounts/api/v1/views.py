@@ -8,14 +8,16 @@ from rest_framework.response import Response
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.views import APIView
 
 from apps.accounts.api.v1.serializers import (AccountWriteSerializer, UserWriteSerializer, ResetPasswordSerializer,
-                                              GetUserSerializer)
+                                              GetUserSerializer, AccountListSerializer)
 from .schemas.accounts_schema import (account_write_request_schema, account_response_schema, user_create_request_schema,
                                       reset_user_password_request_schema, get_user_response_schema)
 
 import logging
 
+from ...models import Account
 from ...services import UserService, AccountService
 
 logger = logging.getLogger(__name__)
@@ -164,3 +166,21 @@ def activate(request, uidb64, token):
         return HttpResponse('Thank you for your email confirmation. Your account is now activated.')
     else:
         return HttpResponse('Activation link is invalid!')
+
+
+class AccountListAPIView(generics.ListAPIView):
+    queryset = Account.objects.all()
+    serializer_class = AccountListSerializer
+
+    # permission_classes = (IsAuthenticated,)
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: openapi.Response(
+                description='List of companies with id and name',
+                schema=AccountListSerializer(many=True)
+            ),
+        }
+    )
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)

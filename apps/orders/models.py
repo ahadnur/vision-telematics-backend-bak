@@ -11,7 +11,9 @@ class Order(TimeStamp):
     current_route = models.TextField(blank=True, null=True)
     engineer = models.ForeignKey('engineers.Engineer', on_delete=models.SET_NULL, null=True, blank=True)
     created_by = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='user_order')
-    customer = models.ForeignKey('customers.Customer', related_name='order_customers', on_delete=models.SET_NULL, null=True, blank=True)
+    customer = models.ForeignKey('customers.Customer', related_name='order_customers', on_delete=models.SET_NULL,
+                                 null=True, blank=True)
+    product = models.ManyToManyField('products.Product', related_name='order_products', blank=True)
 
     def __str__(self):
         return f"order created for {self.customer.contact_name}"

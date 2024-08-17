@@ -8,4 +8,11 @@ admin.site.register(CarData)
 admin.site.register(Supplier)
 admin.site.register(StockSuppliedTo)
 admin.site.register(StockControlCode)
-admin.site.register(PasteError)
+
+
+class PasteErrorAdmin(admin.ModelAdmin):
+    exclude = ('description', 'price', 'total')
+    list_display = ('description', 'price', 'total')
+
+
+admin.site.register(PasteError, PasteErrorAdmin)

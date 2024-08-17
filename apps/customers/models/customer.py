@@ -1,16 +1,20 @@
 from django.db import models
 from apps.utilities.models import TimeStamp, VehicleType, VehicleModel, Company
+from django.utils.crypto import get_random_string
 
 
 class CustomerCompany(TimeStamp):
     company_name = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name_plural = "customer_companies"
 
     def __str__(self):
         return self.company_name
 
 
 class Customer(TimeStamp):
-    customer_ref_number = models.CharField(max_length=100)
+    customer_ref_number = models.CharField(max_length=100, unique=True)
     actinic_reference = models.CharField(max_length=100, blank=True, null=True)
     contact_name = models.CharField(max_length=100, blank=True, null=True)
     phone_numbers = models.CharField(max_length=100, blank=True, null=True)
@@ -106,9 +110,6 @@ class Customer(TimeStamp):
                                  on_delete=models.SET_NULL, null=True, blank=True)
     vehicle_type = models.ForeignKey('utilities.VehicleType', related_name='vehicle_types',
                                      on_delete=models.SET_NULL, blank=True, null=True)
-
-    class Meta:
-        verbose_name_plural = "Customers"
 
 
 class Credit(TimeStamp):

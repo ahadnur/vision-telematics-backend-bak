@@ -1,3 +1,9 @@
-app_name = 'accounts'
+from django.urls import path
+from .views import CompanyListAPIView
 
-urlpatterns = []
+app_name = 'customers'
+
+urlpatterns = [
+    path('company-list/', CompanyListAPIView.as_view(), name='customer-list'),
+    # path('get-company-to-cutomer-ref/')
+]
