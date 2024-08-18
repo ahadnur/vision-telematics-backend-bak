@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import (activate, CreateAccountAPIView, UpdateAccountAPIView, UserCreateAPIView, ResetUserPasswordAPIView,
-                    GetUserAPIView, AccountListAPIView)
+from apps.accounts.views import (activate, CreateAccountAPIView, UpdateAccountAPIView, UserCreateAPIView, ResetUserPasswordAPIView,
+                                 GetUserAPIView, AccountListAPIView)
 
 app_name = 'accounts'
 

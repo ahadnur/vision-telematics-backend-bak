@@ -8,17 +8,16 @@ from rest_framework.response import Response
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.views import APIView
 
-from apps.accounts.api.v1.serializers import (AccountWriteSerializer, UserWriteSerializer, ResetPasswordSerializer,
-                                              GetUserSerializer, AccountListSerializer)
-from .schemas.accounts_schema import (account_write_request_schema, account_response_schema, user_create_request_schema,
-                                      reset_user_password_request_schema, get_user_response_schema)
+from apps.accounts.serializers import (AccountWriteSerializer, UserWriteSerializer, ResetPasswordSerializer,
+                                       GetUserSerializer, AccountListSerializer)
+from apps.accounts.schemas.accounts_schema import (account_write_request_schema, account_response_schema, user_create_request_schema,
+                                                   reset_user_password_request_schema, get_user_response_schema)
 
 import logging
 
-from ...models import Account
-from ...services import UserService, AccountService
+from apps.accounts.models import Account
+from apps.accounts.services import UserService, AccountService
 
 logger = logging.getLogger(__name__)
 

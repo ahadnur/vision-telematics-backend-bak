@@ -1,6 +1,6 @@
 from django.test import TestCase
 from apps.accounts.models import UserRole, User
-from apps.accounts.api.v1.serializers import UserWriteSerializer
+from apps.accounts.serializers import UserWriteSerializer
 
 
 class UserTestCase(TestCase):
