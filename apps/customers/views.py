@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from apps.customers.models import CustomerCompany
-from apps.customers.api.v1.serializers import CompanyListSerializer
+from apps.customers.serializers import CompanyListSerializer
 
 
 class CompanyListAPIView(ListAPIView):
@@ -23,9 +23,3 @@ class CompanyListAPIView(ListAPIView):
     )
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
-
-
-class CreateOrderAPIView(views.APIView):
-
-    def post(self, request, *args, **kwargs):
-        pass

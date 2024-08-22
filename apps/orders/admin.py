@@ -1,6 +1,5 @@
 from django.contrib import admin
-from apps.orders.models import Order, KIF
-# Register your models here.
+from apps.orders.models import Order, OrderItem
 
-admin.site.register(KIF)
+admin.site.register(OrderItem)
 admin.site.register(Order)

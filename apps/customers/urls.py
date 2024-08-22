@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CompanyListAPIView
+from apps.customers.views import CompanyListAPIView
 
 app_name = 'customers'
 

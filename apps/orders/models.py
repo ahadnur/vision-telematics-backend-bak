@@ -19,27 +19,29 @@ class Order(TimeStamp):
         return f"order created for {self.customer.contact_name}"
 
 
-class KIF(models.Model):
-    """KIF means Kit Instalation Field. Imagine a scenario where a customer buys a toolkit for vehicle installation
-    from your store. The KIF table would be used to track details about this purchase and any subsequent returns or
-    credits."""
-
-    """KIF means Kit Instalation Field"""
-
-    order = models.ForeignKey('orders.Order', on_delete=models.SET_NULL, null=True, blank=True)
-    product = models.ForeignKey('products.Product', on_delete=models.SET_NULL, null=True, blank=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    qty = models.PositiveIntegerField()
+# KIF
+class OrderItem(models.Model):
+    order = models.ForeignKey('orders.Order', related_name='items', on_delete=models.CASCADE, null=True, blank=True)
+    product_sku = models.ForeignKey('products.Product', on_delete=models.CASCADE, blank=True, null=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    quantity = models.PositiveIntegerField(default=1)
     discount = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    credit_note = models.ForeignKey('customers.Credit', on_delete=models.CASCADE, null=True, blank=True)
-    # `returned` means kit back, so credit note should add why returned. otherwise `credit_note` will become null.
-    returned = models.BooleanField(default=False)
     description = models.TextField(null=True, blank=True)
+    returned = models.BooleanField(default=False)
+    credit_note = models.ForeignKey('customers.Credit', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return str(self.id)
+        return f"{self.quantity} x {self.product.name} for Order {self.order.order_ref_number}"
 
-    class Meta:
-        verbose_name_plural = "KIFs"
+    def total_price(self):
+        total = self.price * self.quantity
+        if self.discount:
+            total -= self.discount
+        return total
 
-
+    def save(self, *args, **kwargs):
+        # Ensure the quantity ordered doesn't exceed available SKU quantity
+        if self.quantity > self.product_sku.qty:
+            raise ValueError("Ordered quantity exceeds available stock.")
+        self.total_price = self.product_sku.unit_price * self.quantity
+        super().save(*args, **kwargs)
