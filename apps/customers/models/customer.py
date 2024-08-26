@@ -1,6 +1,5 @@
 from django.db import models
-from apps.utilities.models import TimeStamp, VehicleMake, VehicleType, VehicleModel, Company
-from django.utils.crypto import get_random_string
+from apps.utilities.models import TimeStamp, VehicleMake, VehicleType, VehicleModel
 
 
 class CustomerCompany(TimeStamp):
@@ -32,7 +31,7 @@ class Customer(TimeStamp):
 
 
 class CustomerAddress(models.Model):
-    customer = models.ForeignKey(Customer, related_name='addresses', on_delete=models.CASCADE)
+    customer = models.OneToOneField(Customer, on_delete=models.CASCADE)
     address_line_1 = models.CharField(max_length=255)
     address_line_2 = models.CharField(max_length=255, blank=True, null=True)
     address_line_3 = models.CharField(max_length=255, blank=True, null=True)
@@ -149,7 +148,7 @@ class CustomerMiscellaneous(models.Model):
     dispute_eng_reason = models.CharField(max_length=100, blank=True, null=True)
     dispute_by = models.ForeignKey('accounts.User', on_delete=models.SET_NULL, blank=True, null=True)
     back_order = models.BooleanField(default=False)
-    existing_kit = models.BooleanField(default=False)
+    existing_kit = models.CharField(max_length=255, null=True, blank=True)
     package = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
