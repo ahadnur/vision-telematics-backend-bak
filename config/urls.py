@@ -39,6 +39,8 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/account/', include('apps.accounts.urls')),
     path('api/customers/', include('apps.customers.urls')),
+    # path('api/products/', include('apps.products.urls')),
+    path('api/orders/', include('apps.orders.urls')),
 ]
 
 if settings.DEBUG and swagger_url_patterns:

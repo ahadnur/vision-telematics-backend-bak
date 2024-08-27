@@ -2,8 +2,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
-from rest_framework import status, views
-from rest_framework import generics
+from rest_framework import status, views, generics
 from rest_framework.response import Response
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema

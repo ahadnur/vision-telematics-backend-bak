@@ -86,25 +86,6 @@ class Package(models.Model):
         return self.package_type
 
 
-class CarData(models.Model):
-    marque = models.CharField(max_length=100, blank=True, null=True)
-    range = models.CharField(max_length=100, blank=True, null=True)
-    from_year = models.IntegerField(blank=True, null=True)
-    to_year = models.IntegerField(blank=True, null=True)
-    spec_notes = models.TextField(blank=True, null=True)
-    telemute = models.BooleanField(default=False)
-    kram = models.BooleanField(default=False)
-    mounting_notes = models.TextField(blank=True, null=True)
-    mute_pin = models.CharField(max_length=100, blank=True, null=True)
-    vehicle_notes = models.TextField(blank=True, null=True)
-
-    class Meta:
-        verbose_name_plural = 'CarData'
-
-    def __str__(self):
-        return f"{self.marque} - {self.range}"
-
-
 # PastError
 class ProductSKU(TimeStamp):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True)
@@ -124,6 +105,25 @@ class ProductSKU(TimeStamp):
         if self.unit_price is not None and self.qty is not None:
             self.total = self.unit_price * self.qty
         else:
-            self.total = None  # Set total to None if unit_price or qty is missing
+            self.total = None
         super(ProductSKU, self).save(*args, **kwargs)
+
+
+class CarData(models.Model):
+    marque = models.CharField(max_length=100, blank=True, null=True)
+    range = models.CharField(max_length=100, blank=True, null=True)
+    from_year = models.IntegerField(blank=True, null=True)
+    to_year = models.IntegerField(blank=True, null=True)
+    spec_notes = models.TextField(blank=True, null=True)
+    telemute = models.BooleanField(default=False)
+    kram = models.BooleanField(default=False)
+    mounting_notes = models.TextField(blank=True, null=True)
+    mute_pin = models.CharField(max_length=100, blank=True, null=True)
+    vehicle_notes = models.TextField(blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = 'CarData'
+
+    def __str__(self):
+        return f"{self.marque} - {self.range}"
 

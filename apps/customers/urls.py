@@ -8,5 +8,5 @@ urlpatterns = [
     path('company-list/', CompanyListAPIView.as_view(), name='customer-list'),
     path('create-customer/', CreateCustomerAPIView.as_view(), name='customer-create'),
     path('create-vehicle-info/', CreateCustomerVehicleAPIView.as_view(), name='customer-vehicle-create'),
-    path('get-vehicle-info/<type:str>/', GetVehicleInfoAPIView.as_view(), name='customer-get-vehicle-info'),
+    path('get-vehicle-info/', GetVehicleInfoAPIView.as_view(), name='customer-get-vehicle-info'),
 ]

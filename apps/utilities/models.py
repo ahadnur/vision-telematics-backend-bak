@@ -38,17 +38,25 @@ class Company(TimeStamp):
 
 
 class VehicleType(TimeStamp):
-    vehicle_type = models.CharField(max_length=100)
+    vehicle_type = models.CharField(max_length=100, unique=True, null=True, blank=True)
 
     def __str__(self):
         return self.vehicle_type
 
 
-class VehicleModel(TimeStamp):
-    model_name = models.CharField(max_length=100)
+class VehicleMake(TimeStamp):
+    vehicle_make = models.CharField(max_length=50, unique=True, null=True, blank=True)
 
     def __str__(self):
-        return self.model_name
+        return self.vehicle_make
+
+
+class VehicleModel(TimeStamp):
+    vehicle_model = models.CharField(max_length=50, unique=True, null=True, blank=True)
+    vehicle_make = models.ForeignKey(VehicleMake, on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return self.vehicle_model
 
 
 class PhoneModel(TimeStamp):
@@ -70,7 +78,3 @@ class OrderType(TimeStamp):
 
     def __str__(self):
         return self.install_type
-
-
-
-

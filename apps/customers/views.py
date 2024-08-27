@@ -70,7 +70,7 @@ class GetVehicleInfoAPIView(views.APIView):
             )
         }
     )
-    def get(self, request, _type):
+    def get(self, request):
         try:
 
             vehicle_make = VehicleMake.objects.values_list('id', 'vehicle_make')

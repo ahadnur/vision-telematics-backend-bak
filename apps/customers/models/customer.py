@@ -44,7 +44,7 @@ class CustomerAddress(models.Model):
         return f"{self.customer.contact_name} - {self.address_type}"
 
 
-class CustomerVehicle(models.Model):
+class CustomerVehicleInfo(models.Model):
     customer = models.ForeignKey(Customer, related_name='vehicles', on_delete=models.CASCADE)
     registration_number = models.CharField(max_length=20)
     vehicle_make = models.ForeignKey(VehicleMake, on_delete=models.SET_NULL, null=True, blank=True)
