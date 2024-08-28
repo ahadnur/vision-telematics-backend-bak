@@ -3,7 +3,11 @@ from .models import (Customer, Invoice, InvoiceServiceLog, CustomerCompany, Cust
                      CustomerAddress)
 
 
-admin.site.register(Customer)
+@admin.register(Customer)
+class CustomerAdmin(admin.ModelAdmin):
+    list_display = ['customer_ref_number', 'id']
+
+
 admin.site.register(Invoice)
 admin.site.register(InvoiceServiceLog)
 admin.site.register(CustomerCompany)

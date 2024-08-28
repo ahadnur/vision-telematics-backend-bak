@@ -167,7 +167,7 @@ REST_FRAMEWORK = {
 
 # Example JWT settings
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=50),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -197,19 +197,6 @@ SWAGGER_SETTINGS = {
     'DEFAULT_PERMISSION_CLASSES': [
         AllowAny,
     ],
-    'api_key': {
-        'type': 'apiKey',
-        'in': 'header',
-        'name': 'Authorization'
-    },
-    'SECURITY_DEFINITIONS': {
-        'Bearer': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header',
-            'description': 'JWT Bearer token authentication'
-        }
-    },
     'SECURITY': [
         {
             'Bearer': []

@@ -3,10 +3,21 @@ from .models import (PhoneModel, VehicleModel, VehicleMake, VehicleType, OrderTy
                      WarrantyCallType, SpeedUp, Company)
 
 
-admin.site.register(PhoneModel)
-admin.site.register(VehicleModel)
-admin.site.register(VehicleType)
-admin.site.register(VehicleMake)
+@admin.register(VehicleMake)
+class VehicleMakeAdmin(admin.ModelAdmin):
+    list_display = ['vehicle_make', 'id']
+
+
+@admin.register(VehicleType)
+class VehicleTypeAdmin(admin.ModelAdmin):
+    list_display = ['vehicle_type', 'id']
+
+
+@admin.register(VehicleModel)
+class VehicleModelAdmin(admin.ModelAdmin):
+    list_display = ['vehicle_model', 'id']
+
+
 admin.site.register(OrderType)
 admin.site.register(PhoneManufacturer)
 admin.site.register(CarManufacturer)

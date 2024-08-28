@@ -12,15 +12,7 @@ logger = logging.getLogger(__name__)
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
-        fields = ['product_sku', 'quantity', 'total_price']
-
-    def validate_quantity(self, value):
-        # Validate that the ordered quantity doesn't exceed the SKU quantity
-        sku = self.instance.product_sku if self.instance else self.initial_data['product_sku']
-        product_sku = ProductSKU.objects.get(pk=sku)
-        if value > product_sku.qty:
-            raise serializers.ValidationError("Ordered quantity exceeds available stock.")
-        return value
+        fields = ['product_sku', 'quantity']
 
 
 class CreateOrderSerializer(serializers.ModelSerializer):
@@ -30,29 +22,35 @@ class CreateOrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['created_at', 'items', 'customer_order_options', 'customer_vehicle_info']
+        fields = ['customer', 'items', 'customer_order_options', 'customer_vehicle_info', 'created_by']
 
     def create(self, validated_data):
         customer_order_data = validated_data.pop('customer_order_options')
         customer_vehicle_data = validated_data.pop('customer_vehicle_info')
         items_data = validated_data.pop('items')
+
         try:
             with transaction.atomic():
-                customer_options = CustomerInstallation.objects.create(
-                    CustomerOrderOptionsSerializer(),
-                    validated_data=customer_order_data,
+                customer_options = CustomerInstallation.objects.create(**customer_order_data)
+                customer_vehicle_info = CustomerVehicleInfo.objects.create(**customer_vehicle_data)
+                order = Order.objects.create(
+                    customer=validated_data.get('customer'),
+                    created_by=validated_data.get('created_by')  # Assuming `created_by` is provided
                 )
-                customer_vehicle_info = CustomerVehicleInfo.objects.create(
-                    CustomerVehicleInfoSerializer(),
-                    customer_vehicle_data=customer_vehicle_data,
-                )
-                order = Order.objects.create(**validated_data)
                 for item_data in items_data:
-                    OrderItem.objects.create(order=order, **item_data)
-
+                    product_sku = item_data.get('product_sku')
+                    quantity = item_data.get('quantity')
+                    product_sku = ProductSKU.objects.get(id=product_sku.id)
+                    OrderItem.objects.create(
+                        order=order,
+                        product_sku=product_sku,
+                        quantity=quantity,
+                        price=product_sku.unit_price
+                    )
                 return {
                     'customer_order_option': customer_options,
                     'customer_vehicle_info': customer_vehicle_info,
+                    'order': order
                 }
         except Exception as e:
             logger.error(str(e), exc_info=True)

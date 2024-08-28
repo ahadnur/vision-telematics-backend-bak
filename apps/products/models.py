@@ -89,6 +89,7 @@ class Package(models.Model):
 # PastError
 class ProductSKU(TimeStamp):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True)
+    sku_code = models.CharField(max_length=100, unique=True, null=True, blank=True)
     description = models.TextField(blank=True, null=True)
     unit_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     qty = models.IntegerField(blank=True, null=True)

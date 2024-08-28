@@ -22,7 +22,10 @@ class OrderCreateAPIView(views.APIView):
     )
     def post(self, request):
         data = request.data
+        data['created_by'] = request.user.id
         serializer = CreateOrderSerializer(data=data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
-        return Response("Account created successfully", status.HTTP_201_CREATED)
+        return Response(data={
+            'data': serializer.data,
+        }, status=status.HTTP_201_CREATED)

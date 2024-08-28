@@ -27,7 +27,7 @@ order_request_schema = openapi.Schema(
             items=openapi.Schema(
                 type=openapi.TYPE_OBJECT,  # Each item in the array is an object
                 properties={
-                    'product_sku': openapi.Schema(
+                    'product': openapi.Schema(
                         type=openapi.TYPE_INTEGER,
                         description="The ID of the product SKU"
                     ),
@@ -38,9 +38,13 @@ order_request_schema = openapi.Schema(
                 },
             ),
         ),
-        # 'customer': openapi.Schema(
-        #
-        # )
+        'customer': openapi.Schema(
+            type=openapi.TYPE_INTEGER,
+            description="The ID of the customer SKU"
+        ),
+        'created_by': openapi.Schema(
+            type=openapi.TYPE_INTEGER,
+        )
     },
 )
 
