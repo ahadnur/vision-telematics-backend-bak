@@ -10,8 +10,9 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from apps.accounts.serializers import (AccountWriteSerializer, UserWriteSerializer, ResetPasswordSerializer,
                                        GetUserSerializer, AccountListSerializer)
-from apps.accounts.schemas.accounts_schema import (account_write_request_schema, account_response_schema, user_create_request_schema,
-                                                   reset_user_password_request_schema, get_user_response_schema)
+from apps.accounts.schemas.accounts_schema import (account_write_request_schema, account_response_schema,
+                                                   user_create_request_schema, reset_user_password_request_schema,
+                                                   get_user_response_schema)
 
 import logging
 

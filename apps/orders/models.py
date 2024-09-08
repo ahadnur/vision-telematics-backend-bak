@@ -39,8 +39,34 @@ class OrderItem(models.Model):
         return total
 
     def save(self, *args, **kwargs):
-        # Ensure the quantity ordered doesn't exceed available SKU quantity
         if self.quantity > self.product_sku.qty:
             raise ValueError("Ordered quantity exceeds available stock.")
         self.total_price = self.product_sku.unit_price * self.quantity
         super().save(*args, **kwargs)
+
+
+class Booking(models.Model):
+    order = models.OneToOneField(Order, on_delete=models.CASCADE)  # Links the booking to a specific order
+    engineer = models.ForeignKey('engineers.Engineer', on_delete=models.CASCADE)  # Assigned engineer for the booking
+    booking_date = models.DateField()
+    booking_time = models.TimeField()
+    duration = models.DurationField()
+    is_pending = models.BooleanField(default=True)
+    booking_status = models.CharField(
+        max_length=20,
+        choices=[
+            ('scheduled', 'Scheduled'),
+            ('in_progress', 'In Progress'),
+            ('completed', 'Completed'),
+            ('cancelled', 'Cancelled')
+        ],
+        default='scheduled'
+    )
+    remarks = models.TextField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ('engineer', 'booking_date', 'booking_time')
+
+    def __str__(self):
+        return f"Booking for {self.order.customer.customer_name} on {self.booking_date} at {self.booking_time}"
+

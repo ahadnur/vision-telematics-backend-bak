@@ -41,6 +41,11 @@ class POSupplierRef(models.Model):
 class InstallType(models.Model):
     install_type = models.CharField(max_length=100, blank=True, null=True)
 
+    class Meta:
+        db_table = 'install_type'
+        verbose_name_plural = 'Installation Types'
+        managed = True
+
     def __str__(self):
         return self.install_type
 
