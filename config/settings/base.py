@@ -29,6 +29,7 @@ DJANGO_DEFAULT_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
     'drf_yasg',
@@ -51,6 +52,7 @@ PROJECT_APPS = [
 INSTALLED_APPS = DJANGO_DEFAULT_APPS + THIRD_PARTY_APPS + PROJECT_APPS
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -233,3 +235,28 @@ JAZZMIN_SETTINGS = {
     # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
     "site_brand": "Vision Telematics",
 }
+
+
+CORS_ALLOWED_ORIGINS = [
+    "https://example.com",
+    "http://localhost:3000",  # If your frontend is running on localhost
+    "http://127.0.0.1:8000",  # Django dev server
+]
+
+# Optional settings
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "PUT",
+    "DELETE",
+    "OPTIONS"
+]
+
+CORS_ALLOW_HEADERS = [
+    'authorization',
+    'content-type',
+    'x-csrftoken',
+    'accept',
+]
+
+CORS_ALLOW_CREDENTIALS = True
