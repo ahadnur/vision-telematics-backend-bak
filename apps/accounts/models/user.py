@@ -3,7 +3,7 @@ from datetime import timedelta, timezone
 import jwt
 from django.db import models, transaction
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from setuptools.extern import names
+from django.db.models import Q
 
 from apps.utilities.models import TimeStamp
 
@@ -46,7 +46,7 @@ class UserManager(BaseUserManager):
         user.is_superuser = True
         user.is_staff = True
         user.is_active = True
-        user.user_type = UserRole.objects.filter(name='admin').first()
+        user.user_type = UserRole.objects.filter(name__iexact='admin').first()
         user.set_password(password)
         user.save()
         return user
