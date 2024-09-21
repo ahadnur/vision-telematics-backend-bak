@@ -6,10 +6,10 @@ from rest_framework import status, views, generics
 from rest_framework.response import Response
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 
 from apps.accounts.serializers import (AccountWriteSerializer, UserWriteSerializer, ResetPasswordSerializer,
-                                       GetUserSerializer, AccountListSerializer)
+                                       GetUserSerializer, AccountListSerializer, AuthenticationSerializer)
 from apps.accounts.schemas.accounts_schema import (account_write_request_schema, account_response_schema,
                                                    user_create_request_schema, reset_user_password_request_schema,
                                                    get_user_response_schema)
@@ -18,6 +18,7 @@ import logging
 
 from apps.accounts.models import Account
 from apps.accounts.services import UserService, AccountService
+from config.authentication import JWTAuthentication
 
 logger = logging.getLogger(__name__)
 
@@ -25,11 +26,12 @@ User = get_user_model()
 
 
 class UserCreateAPIView(views.APIView):
-    permission_classes = (IsAuthenticated,)
+    authentication_classes = (JWTAuthentication,)
+    permission_classes = (IsAuthenticated, IsAdminUser)
     serializer_class = UserWriteSerializer
 
     @swagger_auto_schema(
-        request_body=user_create_request_schema,
+        request_body=UserWriteSerializer,
         responses={
             status.HTTP_201_CREATED: openapi.Response(
                 description='Account created successfully',
@@ -44,7 +46,7 @@ class UserCreateAPIView(views.APIView):
             serializer.is_valid(raise_exception=True)
             user = serializer.save()
             return Response({
-                'message': 'Account     created successfully',
+                'message': 'Account created successfully',
                 'user_id': user.id,
             }, status=status.HTTP_201_CREATED)
         except Exception as e:
@@ -52,6 +54,25 @@ class UserCreateAPIView(views.APIView):
             return Response({
                 'message': str(e),
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LoginAPIView(views.APIView):
+    permission_classes = (AllowAny,)
+    serializer_class = AuthenticationSerializer
+
+    @swagger_auto_schema(
+        request_body=AuthenticationSerializer,
+        responses={
+            status.HTTP_201_CREATED: openapi.Response(
+                description='Account created successfully',
+                # schema=account_response_schema
+            ),
+        }
+    )
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class GetUserAPIView(views.APIView):
@@ -138,7 +159,8 @@ class UpdateAccountAPIView(views.APIView):
     def put(self, request, _id):
         try:
             account = AccountService.get_account(_id)
-            serializer = AccountWriteSerializer(account, data=request.data, partial=True)  # `partial=True` allows partial updates
+            serializer = AccountWriteSerializer(account, data=request.data,
+                                                partial=True)  # `partial=True` allows partial updates
             if serializer.is_valid():
                 updated_account = serializer.save()
                 response_serializer = AccountWriteSerializer(updated_account)
@@ -168,10 +190,11 @@ def activate(request, uidb64, token):
 
 
 class AccountListAPIView(generics.ListAPIView):
+    authentication_classes = [JWTAuthentication,]
+    permission_classes = [IsAuthenticated]
+
     queryset = Account.objects.all()
     serializer_class = AccountListSerializer
-
-    # permission_classes = (IsAuthenticated,)
 
     @swagger_auto_schema(
         responses={

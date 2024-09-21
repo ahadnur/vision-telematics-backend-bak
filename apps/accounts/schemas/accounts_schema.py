@@ -44,8 +44,7 @@ user_create_request_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
         **user_base_schema,
-        'password1': openapi.Schema(type=openapi.TYPE_STRING,),
-        'password2': openapi.Schema(type=openapi.TYPE_STRING),
+        'password': openapi.Schema(type=openapi.TYPE_STRING,)
     }
 )
 
@@ -53,8 +52,7 @@ reset_user_password_request_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
         'email': openapi.Schema(type=openapi.TYPE_STRING),
-        'password1': openapi.Schema(type=openapi.TYPE_STRING),
-        'password2': openapi.Schema(type=openapi.TYPE_STRING),
+        'password': openapi.Schema(type=openapi.TYPE_STRING),
     }
 )
 
