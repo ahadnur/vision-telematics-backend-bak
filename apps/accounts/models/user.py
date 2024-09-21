@@ -1,7 +1,8 @@
-from datetime import timedelta, timezone
+from datetime import timedelta
 
 import jwt
 from django.db import models, transaction
+from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db.models import Q
 
