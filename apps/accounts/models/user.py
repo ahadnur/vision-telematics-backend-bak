@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta, timezone
 
 import jwt
 from django.db import models, transaction
@@ -32,7 +32,7 @@ class UserManager(BaseUserManager):
             )
         return user
 
-    def create_superuser(self, email: str, password: str, user_type: str):
+    def create_superuser(self, email: str, password: str):
         """
         Create superuser method
         """
@@ -45,7 +45,7 @@ class UserManager(BaseUserManager):
         user.is_superuser = True
         user.is_staff = True
         user.is_active = True
-        user.user_type = user_type
+        user.user_type = 1
         user.set_password(password)
         user.save()
         return user
@@ -83,13 +83,13 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStamp):
         return self._generate_jwt_token(secret_key=secret_key)
 
     def _generate_jwt_token(self, secret_key):
-        iat_dt = datetime.utcnow()
+        iat_dt = timezone.now()  # Use Django's timezone-aware now
         exp_dt = iat_dt + timedelta(days=1)
         token = jwt.encode({
             'user_id': self.id,
             'user_type': self.user_type_id,
-            'exp': int(exp_dt.timestamp()),
-            'iat': int(iat_dt.timestamp()),
+            'exp': exp_dt.timestamp(),  # `timestamp()` can be called directly
+            'iat': iat_dt.timestamp(),
         }, secret_key, algorithm='HS256')
         return token
 
