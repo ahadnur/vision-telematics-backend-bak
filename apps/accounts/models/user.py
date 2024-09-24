@@ -4,7 +4,6 @@ import jwt
 from django.db import models, transaction
 from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from django.db.models import Q
 
 from apps.utilities.models import TimeStamp
 
@@ -13,13 +12,13 @@ class UserManager(BaseUserManager):
     def create_user(self, **kwargs):
         if not kwargs.get('email', None):
             raise ValueError('Email must be specified!')
-        if not kwargs.get('user_type_id', None):
+        if not kwargs.get('user_type', None):
             raise ValueError('User type must be specified!')
 
         with transaction.atomic():
             user = self.model(
                 email=self.normalize_email(kwargs['email']),
-                user_type_id=kwargs['user_type_id'],
+                user_type=kwargs['user_type'],
             )
             user.set_password(kwargs['password'])
             user.is_active = True
@@ -85,12 +84,12 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStamp):
         return self._generate_jwt_token(secret_key=secret_key)
 
     def _generate_jwt_token(self, secret_key):
-        iat_dt = timezone.now()  # Use Django's timezone-aware now
+        iat_dt = timezone.now()
         exp_dt = iat_dt + timedelta(days=1)
         token = jwt.encode({
             'user_id': self.id,
             'user_type': self.user_type_id,
-            'exp': exp_dt.timestamp(),  # `timestamp()` can be called directly
+            'exp': exp_dt.timestamp(),
             'iat': iat_dt.timestamp(),
         }, secret_key, algorithm='HS256')
         return token

@@ -1,3 +1,5 @@
+import logging
+
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
 from django.contrib.auth import get_user_model
@@ -14,7 +16,6 @@ from apps.accounts.schemas.accounts_schema import (account_write_request_schema,
                                                    user_create_request_schema, reset_user_password_request_schema,
                                                    get_user_response_schema)
 
-import logging
 
 from apps.accounts.models import Account
 from apps.accounts.services import UserService, AccountService

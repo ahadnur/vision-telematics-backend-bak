@@ -38,15 +38,15 @@ THIRD_PARTY_APPS = [
 
 
 PROJECT_APPS = [
-    'apps.settings',
-    'apps.utilities',
-    'apps.accounts',
-    'apps.customers',
-    'apps.orders',
-    'apps.engineers',
-    'apps.dispatch',
-    'apps.products',
-    'apps.services',
+    'apps.settings.apps.SettingsConfig',
+    'apps.utilities.apps.UtilitiesConfig',
+    'apps.accounts.apps.AccountsConfig',
+    'apps.customers.apps.CustomersConfig',
+    'apps.orders.apps.OrdersConfig',
+    'apps.engineers.apps.EngineersConfig',
+    'apps.dispatch.apps.DispatchConfig',
+    'apps.products.apps.ProductsConfig',
+    'apps.services.apps.ServicesConfig',
     # 'apps.stock',
 ]
 

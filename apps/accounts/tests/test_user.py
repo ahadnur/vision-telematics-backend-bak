@@ -5,37 +5,44 @@ from apps.accounts.serializers import UserWriteSerializer
 
 class UserTestCase(TestCase):
     def setUp(self):
-        self.role1 = UserRole.objects.create(name='admin')
-        self.role2 = UserRole.objects.create(name='user')
+        self.user_type_admin = UserRole.objects.create(name='admin')
+        self.user_type_user = UserRole.objects.create(name='user')
 
         self.valid_data = {
             'email': 'test@example.com',
-            'password1': 'securepassword',
-            'password2': 'securepassword',
-            'role': [self.role1.id, self.role2.id],
+            'password': 'securepassword',
+            'user_type': self.user_type_admin.id,
+            'first_name': 'Mr',
+            'last_name': 'Name'
         }
 
         self.invalid_data = {
             'email': 'test@example.com',
-            'password1': 'securepassword',
-            'password2': 'securepassword2',
-            'role': [self.role1.id, self.role2.id],
+            # 'password': 'short',
+            'user_type': self.user_type_admin,
+            'first_name': 'Mr',
+            'last_name': 'Name'
         }
 
         self.existing_user = User.objects.create_user(
             email='existing@example.com',
             password='securepassword',
+            user_type=self.user_type_admin,
+            first_name='Mr',
+            last_name='Nas'
         )
 
+    def test_user_unique_email(self):
+        pass
     def test_user_serializer_valid_data(self):
         serializer = UserWriteSerializer(data=self.valid_data)
-        self.assertTrue(serializer.is_valid())
+        self.assertTrue(serializer.is_valid(), msg=f"Errors: {serializer.errors}")
         user = serializer.save()
         self.assertEqual(user.email, self.valid_data['email'])
-        self.assertEqual(user.check_password(self.valid_data['password1']))
-        self.assertEqual(list(user.roles.values_list('id', flat=True)), [self.role1.id, self.role2.id])
+        self.assertTrue(user.check_password(self.valid_data['password']))
+        self.assertEqual(user.user_type.id, self.valid_data['user_type'])
 
     def test_user_serializer_invalid_password(self):
         serializer = UserWriteSerializer(data=self.invalid_data)
         self.assertFalse(serializer.is_valid())
-        self.assertIn('no_fields_error', serializer.errors)
+        self.assertIn('password', serializer.errors)

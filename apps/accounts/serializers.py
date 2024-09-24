@@ -12,7 +12,7 @@ class UserWriteSerializer(serializers.Serializer):
     last_name = serializers.CharField(write_only=True)
     email = serializers.EmailField(write_only=True)
     password = serializers.CharField(write_only=True)
-    user_type = serializers.IntegerField()
+    user_type = serializers.PrimaryKeyRelatedField(queryset=UserRole.objects.all())
 
     def validate(self, data):
         if User.objects.filter(email=data['email']).exists():
@@ -20,13 +20,10 @@ class UserWriteSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
-        email = validated_data['email']
-        user_type = validated_data['user_type']
-        password = validated_data.pop('password')
         user = User.objects.create_user(
-            email=email,
-            password=password,
-            user_type_id=user_type,
+            email=validated_data['email'],
+            password=validated_data['password'],
+            user_type=validated_data['user_type'],
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
         )
