@@ -13,12 +13,10 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from apps.accounts.serializers import (AccountWriteSerializer, UserWriteSerializer, ResetPasswordSerializer,
                                        GetUserSerializer, AccountListSerializer, AuthenticationSerializer)
 from apps.accounts.schemas.accounts_schema import (account_write_request_schema, account_response_schema,
-                                                   user_create_request_schema, reset_user_password_request_schema,
-                                                   get_user_response_schema)
-
+                                                   reset_user_password_request_schema, get_user_response_schema)
 
 from apps.accounts.models import Account
-from apps.accounts.services import UserService, AccountService
+from apps.accounts.services import get_user, get_general_user_list, AccountService
 from config.authentication import JWTAuthentication
 
 logger = logging.getLogger(__name__)
@@ -35,7 +33,7 @@ class UserCreateAPIView(views.APIView):
         request_body=UserWriteSerializer,
         responses={
             status.HTTP_201_CREATED: openapi.Response(
-                description='Account created successfully',
+                description='User created successfully',
                 schema=account_response_schema
             ),
         }
@@ -76,13 +74,36 @@ class LoginAPIView(views.APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+class UserListAPIView(views.APIView):
+
+    authentication_classes = (JWTAuthentication,)
+    permission_classes = (IsAuthenticated, IsAdminUser)
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: openapi.Response(
+                description='Account created successfully',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'users': GetUserSerializer(many=True).data
+                    },
+                ),
+            ),
+        }
+    )
+    def get(self, request):
+        user_list = get_general_user_list()
+        serializer = GetUserSerializer(user_list, many=True)
+        return Response({
+            'users': serializer.data,
+        }, status=status.HTTP_200_OK)
+
+
 class GetUserAPIView(views.APIView):
+    authentication_classes = (JWTAuthentication,)
     permission_classes = (IsAuthenticated,)
     serializer_class = GetUserSerializer
-
-    def __init__(self):
-        super().__init__()
-        self.user_service = UserService()
 
     @swagger_auto_schema(
         responses={
@@ -93,8 +114,8 @@ class GetUserAPIView(views.APIView):
         }
     )
     def get(self, request, _id):
-        get_user = self.user_service.get_user(_id)
-        serializer = self.serializer_class(get_user)
+        user = get_user(_id)
+        serializer = self.serializer_class(user)
         return Response({
             'user': serializer.data,
         }, status=status.HTTP_200_OK)
@@ -191,7 +212,7 @@ def activate(request, uidb64, token):
 
 
 class AccountListAPIView(generics.ListAPIView):
-    authentication_classes = [JWTAuthentication,]
+    authentication_classes = [JWTAuthentication, ]
     permission_classes = [IsAuthenticated]
 
     queryset = Account.objects.all()

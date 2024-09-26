@@ -14,14 +14,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class UserService:
+def get_user(_id):
+    return User.objects.filter(id=_id).first()
 
-    def __init__(self, email_service=None):
-        self.user = User
-        self.email_service = email_service
 
-    def get_user(self, _id):
-        return self.user.objects.filter(id=_id).first()
+def get_general_user_list():
+    return User.objects.filter(user_type_id=2)
 
 
 class AccountService:
@@ -63,4 +61,3 @@ class EmailVerificationService:
             fail_silently=False
         )
         logger.info(f'Email verification sent to {user.email}')
-

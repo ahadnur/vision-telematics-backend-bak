@@ -71,9 +71,18 @@ class ResetPasswordSerializer(serializers.Serializer):
 
 
 class GetUserSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(source='profile.first_name', default='', read_only=True)
+    last_name = serializers.CharField(source='profile.last_name', default='', read_only=True)
+
     class Meta:
         model = User
-        fields = ('id', 'email', 'role')
+        fields = [
+            'id',
+            'first_name',
+            'last_name',
+            'email',
+            'user_type'
+        ]
 
 
 class AccountWriteSerializer(serializers.ModelSerializer):

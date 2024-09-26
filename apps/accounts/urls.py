@@ -1,12 +1,14 @@
 from django.urls import path
-from apps.accounts.views import (activate, CreateAccountAPIView, UpdateAccountAPIView, UserCreateAPIView, ResetUserPasswordAPIView,
-                                 GetUserAPIView, AccountListAPIView, LoginAPIView)
+from apps.accounts.views import (activate, CreateAccountAPIView, UpdateAccountAPIView, UserCreateAPIView,
+                                 ResetUserPasswordAPIView, GetUserAPIView, AccountListAPIView, LoginAPIView,
+                                 UserListAPIView)
 
 app_name = 'accounts'
 
 urlpatterns = [
     path('activate/<uid64>/<token>/', activate, name='activate'),
 ]+[
+    path('user_list/', UserListAPIView.as_view(), name='user_list'),
     path('user/<_id>/', GetUserAPIView.as_view(), name='user'),
     path('user-create/', UserCreateAPIView.as_view(), name='user_create'),
     path('login/', LoginAPIView.as_view(), name='user_login'),
