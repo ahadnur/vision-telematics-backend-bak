@@ -1,57 +1,60 @@
 from django.db import models
 
 
-class TimeStamp(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+class BaseModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    created_by = models.IntegerField(null=True, blank=True)
+    updated_by = models.IntegerField(null=True, blank=True)
 
     class Meta:
         abstract = True
 
 
-class SpeedUp(TimeStamp):
+class SpeedUp(BaseModel):
     speedup = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return self.speedup
 
 
-class CarManufacturer(TimeStamp):
+class CarManufacturer(BaseModel):
     car_manufacturer = models.CharField(max_length=100)
 
     def __str__(self):
         return self.car_manufacturer
 
 
-class PhoneManufacturer(TimeStamp):
+class PhoneManufacturer(BaseModel):
     manufacturer = models.CharField(max_length=100)
 
     def __str__(self):
         return self.manufacturer
 
 
-class Company(TimeStamp):
+class Company(BaseModel):
     company_name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.company_name
 
 
-class VehicleType(TimeStamp):
+class VehicleType(BaseModel):
     vehicle_type = models.CharField(max_length=100, unique=True, null=True, blank=True)
 
     def __str__(self):
         return self.vehicle_type
 
 
-class VehicleMake(TimeStamp):
+class VehicleMake(BaseModel):
     vehicle_make = models.CharField(max_length=50, unique=True, null=True, blank=True)
 
     def __str__(self):
         return self.vehicle_make
 
 
-class VehicleModel(TimeStamp):
+class VehicleModel(BaseModel):
     vehicle_model = models.CharField(max_length=50, unique=True, null=True, blank=True)
     vehicle_make = models.ForeignKey(VehicleMake, on_delete=models.CASCADE, null=True, blank=True)
 
@@ -59,7 +62,7 @@ class VehicleModel(TimeStamp):
         return self.vehicle_model
 
 
-class PhoneModel(TimeStamp):
+class PhoneModel(BaseModel):
     model_name = models.CharField(max_length=100)
 
     def __str__(self):
@@ -73,7 +76,7 @@ class WarrantyCallType(models.Model):
         return self.warranty_call_type
 
 
-class OrderType(TimeStamp):
+class OrderType(BaseModel):
     install_type = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):

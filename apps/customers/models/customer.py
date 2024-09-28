@@ -1,8 +1,8 @@
 from django.db import models
-from apps.utilities.models import TimeStamp, VehicleMake, VehicleType, VehicleModel
+from apps.utilities.models import BaseModel, VehicleMake, VehicleType, VehicleModel
 
 
-class CustomerCompany(TimeStamp):
+class CustomerCompany(BaseModel):
     company_name = models.CharField(max_length=100)
 
     class Meta:
@@ -12,7 +12,7 @@ class CustomerCompany(TimeStamp):
         return self.company_name
 
 
-class Customer(TimeStamp):
+class Customer(BaseModel):
     customer_ref_number = models.CharField(max_length=100, unique=True)
     actinic_reference = models.CharField(max_length=100, blank=True, null=True)
     contact_name = models.CharField(max_length=100, blank=True, null=True)
@@ -155,7 +155,7 @@ class CustomerMiscellaneous(models.Model):
         return f"Miscellaneous for {self.customer.contact_name}"
 
 
-class Credit(TimeStamp):
+class Credit(BaseModel):
     name = models.CharField(max_length=255, blank=True, null=True)
     date = models.DateField(blank=True, null=True)
     original_invoice = models.ForeignKey('Invoice', on_delete=models.CASCADE, null=True, blank=True)

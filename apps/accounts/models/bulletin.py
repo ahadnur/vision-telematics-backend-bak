@@ -1,8 +1,8 @@
 from django.db import models
-from apps.utilities.models import TimeStamp
+from apps.utilities.models import BaseModel
 
 
-class Bulletin(TimeStamp):
+class Bulletin(BaseModel):
     created_by = models.ForeignKey('User', on_delete=models.SET_NULL, null=True)
     date = models.DateField(blank=True, null=True)
     published = models.BooleanField(default=False)

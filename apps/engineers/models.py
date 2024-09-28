@@ -1,9 +1,9 @@
 from django.db import models
 
-from apps.utilities.models import TimeStamp
+from apps.utilities.models import BaseModel
 
 
-class EngineerCompany(TimeStamp):
+class EngineerCompany(BaseModel):
     name = models.CharField(max_length=100)
 
     class Meta:
@@ -36,10 +36,6 @@ class Engineer(models.Model):
     is_deleted = models.BooleanField(default=False)
 
     # service and pricing
-
-    # out_of_hours = models.BooleanField(default=False)
-    # insurance_expires = models.DateField(null=True, blank=True)
-    # insurance_docs_received = models.BooleanField(default=False)
     comments = models.TextField(null=True, blank=True)
     current_sla = models.CharField(max_length=255, null=True, blank=True)
     performance_rating = models.CharField(max_length=2, choices=[('1', 1), ('2', 2), ('3', 3), ('4', 4)])
@@ -55,7 +51,7 @@ class Engineer(models.Model):
         return self.contact_name
 
 
-class EngineerService(TimeStamp):
+class EngineerService(BaseModel):
     engineer = models.OneToOneField(Engineer, on_delete=models.CASCADE, null=True, blank=True)
     is_car_kit_system = models.BooleanField(default=False)
     is_ice_system = models.BooleanField(default=False)
@@ -63,7 +59,7 @@ class EngineerService(TimeStamp):
     is_tracking_system = models.BooleanField(default=False)
 
 
-class EngineerPricing(TimeStamp):
+class EngineerPricing(BaseModel):
     engineer = models.OneToOneField(Engineer, on_delete=models.CASCADE, null=True, blank=True)
     installation = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     de_re = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
@@ -72,7 +68,7 @@ class EngineerPricing(TimeStamp):
     tracking_install = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
 
-class EngineerInvoice(models.Model):
+class EngineerInvoice(BaseModel):
     sp_comms_ref = models.CharField(max_length=255, null=True, blank=True)
     eng_invoice_received = models.DateField(null=True, blank=True)
     eng_invoice_paid = models.DateField(null=True, blank=True)

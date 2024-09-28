@@ -1,8 +1,8 @@
 from django.db import models
-from apps.utilities.models import TimeStamp
+from apps.utilities.models import BaseModel
 
 
-class AuditTrail(TimeStamp):
+class AuditTrail(BaseModel):
     """Track who responsible for certain action"""
     ACTION_CHOICES = (
         ('INSERT', 'Insert'),

@@ -5,7 +5,7 @@ from django.db import models, transaction
 from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
-from apps.utilities.models import TimeStamp
+from apps.utilities.models import BaseModel
 
 
 class UserManager(BaseUserManager):
@@ -52,14 +52,14 @@ class UserManager(BaseUserManager):
         return user
 
 
-class UserRole(TimeStamp):
+class UserRole(BaseModel):
     name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
 
 
-class User(AbstractBaseUser, PermissionsMixin, TimeStamp):
+class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     """Custom user model"""
     email = models.EmailField(
         verbose_name='Email address',
@@ -100,7 +100,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStamp):
         ]
 
 
-class Profile(TimeStamp):
+class Profile(BaseModel):
     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE, null=True, blank=True)
     first_name = models.CharField(max_length=100, null=True, blank=True)
     last_name = models.CharField(max_length=100, null=True, blank=True)

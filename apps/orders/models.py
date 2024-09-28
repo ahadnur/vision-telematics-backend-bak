@@ -1,8 +1,8 @@
 from django.db import models
-from apps.utilities.models import TimeStamp
+from apps.utilities.models import BaseModel
 
 
-class Order(TimeStamp):
+class Order(BaseModel):
     order_ref_number = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=255, null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
@@ -19,7 +19,7 @@ class Order(TimeStamp):
 
 
 # KIF
-class OrderItem(models.Model):
+class OrderItem(BaseModel):
     order = models.ForeignKey('orders.Order', related_name='items', on_delete=models.CASCADE, null=True, blank=True)
     product_sku = models.ForeignKey('products.ProductSKU', on_delete=models.CASCADE, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)

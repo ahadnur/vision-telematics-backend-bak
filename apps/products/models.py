@@ -1,8 +1,8 @@
 from django.db import models
-from apps.utilities.models import TimeStamp
+from apps.utilities.models import BaseModel
 
 
-class Supplier(TimeStamp):
+class Supplier(BaseModel):
     supplier_name = models.CharField(max_length=255, null=True, blank=True)
     category = models.CharField(max_length=255, null=True, blank=True)
 
@@ -18,7 +18,7 @@ to be procured, their quantities, descriptions, and associated suppliers
 """
 
 
-class PO(TimeStamp):
+class PO(BaseModel):
     po_ref = models.CharField(max_length=100, unique=True)
     invoice_number = models.ForeignKey('customers.Invoice', on_delete=models.SET_NULL, null=True, blank=True)
     date = models.DateField()
@@ -38,7 +38,7 @@ class PO(TimeStamp):
         return self.po_ref
 
 
-class StockControlCode(models.Model):
+class StockControlCode(BaseModel):
     code = models.CharField(max_length=100, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
 
@@ -46,7 +46,7 @@ class StockControlCode(models.Model):
         return self.code
 
 
-class StockSuppliedTo(models.Model):
+class StockSuppliedTo(BaseModel):
     stock_supplied_to = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
@@ -56,7 +56,7 @@ class StockSuppliedTo(models.Model):
         return self.stock_supplied_to
 
 
-class Category(TimeStamp):
+class Category(BaseModel):
     category_name = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
@@ -66,7 +66,7 @@ class Category(TimeStamp):
         return self.category_name
 
 
-class Product(models.Model):
+class Product(BaseModel):
     product_name = models.CharField(max_length=255, null=True, blank=True, db_index=True)
     description = models.TextField(null=True, blank=True)  # Changed to TextField
     unit_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
@@ -78,7 +78,7 @@ class Product(models.Model):
         return self.description if self.description else "Unnamed Product"
 
 
-class Package(models.Model):
+class Package(BaseModel):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='packages')
     package_type = models.CharField(max_length=255)
 
@@ -87,7 +87,7 @@ class Package(models.Model):
 
 
 # PastError
-class ProductSKU(TimeStamp):
+class ProductSKU(BaseModel):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True)
     sku_code = models.CharField(max_length=100, unique=True, null=True, blank=True)
     description = models.TextField(blank=True, null=True)
@@ -110,7 +110,7 @@ class ProductSKU(TimeStamp):
         super(ProductSKU, self).save(*args, **kwargs)
 
 
-class CarData(models.Model):
+class CarData(BaseModel):
     marque = models.CharField(max_length=100, blank=True, null=True)
     range = models.CharField(max_length=100, blank=True, null=True)
     from_year = models.IntegerField(blank=True, null=True)

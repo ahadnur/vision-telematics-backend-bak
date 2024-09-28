@@ -1,15 +1,15 @@
 from django.db import models
-from apps.utilities.models import TimeStamp
+from apps.utilities.models import BaseModel
 
 
-class InstallLevel(models.Model):
+class InstallLevel(BaseModel):
     install_levl = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return self.install_levl
 
 
-class Account(TimeStamp):
+class Account(BaseModel):
     # account_name and company_name same
     account_name = models.CharField(max_length=255)  # invoice account
     accounts_contact_name = models.CharField(max_length=255, null=True, blank=True)

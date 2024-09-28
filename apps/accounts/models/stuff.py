@@ -1,9 +1,9 @@
 from django.db import models
-from apps.utilities.models import TimeStamp
+from apps.utilities.models import BaseModel
 
 
 # In lagacy system this is a staff
-class Staff(TimeStamp):
+class Staff(BaseModel):
     first_name = models.CharField(max_length=255, null=True, blank=True)
     last_name = models.CharField(max_length=255, null=True, blank=True)
     user = models.OneToOneField('User', on_delete=models.CASCADE)

@@ -1,8 +1,8 @@
 from django.db import models
-from apps.utilities.models import TimeStamp
+from apps.utilities.models import BaseModel
 
 
-class Invoice(TimeStamp):
+class Invoice(BaseModel):
     STATUS_CHOICE = [('pending', 'Pending'), ('paid', 'Paid'), ('overdue', 'Overdue')]
     invoice_number = models.CharField(max_length=100)
     customer = models.ManyToManyField('Customer', related_name='customer_invoices')
@@ -24,7 +24,7 @@ class Invoice(TimeStamp):
         ]
 
 
-class InvoiceServiceLog(TimeStamp):
+class InvoiceServiceLog(BaseModel):
     LOG_REQ_TYPE = [('create_invoice', 'Create Invoice'),
                     ('create_customer', 'Create Customer'),
                     ('update_customer', 'Update Customer'),

@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db import transaction
 from rest_framework import serializers
 from apps.accounts.backends import CustomAuthBackend
 from apps.accounts.models import Account, User, UserRole
@@ -29,6 +30,18 @@ class UserWriteSerializer(serializers.Serializer):
         )
         user.save()
         return user
+
+    def update(self, instance, validated_data):
+        with transaction.atomic():
+            instance.email = validated_data.get('email', instance.email)
+            instance.user_type = validated_data.get('user_type', instance.user_type)
+            if 'password' in validated_data:
+                instance.set_password(validated_data['password'])
+            instance.save()
+            profile = instance.profile
+            profile.first_name = validated_data.get('first_name', profile.first_name)
+            profile.last_name = validated_data.get('last_name', profile.last_name)
+            profile.save()
 
 
 class AuthenticationSerializer(serializers.Serializer):

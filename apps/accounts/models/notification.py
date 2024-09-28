@@ -1,8 +1,8 @@
 from django.db import models
-from apps.utilities.models import TimeStamp
+from apps.utilities.models import BaseModel
 
 
-class NotifiedBy(TimeStamp):
+class NotifiedBy(BaseModel):
     notified_by = models.ForeignKey('User', on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
