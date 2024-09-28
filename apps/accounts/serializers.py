@@ -11,13 +11,19 @@ logger = logging.getLogger(__name__)
 class UserWriteSerializer(serializers.Serializer):
     first_name = serializers.CharField(write_only=True)
     last_name = serializers.CharField(write_only=True)
-    email = serializers.EmailField(write_only=True)
+    email = serializers.EmailField(write_only=True, required=False)
     password = serializers.CharField(write_only=True)
     user_type = serializers.PrimaryKeyRelatedField(queryset=UserRole.objects.all())
 
     def validate(self, data):
-        if User.objects.filter(email=data['email']).exists():
-            raise serializers.ValidationError("A user with this email already exists.")
+        if self.instance:
+            if 'email' in data and self.instance.email != data['email']:
+                if User.objects.filter(email=data['email']).exists():
+                    raise serializers.ValidationError("A user with this email already exists.")
+        else:
+            if 'email' in data and User.objects.filter(email=data['email']).exists():
+                raise serializers.ValidationError("A user with this email already exists.")
+
         return data
 
     def create(self, validated_data):
@@ -42,6 +48,7 @@ class UserWriteSerializer(serializers.Serializer):
             profile.first_name = validated_data.get('first_name', profile.first_name)
             profile.last_name = validated_data.get('last_name', profile.last_name)
             profile.save()
+        return instance
 
 
 class AuthenticationSerializer(serializers.Serializer):
