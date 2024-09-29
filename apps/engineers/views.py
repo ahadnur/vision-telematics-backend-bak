@@ -58,7 +58,7 @@ class EngineerCreateAPIView(CreateAPIView):
     @swagger_auto_schema(
         tags=['Engineer'],
         operation_description="Create an Engineer with associated services and pricing",
-        request_body=EngineerReadSerializer,
+        request_body=EngineerWriteSerializer,
         responses={
             status.HTTP_201_CREATED: "Successfully engineer created!",
             status.HTTP_400_BAD_REQUEST: "Bad Request"
@@ -76,7 +76,7 @@ class EngineerCreateAPIView(CreateAPIView):
 
 class EngineerRetrieveAPIView(APIView):
     queryset = Engineer.objects.all()
-    serializer_class = EngineerWriteSerializer
+    serializer_class = EngineerReadSerializer
 
     @swagger_auto_schema(
         tags=['Engineer'],
@@ -103,7 +103,7 @@ class EngineerUpdateAPIView(APIView):
     @swagger_auto_schema(
         operation_description="Update an Engineer with associated services and pricing",
         responses={
-            status.HTTP_200_OK: EngineerReadSerializer,
+            status.HTTP_200_OK: EngineerWriteSerializer,
             status.HTTP_400_BAD_REQUEST: "Bad Request"
         }
     )
