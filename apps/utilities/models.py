@@ -1,4 +1,5 @@
 from django.db import models
+from config.middleware import get_current_user
 
 
 class BaseModel(models.Model):
@@ -8,8 +9,20 @@ class BaseModel(models.Model):
     created_by = models.IntegerField(null=True, blank=True)
     updated_by = models.IntegerField(null=True, blank=True)
 
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+
     class Meta:
         abstract = True
+
+    def save(self, *args, **kwargs):
+        current_user = get_current_user()
+
+        if current_user and current_user.is_authenticated:
+            if not self.pk:
+                self.created_by = current_user.id
+            self.updated_by = current_user.id
+        super(BaseModel, self).save(*args, **kwargs)
 
 
 class SpeedUp(BaseModel):

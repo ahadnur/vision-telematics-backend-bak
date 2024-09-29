@@ -13,7 +13,7 @@ urlpatterns = [
     path('user-create/', UserCreateAPIView.as_view(), name='user_create'),
     path('user-update/<pk>/', UserUpdateAPIView.as_view(), name='user_update'),
     path('login/', LoginAPIView.as_view(), name='user_login'),
-    path('user/reset-password/<_id>/', ResetUserPasswordAPIView.as_view(), name='reset-password'),
+    # path('user/reset-password/<_id>/', ResetUserPasswordAPIView.as_view(), name='reset-password'),
 ]+[
     path('create-new-account/', CreateAccountAPIView.as_view(), name='create-account'),
     path('update-new-account/<int:_id>/', UpdateAccountAPIView.as_view(), name='update-account'),

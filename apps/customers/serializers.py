@@ -1,11 +1,15 @@
+from django.db import transaction, IntegrityError
 from rest_framework import serializers
+
+from apps.accounts.serializers import logger
 from apps.customers.models import Customer, CustomerAddress, CustomerVehicleInfo, CustomerInstallation
-from apps.utilities.models import Company, VehicleMake, VehicleModel, VehicleType
+from apps.utilities.models import VehicleMake, VehicleModel, VehicleType
+from apps.customers.models.customer import CustomerCompany
 
 
 class CompanyListSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Company
+        model = CustomerCompany
         fields = ['id', 'company_name']
 
 
@@ -17,11 +21,46 @@ class CustomerAddressSerializer(serializers.ModelSerializer):
 
 class CustomerWriteSerializer(serializers.ModelSerializer):
     address = CustomerAddressSerializer()
-    company = serializers.PrimaryKeyRelatedField(queryset=Company.objects.all())  # Or use `read_only=True` if needed
 
     class Meta:
         model = Customer
-        fields = ['id', 'customer_ref_number', 'contact_name', 'phone_numbers', 'address', 'email_address', 'company']
+        fields = ['id', 'customer_ref_number', 'contact_name', 'phone_numbers', 'email_address', 'company', 'address']
+
+    def create(self, validated_data):
+        address_data = validated_data.pop('address')
+        try:
+            with transaction.atomic():
+                customer = Customer.objects.create(**validated_data)
+                CustomerAddress.objects.create(customer=customer, **address_data)
+            return customer
+        except IntegrityError as e:
+            raise serializers.ValidationError({'customer_ref_number': 'This customer reference number already exists.'})
+        except Exception as e:
+            logger.error(f'create customer error on: {e}')
+            raise serializers.ValidationError("Failed to create customer and address.")
+
+    def update(self, instance, validated_data):
+        address_data = validated_data.pop('address', None)  # Pop address data if it exists
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        try:
+            with transaction.atomic():
+                instance.save()  # Save changes to the Customer instance
+
+                if address_data:
+                    customer_address, created = CustomerAddress.objects.get_or_create(customer=instance)
+                    for attr, value in address_data.items():
+                        setattr(customer_address, attr, value)
+                    customer_address.save()
+
+            return instance
+        except IntegrityError:
+            raise serializers.ValidationError({'customer_ref_number': 'This customer reference number already exists.'})
+        except Exception as e:
+            logger.error(f'update customer error on: {e}')
+            raise serializers.ValidationError("Failed to update customer and address.")
+
+
 
 
 class CustomerVehicleSerializer(serializers.ModelSerializer):

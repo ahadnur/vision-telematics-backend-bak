@@ -4,7 +4,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from apps.customers.models import CustomerCompany
+from apps.customers.models import CustomerCompany, Customer
 from apps.customers.serializers import (CompanyListSerializer, CustomerWriteSerializer, CustomerVehicleSerializer)
 from apps.customers.schemas import vehicle_info_response_schema
 from apps.utilities.models import VehicleMake, VehicleModel, VehicleType
@@ -13,10 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 class CompanyListAPIView(ListAPIView):
-    queryset = CustomerCompany.objects.all()
+    queryset = CustomerCompany.objects.filter(is_active=True)
     serializer_class = CompanyListSerializer
-
-    permission_classes = (IsAuthenticated,)
 
     @swagger_auto_schema(
         tags=['Company List'],
@@ -31,9 +29,7 @@ class CompanyListAPIView(ListAPIView):
         return self.list(request, *args, **kwargs)
 
 
-class CreateCustomerAPIView(views.APIView):
-    permission_classes = (IsAuthenticated,)
-
+class CustomerCreateAPIView(views.APIView):
     @swagger_auto_schema(
         tags=['Customer'],
         request_body=CustomerWriteSerializer,
@@ -45,11 +41,40 @@ class CreateCustomerAPIView(views.APIView):
         }
     )
     def post(self, request, *args, **kwargs):
-        pass
+        try:
+            serializer = CustomerWriteSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response({'message': 'Customer created successfully.'}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            logger.error(f"create customer error on {e}")
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class CustomerUpdateAPIView(views.APIView):
+    @swagger_auto_schema(
+        tags=['Customer'],
+        request_body=CustomerWriteSerializer,
+        responses={
+            status.HTTP_201_CREATED: openapi.Response(
+                description='Created customer',
+                schema=CustomerWriteSerializer
+            )
+        }
+    )
+    def post(self, request, pk):
+        try:
+            customer = Customer.objects.get(id=pk)
+            serializer = CustomerWriteSerializer(instance=customer,data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response({'message': 'Customer updated successfully.'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"create customer error on {e}")
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class CreateCustomerVehicleAPIView(views.APIView):
-    permission_classes = (IsAuthenticated,)
 
     @swagger_auto_schema(
         tags=['Customer'],

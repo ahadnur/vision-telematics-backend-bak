@@ -7,10 +7,10 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 
-from apps.accounts.serializers import (UserWriteSerializer, ResetPasswordSerializer, GetUserSerializer,
-									   AuthenticationSerializer)
-from apps.accounts.schemas.accounts_schema import (account_response_schema, reset_user_password_request_schema,
-												   get_user_response_schema)
+from apps.accounts.serializers import UserWriteSerializer, ResetPasswordSerializer, GetUserSerializer, \
+	AuthenticationSerializer
+from apps.accounts.schemas.accounts_schema import account_response_schema, reset_user_password_request_schema, \
+	get_user_response_schema
 
 from apps.accounts.services import get_user, get_general_user_list
 from config.authentication import JWTAuthentication
@@ -21,8 +21,7 @@ User = get_user_model()
 
 
 class UserCreateAPIView(views.APIView):
-	authentication_classes = (JWTAuthentication,)
-	permission_classes = (IsAuthenticated, IsAdminUser)
+	permission_classes = (IsAdminUser,)
 	serializer_class = UserWriteSerializer
 
 	@swagger_auto_schema(
@@ -71,8 +70,7 @@ class LoginAPIView(views.APIView):
 
 
 class UserListAPIView(views.APIView):
-	authentication_classes = (JWTAuthentication,)
-	permission_classes = (IsAuthenticated, IsAdminUser)
+	permission_classes = (IsAdminUser,)
 
 	@swagger_auto_schema(
 		responses={
@@ -96,8 +94,6 @@ class UserListAPIView(views.APIView):
 
 
 class GetUserAPIView(views.APIView):
-	authentication_classes = (JWTAuthentication,)
-	permission_classes = (IsAuthenticated,)
 	serializer_class = GetUserSerializer
 
 	@swagger_auto_schema(
