@@ -16,8 +16,9 @@ logger = logging.getLogger(__name__)
 
 
 class EngineerCompanyListAPIView(ListAPIView):
-    queryset = EngineerCompany.objects.all()
+    queryset = EngineerCompany.objects.filter(is_active=True)
     serializer_class = EngieerCompanyListSerializer
+    pagination_class = None
 
     @swagger_auto_schema(
         tags=['Engineer'],
@@ -30,11 +31,11 @@ class EngineerCompanyListAPIView(ListAPIView):
     )
     def get(self, request, *args, **kwargs):
         logger.info('Fetching list of Engineer Companies')
-        return super().get(request, *args, **kwargs)
+        return self.list(request, *args, **kwargs)
 
 
 class EngineerListAPIView(ListAPIView):
-    queryset = Engineer.objects.all()
+    queryset = Engineer.objects.filter(is_active=True).order_by('contact_name')
     serializer_class = GetEngineerListSerializer
 
     @swagger_auto_schema(
@@ -47,11 +48,11 @@ class EngineerListAPIView(ListAPIView):
         }
     )
     def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
+        return self.list(request, *args, **kwargs)
 
 
 class EngineerCreateAPIView(CreateAPIView):
-    queryset = Engineer.objects.all()
+    queryset = Engineer.objects.filter(is_active=True)
     serializer_class = EngineerWriteSerializer
 
     @swagger_auto_schema(

@@ -61,6 +61,12 @@ class CustomerWriteSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Failed to update customer and address.")
 
 
+class GetCustomerSerializer(serializers.ModelSerializer):
+    address = CustomerAddressSerializer(source='customeraddress')
+
+    class Meta:
+        model = Customer
+        fields = ['id', 'customer_ref_number', 'contact_name', 'phone_numbers', 'email_address', 'company', 'address']
 
 
 class CustomerVehicleSerializer(serializers.ModelSerializer):

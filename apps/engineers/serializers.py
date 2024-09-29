@@ -1,7 +1,9 @@
-from django.db import transaction
+from django.db import IntegrityError
 from rest_framework import serializers
 
-from apps.engineers.models import EngineerCompany, Engineer, EngineerService, EngineerPricing
+from apps.customers.views import logger
+from apps.engineers.models import EngineerCompany, Engineer
+from apps.settings.models import InstallType
 from apps.settings.serializers import InstallTypeSerializer
 
 
@@ -11,69 +13,60 @@ class EngieerCompanyListSerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 
-class EngineerServiceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EngineerService
-        fields = ['is_car_kit_system', 'is_ice_system', 'is_alarm_system', 'is_tracking_system']
-
-
-class EngieerPricingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EngineerPricing
-        fields = ['installation', 'de_re', 'de_installation', 'upgrade', 'tracking_install']
-
-
 class EngineerWriteSerializer(serializers.ModelSerializer):
-    service = EngineerServiceSerializer(required=False)
-    pricing = EngieerPricingSerializer(required=False)
+    company = serializers.PrimaryKeyRelatedField(queryset=EngineerCompany.objects.filter(is_active=True))
+    job = serializers.PrimaryKeyRelatedField(queryset=InstallType.objects.filter(is_active=True))
 
     class Meta:
         model = Engineer
         fields = [
             'contact_name', 'company', 'engineer_id', 'address', 'contact_number', 'office_number',
-            'email_address', 'website', 'confirm_method', 'postcode_coverage', 'comments',
-            'current_sla', 'performance_rating', 'engineer_priority', 'job', 'service', 'pricing'
+            'email_address', 'website', 'postcode_coverage', 'comments', 'insurance_expiration',
+            'current_sla', 'performance_rating', 'engineer_priority', 'job',
+            'is_telematics', 'is_dashcam', 'is_dvs', 'is_dvr', 'is_adr_tanker',
+            'is_specialist_vehicles', 'is_insurance_on_file', 'is_current_sla', 'is_other'
         ]
 
     def create(self, validated_data):
-        service_data = validated_data.pop('service')
-        pricing_data = validated_data.pop('pricing')
-        with transaction.atomic():
+        try:
             engineer = Engineer.objects.create(**validated_data)
-            EngineerService.objects.create(engineer=engineer, **service_data)
-            EngineerPricing.objects.create(engineer=engineer, **pricing_data)
-        return engineer
+            return engineer
+        except IntegrityError as e:
+            logger.error(f'update enginer error on: {e}')
+            raise serializers.ValidationError(f'{e}')
+        except Exception as e:
+            logger.error(f'update enginer error on: {e}')
+            raise serializers.ValidationError(f'{e}')
 
     def update(self, instance, validated_data):
-        service_data = validated_data.pop('service', None)
-        pricing_data = validated_data.pop('pricing', None)
-
-        with transaction.atomic():
+        try:
             for attr, value in validated_data.items():
                 setattr(instance, attr, value)
             instance.save()
-            if service_data:
-                EngineerService.objects.update_or_create(engineer=instance, defaults=service_data)
-            if pricing_data:
-                EngineerPricing.objects.update_or_create(engineer=instance, defaults=pricing_data)
             return instance
+        except IntegrityError as e:
+            logger.error(f'update enginer error on: {e}')
+            raise serializers.ValidationError(f'{e}')
+        except Exception as e:
+            logger.error(f'update enginer error on: {e}')
+            raise serializers.ValidationError(f'{e}')
 
 
 class EngineerReadSerializer(serializers.ModelSerializer):
-    service = EngineerServiceSerializer(read_only=True)
-    pricing = EngieerPricingSerializer(read_only=True)
     job = InstallTypeSerializer(read_only=True)
 
     class Meta:
         model = Engineer
         fields = [
-            'id', 'contact_name', 'company', 'engineer_id', 'address', 'contact_number', 'office_number',
-            'email_address', 'website', 'confirm_method', 'postcode_coverage', 'comments',
-            'current_sla', 'performance_rating', 'engineer_priority', 'job', 'service', 'pricing'
+            'contact_name', 'company', 'engineer_id', 'address', 'contact_number', 'office_number',
+            'email_address', 'website', 'postcode_coverage', 'comments', 'insurance_expiration',
+            'current_sla', 'performance_rating', 'engineer_priority', 'job',
+            'is_telematics', 'is_dashcam', 'is_dvs', 'is_dvr', 'is_adr_tanker',
+            'is_specialist_vehicles', 'is_insurance_on_file', 'is_current_sla', 'is_other'
         ]
 
 
 class GetEngineerListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Engineer
-        fields = ['id', 'contact_name']
+        fields = ['id', 'contact_name', 'email_address', 'address', 'contact_number']

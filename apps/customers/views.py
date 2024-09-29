@@ -1,12 +1,12 @@
 from rest_framework import status, views
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
-from rest_framework.permissions import IsAuthenticated
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from apps.customers.models import CustomerCompany, Customer
-from apps.customers.serializers import (CompanyListSerializer, CustomerWriteSerializer, CustomerVehicleSerializer)
-from apps.customers.schemas import vehicle_info_response_schema
+from apps.customers.serializers import (CompanyListSerializer, CustomerWriteSerializer, CustomerVehicleSerializer,
+                                        CustomerWriteSerializer, GetCustomerSerializer)
+from apps.customers.schemas import vehicle_info_response_schema, customer_list_response_schema
 from apps.utilities.models import VehicleMake, VehicleModel, VehicleType
 import logging
 logger = logging.getLogger(__name__)
@@ -23,6 +23,24 @@ class CompanyListAPIView(ListAPIView):
                 description='List of companies with id and name',
                 schema=CompanyListSerializer(many=True)
             ),
+        }
+    )
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+
+class CustomerListAPIView(ListAPIView):
+    queryset = Customer.objects.filter(is_active=True)
+    serializer_class = GetCustomerSerializer
+
+    @swagger_auto_schema(
+        tags=['Customer'],
+        responses={
+            status.HTTP_200_OK: openapi.Response(
+                description='List of customers',
+                schema=customer_list_response_schema
+            ),
+            status.HTTP_400_BAD_REQUEST: "Bad request"
         }
     )
     def get(self, request, *args, **kwargs):
@@ -65,7 +83,7 @@ class CustomerUpdateAPIView(views.APIView):
     def post(self, request, pk):
         try:
             customer = Customer.objects.get(id=pk)
-            serializer = CustomerWriteSerializer(instance=customer,data=request.data)
+            serializer = CustomerWriteSerializer(instance=customer, data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response({'message': 'Customer updated successfully.'}, status=status.HTTP_200_OK)

@@ -2,7 +2,11 @@ from django.contrib import admin
 from .models import (InstallType, CreditReason, CallBackReason, CallBackReasonOld, PaymentMethod,
                      ContactHistoryReason, POSupplierRef, ContactHistoryStatus)
 
-admin.site.register(InstallType)
+
+@admin.register(InstallType)
+class AccountAdmin(admin.ModelAdmin):
+    list_display = ['id', 'install_type']
+    fields = ['install_type']
 admin.site.register(CreditReason)
 admin.site.register(CallBackReason)
 admin.site.register(CallBackReasonOld)
