@@ -21,7 +21,7 @@ class Engineer(BaseModel):
         ('medium', 'Medium'),
         ('high', 'High')
     ]
-    contact_name = models.CharField(max_length=255, unique=True, null=True, blank=True)
+    contact_name = models.CharField(max_length=255, null=True, blank=True)
     company = models.ForeignKey(EngineerCompany, on_delete=models.SET_NULL, null=True, blank=True)
     email_address = models.EmailField(unique=True, null=True, blank=True)
     engineer_id = models.CharField(max_length=50, unique=True, null=True, blank=True)
