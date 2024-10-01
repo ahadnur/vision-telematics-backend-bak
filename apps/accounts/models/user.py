@@ -46,7 +46,9 @@ class UserManager(BaseUserManager):
         user.is_superuser = True
         user.is_staff = True
         user.is_active = True
-        user.user_type = UserRole.objects.filter(name__iexact='admin').first()
+        user.user_type = UserRole.objects.get_or_create(
+            name='admin'
+        )
         user.set_password(password)
         user.save()
         return user
