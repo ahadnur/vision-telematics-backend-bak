@@ -34,21 +34,19 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email: str, password: str):
-        """
-        Create superuser method
-        """
+        user_role, created = UserRole.objects.get_or_create(
+            name='admin'
+        )
         if not email:
             raise ValueError('Email must be specified!')
 
         user = self.model(
             email=self.normalize_email(email),
+            user_type=user_role
         )
         user.is_superuser = True
         user.is_staff = True
         user.is_active = True
-        user.user_type = UserRole.objects.get_or_create(
-            name='admin'
-        )
         user.set_password(password)
         user.save()
         return user
