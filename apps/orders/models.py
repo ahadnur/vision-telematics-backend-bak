@@ -45,7 +45,7 @@ class OrderItem(BaseModel):
         super().save(*args, **kwargs)
 
 
-class Booking(models.Model):
+class Booking(BaseModel):
     order = models.OneToOneField(Order, on_delete=models.CASCADE)  # Links the booking to a specific order
     engineer = models.ForeignKey('engineers.Engineer', on_delete=models.CASCADE)  # Assigned engineer for the booking
     booking_date = models.DateField()
