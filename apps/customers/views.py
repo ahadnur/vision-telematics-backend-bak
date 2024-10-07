@@ -1,15 +1,16 @@
 from rest_framework import status, views
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from apps.customers.models import CustomerCompany, Customer
-from apps.customers.serializers import (CompanyListSerializer, CustomerWriteSerializer, CustomerVehicleSerializer,
+from apps.customers.serializers import (CompanyListSerializer, CustomerVehicleSerializer,
                                         CustomerWriteSerializer, GetCustomerSerializer)
 from apps.customers.schemas import vehicle_info_response_schema, customer_list_response_schema
 from apps.utilities.models import VehicleMake, VehicleModel, VehicleType
 import logging
+
+
 logger = logging.getLogger(__name__)
 
 
