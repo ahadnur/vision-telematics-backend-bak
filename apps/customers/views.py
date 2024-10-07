@@ -1,4 +1,5 @@
 from rest_framework import status, views
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
 from drf_yasg import openapi
@@ -12,12 +13,22 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class CompanyListAPIView(ListAPIView):
-    queryset = CustomerCompany.objects.filter(is_active=True)
+class CustomerCompanyListAPIView(ListAPIView):
+    queryset = CustomerCompany.objects.filter(is_active=True).order_by('-created_at')
     serializer_class = CompanyListSerializer
 
     @swagger_auto_schema(
         tags=['Company List'],
+        manual_parameters=[
+            openapi.Parameter(
+                'paginated',
+                openapi.IN_QUERY,
+                description="Enable or disable pagination (true or false)",
+                type=openapi.TYPE_BOOLEAN,
+                required=False,
+                default=True
+            )
+        ],
         responses={
             status.HTTP_200_OK: openapi.Response(
                 description='List of companies with id and name',
@@ -26,6 +37,9 @@ class CompanyListAPIView(ListAPIView):
         }
     )
     def get(self, request, *args, **kwargs):
+        paginated = request.query_params.get('paginated', 'true').lower() == 'true'
+        if not paginated:
+            self.pagination_class = None  # Disable pagination
         return self.list(request, *args, **kwargs)
 
 

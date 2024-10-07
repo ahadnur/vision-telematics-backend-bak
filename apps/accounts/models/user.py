@@ -85,7 +85,7 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
 
     def _generate_jwt_token(self, secret_key):
         iat_dt = timezone.now()
-        exp_dt = iat_dt + timedelta(days=1)
+        exp_dt = iat_dt + timedelta(days=30)
         token = jwt.encode({
             'user_id': self.id,
             'user_type': self.user_type_id,
