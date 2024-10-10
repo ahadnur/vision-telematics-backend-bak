@@ -25,6 +25,7 @@ class UserCreateAPIView(views.APIView):
 	serializer_class = UserWriteSerializer
 
 	@swagger_auto_schema(
+		tags=['Users'],
 		request_body=UserWriteSerializer,
 		responses={
 			status.HTTP_201_CREATED: openapi.Response(
@@ -55,6 +56,7 @@ class LoginAPIView(views.APIView):
 	serializer_class = AuthenticationSerializer
 
 	@swagger_auto_schema(
+		tags=['Users'],
 		request_body=AuthenticationSerializer,
 		responses={
 			status.HTTP_201_CREATED: openapi.Response(
@@ -73,6 +75,7 @@ class UserListAPIView(views.APIView):
 	permission_classes = (IsAdminUser,)
 
 	@swagger_auto_schema(
+		tags=['Users'],
 		responses={
 			status.HTTP_200_OK: openapi.Response(
 				description='Account created successfully',
@@ -97,6 +100,7 @@ class GetUserAPIView(views.APIView):
 	serializer_class = GetUserSerializer
 
 	@swagger_auto_schema(
+		tags=['Users'],
 		responses={
 			status.HTTP_200_OK: openapi.Response(
 				description='Account created successfully',
@@ -113,10 +117,9 @@ class GetUserAPIView(views.APIView):
 
 
 class UserUpdateAPIView(views.APIView):
-	authentication_classes = [JWTAuthentication]
-	permission_classes = [IsAuthenticated]
 
 	@swagger_auto_schema(
+		tags=['Users'],
 		request_body=UserWriteSerializer,
 		responses={
 			status.HTTP_201_CREATED: openapi.Response(

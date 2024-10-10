@@ -19,7 +19,7 @@ class CustomerCompanyListAPIView(ListAPIView):
     serializer_class = CompanyListSerializer
 
     @swagger_auto_schema(
-        tags=['Company List'],
+        tags=['Customer'],
         manual_parameters=[
             openapi.Parameter(
                 'paginated',

@@ -4,29 +4,30 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
-from rest_framework import status, views, generics
+from rest_framework import status, views
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 
-from apps.accounts.serializers import AccountWriteSerializer, AccountListSerializer
+from apps.accounts.serializers import AccountWriteSerializer, AccountSerializer, AccountListDropdownSerializer
 from apps.accounts.schemas.accounts_schema import (account_write_request_schema, account_response_schema,
                                                    get_user_response_schema)
 
 from apps.accounts.models import Account
 from apps.accounts.services import AccountService
-from config.authentication import JWTAuthentication
 
 logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
 
-class CreateAccountAPIView(generics.CreateAPIView):
+class CreateAccountAPIView(CreateAPIView):
     serializer_class = AccountWriteSerializer
 
     @swagger_auto_schema(
+        tags=['Accounts'],
         request_body=account_write_request_schema,
         responses={
             status.HTTP_201_CREATED: openapi.Response(
@@ -41,10 +42,11 @@ class CreateAccountAPIView(generics.CreateAPIView):
 
 class UpdateAccountAPIView(views.APIView):
     @swagger_auto_schema(
+        tags=['Accounts'],
         request_body=account_write_request_schema,
         responses={
             status.HTTP_201_CREATED: openapi.Response(
-                description='Account created successfully',
+                description='Account updated successfully',
                 schema=account_response_schema
             ),
         },
@@ -66,6 +68,68 @@ class UpdateAccountAPIView(views.APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
+class AccountListAPIView(ListAPIView):
+    queryset = Account.objects.filter(is_active=True, is_deleted=False)
+    serializer_class = AccountSerializer
+
+    @swagger_auto_schema(
+        tags=['Accounts'],
+        manual_parameters=[
+            openapi.Parameter(
+                'paginated',
+                openapi.IN_QUERY,
+                description="Enable or disable pagination (true or false)",
+                type=openapi.TYPE_BOOLEAN,
+                required=False,
+                default=True
+            )
+        ],
+        responses={
+            status.HTTP_200_OK: openapi.Response(
+                description='List of companies with id and name',
+                schema=AccountSerializer(many=True)
+            ),
+        }
+    )
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+
+class GetAccountAPIView(RetrieveAPIView):
+    serializer_class = AccountSerializer
+    queryset = Account.objects.filter(is_active=True, is_deleted=False)
+
+    @swagger_auto_schema(
+        tags=['Accounts'],
+        responses={
+            status.HTTP_200_OK: openapi.Response(
+                description='Account details',
+                schema=AccountSerializer,
+            )
+        }
+    )
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+
+class AccountDropdownListAPIView(ListAPIView):
+    serializer_class = AccountListDropdownSerializer
+    queryset = Account.objects.filter(is_active=True, is_deleted=False)
+    pagination_class = None
+
+    @swagger_auto_schema(
+        tags=['Accounts'],
+        responses={
+            status.HTTP_200_OK: openapi.Response(
+                description='List of companies with id and name',
+                schema=AccountListDropdownSerializer(many=True)
+            )
+        }
+    )
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+
 def activate(request, uidb64, token):
     try:
         uidb64 = force_str(urlsafe_base64_decode(uidb64))
@@ -80,35 +144,3 @@ def activate(request, uidb64, token):
         return HttpResponse('Thank you for your email confirmation. Your account is now activated.')
     else:
         return HttpResponse('Activation link is invalid!')
-
-
-class AccountListAPIView(generics.ListAPIView):
-    authentication_classes = [JWTAuthentication, ]
-    permission_classes = [IsAuthenticated]
-
-    queryset = Account.objects.all()
-    serializer_class = AccountListSerializer
-
-    @swagger_auto_schema(
-        manual_parameters=[
-            openapi.Parameter(
-                'paginated',
-                openapi.IN_QUERY,
-                description="Enable or disable pagination (true or false)",
-                type=openapi.TYPE_BOOLEAN,
-                required=False,
-                default=True
-            )
-        ],
-        responses={
-            status.HTTP_200_OK: openapi.Response(
-                description='List of companies with id and name',
-                schema=AccountListSerializer(many=True)
-            ),
-        }
-    )
-    def get(self, request, *args, **kwargs):
-        paginated = request.query_params.get('paginated', 'true').lower() == 'true'
-        if not paginated:
-            self.pagination_class = None
-        return self.list(request, *args, **kwargs)

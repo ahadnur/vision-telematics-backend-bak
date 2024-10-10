@@ -1,7 +1,7 @@
 from django.urls import path
 from apps.accounts.views import (activate, CreateAccountAPIView, UpdateAccountAPIView, UserCreateAPIView,
                                  ResetUserPasswordAPIView, GetUserAPIView, AccountListAPIView, LoginAPIView,
-                                 UserListAPIView, UserUpdateAPIView)
+                                 UserListAPIView, UserUpdateAPIView, AccountDropdownListAPIView, GetAccountAPIView)
 
 app_name = 'accounts'
 
@@ -15,7 +15,10 @@ urlpatterns = [
     path('login/', LoginAPIView.as_view(), name='user_login'),
     # path('user/reset-password/<_id>/', ResetUserPasswordAPIView.as_view(), name='reset-password'),
 ]+[
-    path('create-new-account/', CreateAccountAPIView.as_view(), name='create-account'),
-    path('update-new-account/<int:_id>/', UpdateAccountAPIView.as_view(), name='update-account'),
-    path('account-list/', AccountListAPIView.as_view(), name='account-list'),
+    path('create/', CreateAccountAPIView.as_view(), name='account_create'),
+    path('update/<int:_id>/', UpdateAccountAPIView.as_view(), name='account_update'),
+    path('<int:pk>/', GetAccountAPIView.as_view(), name='get_account'),
+    path('account-list/', AccountListAPIView.as_view(), name='account_list'),
+    path('account-list-dropdown/', AccountDropdownListAPIView.as_view(), name='account_list_dropdown'),
+
 ]

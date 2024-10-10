@@ -10,7 +10,6 @@ class Order(BaseModel):
     discount = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     current_route = models.TextField(blank=True, null=True)
     engineer = models.ForeignKey('engineers.Engineer', on_delete=models.SET_NULL, null=True, blank=True)
-    created_by = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='user_order')
     customer = models.ForeignKey('customers.Customer', related_name='order_customers', on_delete=models.SET_NULL,
                                  null=True, blank=True)
 

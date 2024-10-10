@@ -21,6 +21,7 @@ class Service(models.Model):
     order = models.ForeignKey('orders.Order', on_delete=models.SET_NULL, null=True, blank=True)
     customer = models.ForeignKey('customers.Customer', related_name='customer_services',
                                  on_delete=models.SET_NULL, null=True, blank=True)
+    install_level = models.ForeignKey('accounts.InstallLevel', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.service_ref

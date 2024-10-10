@@ -16,13 +16,9 @@ class Account(BaseModel):
     contact_number = models.CharField(max_length=20, null=True, blank=True)
     in_add = models.CharField(max_length=255, null=True, blank=True)
     post_code = models.CharField(max_length=20, null=True, blank=True)
-    install_level = models.ForeignKey('InstallLevel', related_name='install_levels',
-                                      on_delete=models.SET_NULL, null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
     discount = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     invoice_terms = models.CharField(max_length=50, null=True, blank=True,)  # maybe days.
-    opened = models.DateTimeField(null=True, blank=True)
-    opened_by = models.ForeignKey('User', on_delete=models.SET_NULL, null=True, blank=True)
     freeze_account = models.BooleanField(default=False)
     hot_account = models.BooleanField(default=False)
     reseller_account = models.BooleanField(default=False)
