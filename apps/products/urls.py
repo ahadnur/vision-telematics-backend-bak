@@ -5,9 +5,9 @@ from apps.products.views.category_view import (CategoryCreateAPIView, CategoryUp
 from apps.products.views.product_view import ProductListAPIView, ProductDetailAPIVIew, ProductCreateAPIView
 
 urlpatterns = [
-	# path('create/', ProductCreateAPIView.as_view(), name='create'),
-	# path('list/', ProductListAPIView.as_view(), name='product-list'),
-	# path('<pk>/', ProductDetailAPIVIew.as_view(), name='product-detail')
+	path('create/', ProductCreateAPIView.as_view(), name='create'),
+	path('list/', ProductListAPIView.as_view(), name='product-list'),
+	path('<pk>/', ProductDetailAPIVIew.as_view(), name='product-detail')
 ] + [
 	path('category-list/', CategoryListAPIView.as_view(), name='category-list'),
 	path('category/<pk>/', CategoryRetrieveAPIView.as_view(), name='category'),
