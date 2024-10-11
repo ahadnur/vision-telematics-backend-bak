@@ -34,7 +34,7 @@ product_list_response_schema = {
 		description='List of products',
 		schema=openapi.Schema(
 			type=openapi.TYPE_ARRAY,
-			items=product_response_schema  # Correctly reference the product_response_schema here
+			items=product_response_schema
 		)
 	)
 }

@@ -1,5 +1,3 @@
-from itertools import product
-
 from rest_framework import serializers
 from django.db import transaction
 from apps.products.models import Category, ProductSKU, Product
@@ -33,4 +31,7 @@ class ProductSerializer(serializers.ModelSerializer):
 				ProductSKU(product=_product, **sku_data) for sku_data in product_skus_data
 			]
 			ProductSKU.objects.bulk_create(product_skus)
-		return product
+		return
+
+	def update(self, instance, validated_data):
+		pass

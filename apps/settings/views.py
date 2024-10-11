@@ -1,7 +1,9 @@
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from requests import Response
 from rest_framework import status
 from rest_framework.generics import ListAPIView, CreateAPIView, UpdateAPIView
+from rest_framework.views import APIView
 
 from apps.settings.models import InstallType
 from apps.settings.serializers import InstallTypeSerializer
@@ -25,10 +27,8 @@ class InstallTypeCreateAPIView(CreateAPIView):
 		return self.create(request, *args, **kwargs)
 
 
-class InstallTypeUpdateAPIView(UpdateAPIView):
-	queryset = InstallType.objects.filter(is_active=True, is_deleted=False)
+class InstallTypeUpdateAPIView(APIView):
 	serializer_class = InstallTypeSerializer
-	lookup_field = 'pk'
 
 	@swagger_auto_schema(
 		tags=['Settings'],
@@ -40,8 +40,16 @@ class InstallTypeUpdateAPIView(UpdateAPIView):
 			)
 		}
 	)
-	def put(self, request, *args, **kwargs):
-		return self.update(request, *args, **kwargs)
+	def put(self, request, pk):
+		queryset = InstallType.objects.filter(id=pk, is_active=True, is_deleted=False)
+		serializer = InstallTypeSerializer(instance=queryset, data=request.data)
+		serializer.is_valid(raise_exception=True)
+		serializer.save()
+		return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+
+
 
 
 class InstallTypeListAPIView(ListAPIView):

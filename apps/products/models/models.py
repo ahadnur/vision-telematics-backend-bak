@@ -57,7 +57,6 @@ class StockSuppliedTo(BaseModel):
         return self.stock_supplied_to
 
 
-
 class Package(BaseModel):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='packages')
     package_type = models.CharField(max_length=255)
