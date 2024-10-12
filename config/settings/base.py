@@ -170,16 +170,16 @@ REST_FRAMEWORK = {
 
 
 SWAGGER_SETTINGS = {
-    'DEFAULT_INFO': 'vision_telematics-backend.urls.swagger_info',
-    'DEFAULT_PERMISSION_CLASSES': [
-        AllowAny,
-    ],
-    'SECURITY': [
-        {
-            'Bearer': []
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
         }
-    ],
+    },
     'USE_SESSION_AUTH': False,
+    'JSON_EDITOR': True,
+    'SUPPORTED_SUBMIT_METHODS': ['get', 'post', 'put', 'delete', 'patch'],
 }
 
 # Email Backend

@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 class CategoryListAPIView(APIView):
 	@swagger_auto_schema(
-		tags=['Products'],
+		tags=['Category'],
 		responses=category_list_reponse
 	)
 	def get(self, request, *args, **kwargs):
@@ -30,10 +30,10 @@ class CategoryListAPIView(APIView):
 
 class CategoryCreateAPIView(CreateAPIView):
 	serializer_class = CategorySerializer
-	queryset = Category.objects.filter(is_active=True, is_deleted=False)
+	queryset = Category.objects.all()
 
 	@swagger_auto_schema(
-		tags=['Products'],
+		tags=['Category'],
 		request_body=CategorySerializer,
 		responses={
 			200: CategorySerializer(),
@@ -47,7 +47,7 @@ class CategoryUpdateAPIView(APIView):
 	serializer_class = CategorySerializer
 
 	@swagger_auto_schema(
-		tags=['Products'],
+		tags=['Category'],
 		request_body=CategorySerializer,
 		responses={
 			status.HTTP_200_OK: CategorySerializer(),
@@ -68,7 +68,7 @@ class CategoryRetrieveAPIView(RetrieveAPIView):
 	lookup_field = 'pk'
 
 	@swagger_auto_schema(
-		tags=['Products'],
+		tags=['Category'],
 		responses={
 			status.HTTP_200_OK: CategorySerializer(),
 		}
@@ -82,7 +82,7 @@ class CategoryDestroyAPIView(DestroyAPIView):
 	queryset = Category.objects.filter(is_active=True, is_deleted=False)
 
 	@swagger_auto_schema(
-		tags=['Products'],
+		tags=['Category'],
 		responses={
 			status.HTTP_204_NO_CONTENT: "Successfully deleted!",
 		}

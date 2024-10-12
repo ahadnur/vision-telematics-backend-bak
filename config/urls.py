@@ -3,10 +3,10 @@ from django.conf import settings
 from django.urls import path, include
 from django.shortcuts import redirect
 from rest_framework import permissions
-from django.views.generic import TemplateView
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework.authentication import SessionAuthentication
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from .authentication import JWTAuthentication
 
 
 admin.site.site_header = 'Vision Telematics'
@@ -24,7 +24,7 @@ if settings.DEBUG:
         ),
         public=True,
         permission_classes=[permissions.AllowAny, ],
-        authentication_classes=[],
+        authentication_classes=[SessionAuthentication, JWTAuthentication],
     )
     swagger_url_patterns = [
         path('', lambda request: redirect('/swagger/', permanent=True)),
@@ -37,9 +37,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/account/', include('apps.accounts.urls')),
     path('api/customers/', include('apps.customers.urls')),
+    path('api/engineers/', include('apps.engineers.urls')),
     path('api/products/', include('apps.products.urls')),
     path('api/orders/', include('apps.orders.urls')),
-    path('api/engineers/', include('apps.engineers.urls')),
     path('api/settings/', include('apps.settings.urls')),
 ]
 

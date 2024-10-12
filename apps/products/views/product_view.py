@@ -1,6 +1,8 @@
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from apps.products.models import Product
 from apps.products.schemas.product_shema import product_list_response_schema, product_detail_response_schema
@@ -24,7 +26,7 @@ class ProductCreateAPIView(CreateAPIView):
 
 class ProductListAPIView(ListAPIView):
 	serializer_class = ProductSerializer
-	queryset = Product.objects.filter(is_active=True)
+	queryset = Product.objects.filter(is_active=True).order_by('-created_at')
 
 	@swagger_auto_schema(
 		tags=['Products'],
@@ -46,3 +48,13 @@ class ProductDetailAPIVIew(RetrieveAPIView):
 	def get(self, request, *args, **kwargs):
 		return self.retrieve(request, *args, **kwargs)
 
+
+class ProductUpdateAPIView(APIView):
+	serializer_class = ProductSerializer
+
+	def put(self, request, pk, *args, **kwargs):
+		instance = Product.objects.filter(is_active=True, is_deleted=False).get(pk=pk)
+		serializer = self.serializer_class(instance, data=request.data, partial=True)
+		serializer.is_valid(raise_exception=True)
+		serializer.save()
+		return Response(serializer.data, status=status.HTTP_200_OK)
