@@ -2,7 +2,7 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from requests import Response
 from rest_framework import status
-from rest_framework.generics import ListAPIView, CreateAPIView, UpdateAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, UpdateAPIView, DestroyAPIView
 from rest_framework.views import APIView
 
 from apps.settings.models import InstallType
@@ -48,10 +48,6 @@ class InstallTypeUpdateAPIView(APIView):
 		return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-
-
-
-
 class InstallTypeListAPIView(ListAPIView):
 	queryset = InstallType.objects.filter(is_active=True).order_by('-created_at')
 	serializer_class = InstallTypeSerializer
@@ -74,3 +70,26 @@ class InstallTypeListAPIView(ListAPIView):
 		if not paginated:
 			self.pagination_class = None
 		return self.list(request, *args, **kwargs)
+
+
+class InstallTypeDeleteAPIView(DestroyAPIView):
+	serializer_class = InstallTypeSerializer
+	queryset = InstallType.objects.filter(is_active=True, is_deleted=False)
+
+	@swagger_auto_schema(
+		tags=['Settings'],
+		responses={
+			status.HTTP_204_NO_CONTENT: "Successfully deleted!",
+		}
+	)
+	def delete(self, request, *args, **kwargs):
+		return self.destroy(request, *args, **kwargs)
+
+	def destroy(self, request, *args, **kwargs):
+		try:
+			instance = self.get_object()
+			instance.is_deleted = True
+			instance.is_active = False
+			return Response(status=status.HTTP_204_NO_CONTENT)
+		except Exception as e:
+			return Response(status=status.HTTP_400_BAD_REQUEST)

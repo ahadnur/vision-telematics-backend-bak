@@ -1,6 +1,6 @@
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView, DestroyAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -52,9 +52,39 @@ class ProductDetailAPIVIew(RetrieveAPIView):
 class ProductUpdateAPIView(APIView):
 	serializer_class = ProductSerializer
 
+	@swagger_auto_schema(
+		tags=['Products'],
+		request_body=ProductSerializer,
+		responses={
+			status.HTTP_200_OK: ProductSerializer(),
+		}
+	)
 	def put(self, request, pk, *args, **kwargs):
 		instance = Product.objects.filter(is_active=True, is_deleted=False).get(pk=pk)
 		serializer = self.serializer_class(instance, data=request.data, partial=True)
 		serializer.is_valid(raise_exception=True)
 		serializer.save()
 		return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ProductDestroyAPIView(DestroyAPIView):
+	serializer_class = ProductSerializer
+	queryset = Product.objects.filter(is_active=True, is_deleted=False)
+
+	@swagger_auto_schema(
+		tags=['Products'],
+		responses={
+			status.HTTP_204_NO_CONTENT: "Successfully deleted!",
+		}
+	)
+	def delete(self, request, *args, **kwargs):
+		return self.destroy(request, *args, **kwargs)
+
+	def destroy(self, request, *args, **kwargs):
+		try:
+			instance = self.get_object()
+			instance.is_deleted = True
+			instance.is_active = False
+			return Response(status=status.HTTP_204_NO_CONTENT)
+		except Exception as e:
+			return Response(status=status.HTTP_400_BAD_REQUEST)
