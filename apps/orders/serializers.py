@@ -20,7 +20,7 @@ class OrderWriteSerializer(serializers.ModelSerializer):
         fields = ['id', 'order_ref_number', 'description', 'current_route', 'engineer', 'customer', 'item_orders']
 
         def validate(self, data):
-            items_data = data.get('items', [])
+            items_data = data.get('item_orders', [])
             for item_data in items_data:
                 product_sku_id = item_data.get('product_sku')
                 quantity = item_data.get('quantity', 0)
@@ -42,7 +42,7 @@ class OrderWriteSerializer(serializers.ModelSerializer):
         return order
 
     def update(self, instance, validated_data):
-        items_data = validated_data.pop('items')
+        items_data = validated_data.pop('item_orders')
         instance.order_ref_number = validated_data.get('order_ref_number', instance.order_ref_number)
         instance.description = validated_data.get('description', instance.description)
         instance.current_route = validated_data.get('current_route', instance.current_route)
