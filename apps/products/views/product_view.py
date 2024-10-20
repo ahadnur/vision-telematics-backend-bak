@@ -4,6 +4,7 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView,
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.engineers.views import logger
 from apps.products.models import Product
 from apps.products.schemas.product_shema import product_list_response_schema, product_detail_response_schema
 from apps.products.serializers import ProductSerializer
@@ -87,4 +88,5 @@ class ProductDestroyAPIView(DestroyAPIView):
 			instance.is_active = False
 			return Response(status=status.HTTP_204_NO_CONTENT)
 		except Exception as e:
+			logger.error(f'error on {e}')
 			return Response(status=status.HTTP_400_BAD_REQUEST)

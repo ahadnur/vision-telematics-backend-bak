@@ -86,14 +86,13 @@ class EngineerRetrieveAPIView(APIView):
             status.HTTP_400_BAD_REQUEST: "Bad Request"
         }
     )
-    def get(self, request, *args, **kwargs):
-        logger.info(f'Retrieving Engineer details for id: {kwargs.get("pk")}')
+    def get(self, request, pk):
         try:
-            engineer = Engineer.objects.get(pk=kwargs.get('pk'))
+            engineer = Engineer.objects.get(id=pk)
             serializer = self.serializer_class(engineer)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Engineer.DoesNotExist:
-            logger.error(f'Engineer with id {kwargs.get("pk")} not found')
+            logger.error(f'Engineer with id {pk} not found')
             return Response({'error': 'Engineer not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
@@ -101,25 +100,26 @@ class EngineerUpdateAPIView(APIView):
     serializer_class = EngineerWriteSerializer
 
     @swagger_auto_schema(
+        tags=['Engineer'],
         operation_description="Update an Engineer with associated services and pricing",
+        request_body=EngineerWriteSerializer(),
         responses={
-            status.HTTP_200_OK: EngineerWriteSerializer,
+            status.HTTP_200_OK: EngineerWriteSerializer(),
             status.HTTP_400_BAD_REQUEST: "Bad Request"
         }
     )
-    def put(self, request, *args, **kwargs):
-        logger.info(f'Updating Engineer with id: {kwargs.get("pk")}')
+    def put(self, request, pk):
         try:
-            engineer = Engineer.objects.get(pk=kwargs.get('pk'))
+            engineer = Engineer.objects.get(id=pk)
             serializer = self.serializer_class(engineer, data=request.data)
             if serializer.is_valid():
                 serializer.save()
-                logger.info(f'Engineer {kwargs.get("pk")} updated successfully')
+                logger.info(f'Engineer {pk} updated successfully')
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 logger.warning(f'Engineer update failed due to validation error: {serializer.errors}')
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Engineer.DoesNotExist:
-            logger.error(f'Engineer with id {kwargs.get("pk")} not found for update')
+            logger.error(f'Engineer with id {pk} not found for update')
             return Response({'error': 'Engineer not found'}, status=status.HTTP_404_NOT_FOUND)
 

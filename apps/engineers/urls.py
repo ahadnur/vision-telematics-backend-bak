@@ -6,8 +6,8 @@ app_name = 'engineers'
 
 urlpatterns = [
     path('company-list/', EngineerCompanyListAPIView.as_view(), name='company-list'),
-    path('engineer-list/', EngineerListAPIView.as_view(), name='engineer-list'),
-    path('engineer-create/', EngineerCreateAPIView.as_view(), name='create-engineer'),
-    path('engineer/<pk>/', EngineerRetrieveAPIView.as_view(), name='get-engineer'),
-    path('engineer/<pk>/', EngineerUpdateAPIView.as_view(), name='update-engineer'),
+    path('list/', EngineerListAPIView.as_view(), name='engineer-list'),
+    path('create/', EngineerCreateAPIView.as_view(), name='create-engineer'),
+    path('detail/<int:pk>/', EngineerRetrieveAPIView.as_view(), name='get-engineer'),
+    path('update/<int:pk>/', EngineerUpdateAPIView.as_view(), name='update-engineer'),
 ]
