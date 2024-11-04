@@ -43,25 +43,33 @@ class OrderWriteSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         items_data = validated_data.pop('item_orders')
-        instance.order_ref_number = validated_data.get('order_ref_number', instance.order_ref_number)
-        instance.description = validated_data.get('description', instance.description)
-        instance.current_route = validated_data.get('current_route', instance.current_route)
-        instance.engineer = validated_data.get('engineer', instance.engineer)
-        instance.customer = validated_data.get('customer', instance.customer)
+        for key, value in validated_data.items():
+            if hasattr(instance, key):
+                setattr(instance, key, value)
         instance.save()
+        # instance.order_ref_number = validated_data.get('order_ref_number', instance.order_ref_number)
+        # instance.description = validated_data.get('description', instance.description)
+        # instance.current_route = validated_data.get('current_route', instance.current_route)
+        # instance.engineer = validated_data.get('engineer', instance.engineer)
+        # instance.customer = validated_data.get('customer', instance.customer)
+        # instance.save()
 
         for item_data in items_data:
             item_id = item_data.get('id')
             if item_id:
                 order_item = OrderItem.objects.get(id=item_id, order=instance)
-                order_item.product_sku = item_data.get('product_sku', order_item.product_sku)
-                order_item.price = item_data.get('price', order_item.price)
-                order_item.quantity = item_data.get('quantity', order_item.quantity)
-                order_item.discount = item_data.get('discount', order_item.discount)
-                order_item.description = item_data.get('description', order_item.description)
-                order_item.returned = item_data.get('returned', order_item.returned)
-                order_item.credit_note = item_data.get('credit_note', order_item.credit_note)
+                for key, value in item_data.items():
+                    if hasattr(order_item, key):
+                        setattr(order_item, key, value)
                 order_item.save()
+                # order_item.product_sku = item_data.get('product_sku', order_item.product_sku)
+                # order_item.price = item_data.get('price', order_item.price)
+                # order_item.quantity = item_data.get('quantity', order_item.quantity)
+                # order_item.discount = item_data.get('discount', order_item.discount)
+                # order_item.description = item_data.get('description', order_item.description)
+                # order_item.returned = item_data.get('returned', order_item.returned)
+                # order_item.credit_note = item_data.get('credit_note', order_item.credit_note)
+                # order_item.save()
             else:
                 OrderItem.objects.create(order=instance, **item_data)
 
@@ -76,7 +84,8 @@ class OrderItemReadSerializer(serializers.ModelSerializer):
         fields = ['id', 'order', 'product_sku', 'price', 'quantity', 'discount', 'description', 'returned',
                   'credit_note', 'total_price']
 
-    def get_total_price(self, obj):
+    @staticmethod
+    def get_total_price(obj):
         return obj.total_price()
 
 
@@ -90,9 +99,11 @@ class OrderReadSerializer(serializers.ModelSerializer):
         fields = ['id', 'order_ref_number', 'description', 'current_route', 'engineer', 'customer', 'item_orders',
                   'total_price', 'total_quantity']
 
-    def get_total_price(self, obj):
+    @staticmethod
+    def get_total_price(obj):
         return obj.total_price()
 
-    def get_total_quantity(self, obj):
+    @staticmethod
+    def get_total_quantity(obj):
         return obj.total_quantity()
 

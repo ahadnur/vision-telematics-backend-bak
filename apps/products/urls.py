@@ -2,7 +2,7 @@ from django.urls import path
 
 from apps.products.views.category_view import *
 from apps.products.views.product_view import ProductListAPIView, ProductDetailAPIVIew, ProductCreateAPIView, \
-	ProductUpdateAPIView, ProductDestroyAPIView
+	ProductUpdateAPIView, ProductDestroyAPIView, GenerateProductSkuCodeAPIView
 
 urlpatterns = [
 	path('create/', ProductCreateAPIView.as_view(), name='product_create'),
@@ -17,4 +17,5 @@ urlpatterns = [
 	path('category-details/<pk>/', CategoryRetrieveAPIView.as_view(), name='get_category'),
 	path('category-update/<int:pk>/', CategoryUpdateAPIView.as_view(), name='category_update'),
 	path('category-delete/<int:pk>/', CategoryDestroyAPIView.as_view(), name='category_delete'),
+	path('generate-sku/', GenerateProductSkuCodeAPIView.as_view(), name='generate_sku'),
 ]

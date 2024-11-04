@@ -1,11 +1,15 @@
+import uuid
+
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView, DestroyAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.engineers.views import logger
-from apps.products.models import Product
+from apps.products.models import Product, ProductSKU
 from apps.products.schemas.product_shema import product_list_response_schema, product_detail_response_schema
 from apps.products.serializers import ProductSerializer
 
@@ -90,3 +94,28 @@ class ProductDestroyAPIView(DestroyAPIView):
 		except Exception as e:
 			logger.error(f'error on {e}')
 			return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class GenerateProductSkuCodeAPIView(APIView):
+	permission_classes = (AllowAny, )
+
+	@swagger_auto_schema(
+		tags=['Products'],
+		responses={
+			status.HTTP_200_OK: openapi.Schema(
+				type=openapi.TYPE_OBJECT,
+				properties={
+					'sku_code': openapi.Schema(
+						type=openapi.TYPE_STRING,
+					)
+				}
+			),
+		}
+	)
+	def get(self, request, *args, **kwargs):
+		prefix = "SKU"
+		while True:
+			unique_code = f"{prefix}-{uuid.uuid4().hex[:8].upper()}"
+			if not ProductSKU.objects.filter(sku_code=unique_code).exists():
+				break
+		return Response({"sku_code": unique_code})
