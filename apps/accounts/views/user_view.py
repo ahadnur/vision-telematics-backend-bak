@@ -61,7 +61,6 @@ class LoginAPIView(views.APIView):
 		responses={
 			status.HTTP_201_CREATED: openapi.Response(
 				description='Account created successfully',
-				# schema=account_response_schema
 			),
 		}
 	)

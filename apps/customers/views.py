@@ -1,8 +1,10 @@
 from rest_framework import status, views
 from rest_framework.response import Response
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework.views import APIView
+
 from apps.customers.models import CustomerCompany, Customer
 from apps.customers.serializers import (CompanyListSerializer, CustomerVehicleSerializer,
                                         CustomerWriteSerializer, GetCustomerSerializer)
@@ -84,7 +86,24 @@ class CustomerCreateAPIView(views.APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class CustomerUpdateAPIView(views.APIView):
+class CustomerRetrieveAPIView(RetrieveAPIView):
+    serializer_class = GetCustomerSerializer
+    queryset = Customer.objects.filter(is_active=True)
+
+    @swagger_auto_schema(
+        tags=['Customer'],
+        responses={
+            status.HTTP_200_OK: openapi.Response(
+                description='Get customer',
+                schema=CustomerWriteSerializer
+            )
+        }
+    )
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+
+class CustomerUpdateAPIView(APIView):
     @swagger_auto_schema(
         tags=['Customer'],
         request_body=CustomerWriteSerializer,

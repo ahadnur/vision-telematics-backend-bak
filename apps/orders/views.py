@@ -2,8 +2,8 @@ import logging
 
 
 from django.db.models import Prefetch
-from rest_framework import views, status
-from rest_framework.generics import ListAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
+from rest_framework import status
+from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView
 from rest_framework.response import Response
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -95,7 +95,7 @@ class OrderRetrieveAPIView(RetrieveAPIView):
 class OrderListAPIView(ListAPIView):
     queryset = Order.objects.prefetch_related(
         Prefetch("item_orders", queryset=OrderItem.objects.filter(is_active=True)),
-    ).all().order_by('-created_at')
+    ).order_by('-created_at')
     serializer_class = OrderReadSerializer
 
     @swagger_auto_schema(

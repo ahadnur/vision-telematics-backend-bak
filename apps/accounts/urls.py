@@ -17,7 +17,7 @@ urlpatterns = [
 ]+[
     path('create/', CreateAccountAPIView.as_view(), name='account_create'),
     path('update/<int:_id>/', UpdateAccountAPIView.as_view(), name='account_update'),
-    path('<int:pk>/', GetAccountAPIView.as_view(), name='get_account'),
+    path('detail/<int:pk>/', GetAccountAPIView.as_view(), name='get_account'),
     path('account-list/', AccountListAPIView.as_view(), name='account_list'),
     path('account-list-dropdown/', AccountDropdownListAPIView.as_view(), name='account_list_dropdown'),
 

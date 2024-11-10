@@ -52,7 +52,6 @@ class CustomerWriteSerializer(serializers.ModelSerializer):
                     for attr, value in address_data.items():
                         setattr(customer_address, attr, value)
                     customer_address.save()
-
             return instance
         except IntegrityError:
             raise serializers.ValidationError({'customer_ref_number': 'This customer reference number already exists.'})

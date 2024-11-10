@@ -6,6 +6,8 @@ class Order(BaseModel):
     order_ref_number = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=255, null=True, blank=True)
     current_route = models.TextField(blank=True, null=True)
+    purchasing_notes = models.TextField(blank=True, null=True)
+    engineer_notes = models.TextField(blank=True, null=True)
     engineer = models.ForeignKey('engineers.Engineer', related_name='order_engineers', on_delete=models.SET_NULL, null=True, blank=True)
     customer = models.ForeignKey('customers.Customer', related_name='order_customers', on_delete=models.SET_NULL, null=True, blank=True)
 

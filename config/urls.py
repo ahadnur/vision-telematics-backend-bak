@@ -42,6 +42,7 @@ urlpatterns = [
     path('api/orders/', include('apps.orders.urls')),
     path('api/settings/', include('apps.settings.urls')),
     path('api/services/', include('apps.services.urls')),
+    path('api/configuration/', include('apps.utilities.urls')),
 ]
 
 if settings.DEBUG and swagger_url_patterns:
