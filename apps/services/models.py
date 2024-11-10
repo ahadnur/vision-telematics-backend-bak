@@ -1,7 +1,9 @@
 from django.db import models
 
+from apps.utilities.models import BaseModel
 
-class Service(models.Model):
+
+class Service(BaseModel):
     service_ref = models.CharField(max_length=100)
     purchase_date = models.DateField()
     first_return_visit = models.DateField(null=True, blank=True)
