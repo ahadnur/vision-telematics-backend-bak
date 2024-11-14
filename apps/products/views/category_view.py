@@ -20,7 +20,7 @@ class CategoryListAPIView(APIView):
 	)
 	def get(self, request, *args, **kwargs):
 		try:
-			queryset = Category.objects.filter(is_active=True, is_deleted=False)
+			queryset = Category.active_objects.all()
 			serializer = CategorySerializer(queryset, many=True)
 			return Response(serializer.data)
 		except Exception as e:
@@ -64,7 +64,7 @@ class CategoryUpdateAPIView(APIView):
 
 class CategoryRetrieveAPIView(RetrieveAPIView):
 	serializer_class = CategorySerializer
-	queryset = Category.objects.filter(is_active=True, is_deleted=False)
+	queryset = Category.active_objects.all()
 	lookup_field = 'pk'
 
 	@swagger_auto_schema(
@@ -79,7 +79,7 @@ class CategoryRetrieveAPIView(RetrieveAPIView):
 
 class CategoryDestroyAPIView(DestroyAPIView):
 	serializer_class = CategorySerializer
-	queryset = Category.objects.filter(is_active=True, is_deleted=False)
+	queryset = Category.active_objects.all()
 
 	@swagger_auto_schema(
 		tags=['Category'],

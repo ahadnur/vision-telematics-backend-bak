@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class EngineerCompanyListAPIView(ListAPIView):
-    queryset = EngineerCompany.objects.filter(is_active=True)
+    queryset = EngineerCompany.active_objects.all()
     serializer_class = EngieerCompanyListSerializer
     pagination_class = None
 
@@ -35,7 +35,7 @@ class EngineerCompanyListAPIView(ListAPIView):
 
 
 class EngineerListAPIView(ListAPIView):
-    queryset = Engineer.objects.filter(is_active=True).order_by('contact_name')
+    queryset = Engineer.active_objects.all().order_by('contact_name')
     serializer_class = GetEngineerListSerializer
 
     @swagger_auto_schema(
@@ -52,7 +52,7 @@ class EngineerListAPIView(ListAPIView):
 
 
 class EngineerCreateAPIView(CreateAPIView):
-    queryset = Engineer.objects.filter(is_active=True)
+    queryset = Engineer.active_objects.all()
     serializer_class = EngineerWriteSerializer
 
     @swagger_auto_schema(
@@ -75,7 +75,7 @@ class EngineerCreateAPIView(CreateAPIView):
 
 
 class EngineerRetrieveAPIView(APIView):
-    queryset = Engineer.objects.all()
+    queryset = Engineer.active_objects.all()
     serializer_class = EngineerReadSerializer
 
     @swagger_auto_schema(
@@ -110,7 +110,7 @@ class EngineerUpdateAPIView(APIView):
     )
     def put(self, request, pk):
         try:
-            engineer = Engineer.objects.get(id=pk)
+            engineer = Engineer.active_objects.filter(id=pk).first()
             serializer = self.serializer_class(engineer, data=request.data)
             if serializer.is_valid():
                 serializer.save()

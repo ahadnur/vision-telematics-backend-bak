@@ -1,19 +1,14 @@
 import environ
 import os
 from pathlib import Path
-from datetime import timedelta
-from rest_framework.permissions import AllowAny
 
 
 env = environ.Env()
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 env_file = Path(__file__).resolve().parent.parent.parent
 environ.Env.read_env(os.path.join(env_file, '.env'))
 
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.str('SECRET_KEY')
 JWT_TOKEN = env.str('JWT_TOKEN')
 
@@ -77,7 +72,7 @@ PASSWORD_HASHERS = [
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -135,13 +130,14 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "verbose": {'SECURITY_DEFINITIONS': {
-        'api_key': {
-            'type': 'apiKey',
-            'in': 'header',
-            'name': 'Authorization'
-        }
-    },
+        "verbose": {
+            'SECURITY_DEFINITIONS': {
+                'api_key': {
+                    'type': 'apiKey',
+                    'in': 'header',
+                    'name': 'Authorization'
+                }
+            },
             "format": "%(levelname)s %(name)-12s %(asctime)s %(module)s "
                       "%(process)d %(thread)d %(message)s"
         }

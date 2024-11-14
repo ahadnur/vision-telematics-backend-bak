@@ -16,7 +16,7 @@ from apps.products.serializers import ProductSerializer
 
 class ProductCreateAPIView(CreateAPIView):
 	serializer_class = ProductSerializer
-	queryset = Product.objects.filter(is_active=True, is_deleted=False)
+	queryset = Product.active_objects.all()
 
 	@swagger_auto_schema(
 		tags=['Products'],
@@ -43,7 +43,7 @@ class ProductListAPIView(ListAPIView):
 
 class ProductDetailAPIVIew(RetrieveAPIView):
 	serializer_class = ProductSerializer
-	queryset = Product.objects.filter(is_active=True)
+	queryset = Product.active_objects.all()
 	lookup_field = 'pk'
 
 	@swagger_auto_schema(
@@ -65,7 +65,7 @@ class ProductUpdateAPIView(APIView):
 		}
 	)
 	def put(self, request, pk, *args, **kwargs):
-		instance = Product.objects.filter(is_active=True, is_deleted=False).get(pk=pk)
+		instance = Product.active_objects.filter(pk=pk).first()
 		serializer = self.serializer_class(instance, data=request.data, partial=True)
 		serializer.is_valid(raise_exception=True)
 		serializer.save()
@@ -74,7 +74,7 @@ class ProductUpdateAPIView(APIView):
 
 class ProductDestroyAPIView(DestroyAPIView):
 	serializer_class = ProductSerializer
-	queryset = Product.objects.filter(is_active=True, is_deleted=False)
+	queryset = Product.active_objects.all()
 
 	@swagger_auto_schema(
 		tags=['Products'],

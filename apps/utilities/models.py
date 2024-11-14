@@ -1,4 +1,6 @@
 from django.db import models
+
+from apps.common.active_manager import ActiveManager
 from config.middleware import get_current_user
 
 
@@ -11,6 +13,9 @@ class BaseModel(models.Model):
 
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+
+    objects = models.Manager()
+    active_objects = ActiveManager()
 
     class Meta:
         abstract = True

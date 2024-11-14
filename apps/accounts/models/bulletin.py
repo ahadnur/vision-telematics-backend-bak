@@ -1,4 +1,6 @@
 from django.db import models
+
+from apps.common.active_manager import ActiveManager
 from apps.utilities.models import BaseModel
 
 

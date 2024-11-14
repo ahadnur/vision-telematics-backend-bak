@@ -1,6 +1,4 @@
 import logging
-
-
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -15,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class VehicleMakeCreateAPIView(CreateAPIView):
-	queryset = VehicleMake.objects.all()
+	queryset = VehicleMake.active_objects.all()
 	serializer_class = VehicleMakeSerializer
 
 	@swagger_auto_schema(
@@ -30,11 +28,21 @@ class VehicleMakeCreateAPIView(CreateAPIView):
 
 
 class VehicleMakeListAPIView(ListAPIView):
-	queryset = VehicleMake.objects.all()
+	queryset = VehicleMake.active_objects.all()
 	serializer_class = VehicleMakeSerializer
 
 	@swagger_auto_schema(
 		tags=["Configuration"],
+		manual_parameters=[
+			openapi.Parameter(
+				'paginated',
+				openapi.IN_QUERY,
+				description="Enable or disable pagination (true or false)",
+				type=openapi.TYPE_BOOLEAN,
+				required=False,
+				default=True
+			)
+		],
 		responses={
 			status.HTTP_200_OK: openapi.Response(
 				description="List of Vehicle Types",
@@ -51,12 +59,15 @@ class VehicleMakeListAPIView(ListAPIView):
 		}
 	)
 	def get(self, request, *args, **kwargs):
+		paginated = request.query_params.get('paginated', 'true').lower() == 'true'
+		if not paginated:
+			self.pagination_class = None
 		return self.list(request, *args, **kwargs)
 
 
 class VehicleMakeRetrieveAPIView(RetrieveAPIView):
 	serializer_class = VehicleMakeSerializer
-	queryset = VehicleMake.objects.filter(is_active=True)
+	queryset = VehicleMake.active_objects.all()
 
 	@swagger_auto_schema(
 		tags=["Configuration"],
@@ -99,7 +110,7 @@ class VehicleMakeUpdateAPIView(APIView):
 
 	def update(self, request, pk):
 		try:
-			instance = VehicleMake.objects.filter(id=pk, is_active=True)
+			instance = VehicleMake.objects.filter(id=pk, is_active=True).first()
 			serializer = self.serializer_class(instance, data=request.data)
 			serializer.is_valid(raise_exception=True)
 			serializer.save()
@@ -110,7 +121,7 @@ class VehicleMakeUpdateAPIView(APIView):
 
 
 class VehicleMakeDeleteAPIView(DestroyAPIView):
-	queryset = VehicleMake.objects.filter(is_active=True, is_deleted=False)
+	queryset = VehicleMake.active_objects.all()
 	lookup_field = 'pk'
 
 	@swagger_auto_schema(

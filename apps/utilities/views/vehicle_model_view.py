@@ -1,6 +1,5 @@
 import logging
 
-
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -15,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class VehicleModelCreateAPIView(CreateAPIView):
-	queryset = VehicleModel.objects.all()
+	queryset = VehicleModel.active_objects.all()
 	serializer_class = VehicleModelSerializer
 
 	@swagger_auto_schema(
@@ -30,7 +29,7 @@ class VehicleModelCreateAPIView(CreateAPIView):
 
 
 class VehicleModelListAPIView(ListAPIView):
-	queryset = VehicleModel.objects.all()
+	queryset = VehicleModel.active_objects.all()
 	serializer_class = VehicleModelSerializer
 	pagination_class = None
 
@@ -70,7 +69,7 @@ class VehicleModelListAPIView(ListAPIView):
 
 class VehicleModelRetrieveAPIView(RetrieveAPIView):
 	serializer_class = VehicleModelSerializer
-	queryset = VehicleModel.objects.filter(is_active=True)
+	queryset = VehicleModel.active_objects.all()
 
 	@swagger_auto_schema(
 		tags=["Configuration"],
@@ -113,7 +112,7 @@ class VehicleModelUpdateAPIView(APIView):
 
 	def update(self, request, pk):
 		try:
-			instance = VehicleModel.objects.filter(id=pk, is_active=True)
+			instance = VehicleModel.objects.filter(id=pk, is_active=True).first()
 			serializer = self.serializer_class(instance, data=request.data)
 			serializer.is_valid(raise_exception=True)
 			serializer.save()
@@ -124,7 +123,7 @@ class VehicleModelUpdateAPIView(APIView):
 
 
 class VehicleModelDeleteAPIView(DestroyAPIView):
-	queryset = VehicleModel.objects.filter(is_active=True, is_deleted=False)
+	queryset = VehicleModel.active_objects.all()
 	lookup_field = 'pk'
 
 	@swagger_auto_schema(

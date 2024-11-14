@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class VehicleTypeCreateAPIView(CreateAPIView):
-	queryset = VehicleType.objects.all()
+	queryset = VehicleType.active_objects.all()
 	serializer_class = VehicleTypeSerializer
 
 	@swagger_auto_schema(
@@ -30,7 +30,7 @@ class VehicleTypeCreateAPIView(CreateAPIView):
 
 
 class VehicleTypeListAPIView(ListAPIView):
-	queryset = VehicleType.objects.all()
+	queryset = VehicleType.active_objects.all()
 	serializer_class = VehicleTypeSerializer
 	pagination_class = None
 
@@ -70,7 +70,7 @@ class VehicleTypeListAPIView(ListAPIView):
 
 class VehicleTypeRetrieveAPIView(RetrieveAPIView):
 	serializer_class = VehicleTypeSerializer
-	queryset = VehicleType.objects.filter(is_active=True)
+	queryset = VehicleType.active_objects.all()
 
 	@swagger_auto_schema(
 		tags=["Configuration"],
@@ -113,7 +113,7 @@ class VehicleTypeUpdateAPIView(APIView):
 
 	def update(self, request, pk):
 		try:
-			instance = VehicleType.objects.filter(id=pk, is_active=True)
+			instance = VehicleType.objects.filter(id=pk, is_active=True).first()
 			serializer = self.serializer_class(instance, data=request.data)
 			serializer.is_valid(raise_exception=True)
 			serializer.save()
@@ -124,7 +124,7 @@ class VehicleTypeUpdateAPIView(APIView):
 
 
 class VehicleTypeDeleteAPIView(DestroyAPIView):
-	queryset = VehicleType.objects.filter(is_active=True, is_deleted=False)
+	queryset = VehicleType.active_objects.all()
 	lookup_field = 'pk'
 
 	@swagger_auto_schema(
