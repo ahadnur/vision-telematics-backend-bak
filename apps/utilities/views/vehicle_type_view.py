@@ -1,6 +1,5 @@
 import logging
 
-
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -141,6 +140,7 @@ class VehicleTypeDeleteAPIView(DestroyAPIView):
 			instance = self.get_object()
 			instance.is_deleted = True
 			instance.is_active = False
+			instance.save()
 			return Response(status=status.HTTP_204_NO_CONTENT)
 		except Exception as e:
 			logger.error(f'error on {e}')
