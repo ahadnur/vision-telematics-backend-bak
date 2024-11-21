@@ -5,20 +5,18 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.views import APIView
 
-from apps.customers.models import CustomerCompany, Customer
-from apps.customers.serializers import (CompanyListSerializer, CustomerVehicleSerializer,
-                                        CustomerWriteSerializer, GetCustomerSerializer)
-from apps.customers.schemas import vehicle_info_response_schema, customer_list_response_schema
-from apps.utilities.models import VehicleMake, VehicleModel, VehicleType
+from apps.customers.models import Customer
+from apps.customers.serializers import CustomerWriteSerializer, GetCustomerSerializer
+from apps.customers.schemas import customer_list_response_schema
 import logging
 
 
 logger = logging.getLogger(__name__)
 
 
-class CustomerCompanyListAPIView(ListAPIView):
-    queryset = CustomerCompany.objects.filter(is_active=True).order_by('-created_at')
-    serializer_class = CompanyListSerializer
+class CustomerListAPIView(ListAPIView):
+    queryset = Customer.objects.filter(is_active=True)
+    serializer_class = GetCustomerSerializer
 
     @swagger_auto_schema(
         tags=['Customer'],
@@ -34,33 +32,16 @@ class CustomerCompanyListAPIView(ListAPIView):
         ],
         responses={
             status.HTTP_200_OK: openapi.Response(
-                description='List of companies with id and name',
-                schema=CompanyListSerializer(many=True)
-            ),
-        }
-    )
-    def get(self, request, *args, **kwargs):
-        paginated = request.query_params.get('paginated', 'true').lower() == 'true'
-        if not paginated:
-            self.pagination_class = None  # Disable pagination
-        return self.list(request, *args, **kwargs)
-
-
-class CustomerListAPIView(ListAPIView):
-    queryset = Customer.objects.filter(is_active=True)
-    serializer_class = GetCustomerSerializer
-
-    @swagger_auto_schema(
-        tags=['Customer'],
-        responses={
-            status.HTTP_200_OK: openapi.Response(
                 description='List of customers',
-                schema=customer_list_response_schema
+                schema=customer_list_response_schema,
             ),
             status.HTTP_400_BAD_REQUEST: "Bad request"
         }
     )
     def get(self, request, *args, **kwargs):
+        paginated = request.query_params.get('paginated', 'true').lower() == 'true'
+        if not paginated:
+            self.pagination_class = None
         return self.list(request, *args, **kwargs)
 
 
@@ -124,42 +105,3 @@ class CustomerUpdateAPIView(APIView):
         except Exception as e:
             logger.error(f"create customer error on {e}")
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-class CreateCustomerVehicleAPIView(views.APIView):
-
-    @swagger_auto_schema(
-        tags=['Customer'],
-        request_body=CustomerVehicleSerializer,
-    )
-    def post(self, request, *args, **kwargs):
-        pass
-
-
-class GetVehicleInfoAPIView(views.APIView):
-    # permission_classes = (IsAuthenticated,)
-    @swagger_auto_schema(
-        tags=['Customer'],
-        responses={
-            status.HTTP_200_OK: openapi.Response(
-                description='Vehicle info',
-                schema=vehicle_info_response_schema
-            )
-        }
-    )
-    def get(self, request):
-        try:
-
-            vehicle_make = VehicleMake.objects.values_list('id', 'vehicle_make')
-            vehicle_model = VehicleModel.objects.values_list('id', 'vehicle_model')
-            vehicle_type = VehicleType.objects.values_list('id', 'vehicle_type')
-            data = {
-                'vehicle_makes': vehicle_make,
-                'vehicle_models': vehicle_model,
-                'vehicle_types': vehicle_type
-            }
-            return Response(data, status=status.HTTP_200_OK)
-        except Exception as e:
-            logger.error(str(e),exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-

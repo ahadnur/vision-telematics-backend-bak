@@ -2,15 +2,7 @@ from django.db import transaction, IntegrityError
 from rest_framework import serializers
 
 from apps.accounts.serializers import logger
-from apps.customers.models import Customer, CustomerAddress, CustomerVehicleInfo, CustomerInstallation
-from apps.utilities.models import VehicleMake, VehicleModel, VehicleType
-from apps.customers.models.customer import CustomerCompany
-
-
-class CompanyListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomerCompany
-        fields = ['id', 'company_name']
+from apps.customers.models import Customer, CustomerAddress
 
 
 class CustomerAddressSerializer(serializers.ModelSerializer):
@@ -40,13 +32,12 @@ class CustomerWriteSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Failed to create customer and address.")
 
     def update(self, instance, validated_data):
-        address_data = validated_data.pop('address', None)  # Pop address data if it exists
+        address_data = validated_data.pop('address', None)
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         try:
             with transaction.atomic():
-                instance.save()  # Save changes to the Customer instance
-
+                instance.save()
                 if address_data:
                     customer_address, created = CustomerAddress.objects.get_or_create(customer=instance)
                     for attr, value in address_data.items():
@@ -68,32 +59,9 @@ class GetCustomerSerializer(serializers.ModelSerializer):
         fields = ['id', 'customer_ref_number', 'contact_name', 'phone_numbers', 'email_address', 'company', 'address']
 
 
-class CustomerVehicleSerializer(serializers.ModelSerializer):
-    customer = serializers.PrimaryKeyRelatedField(queryset=Customer.objects.all())
-    vehicle_make = serializers.PrimaryKeyRelatedField(queryset=VehicleMake.objects.all())
-    vehicle_model = serializers.PrimaryKeyRelatedField(queryset=VehicleModel.objects.all())
-    vehicle_type = serializers.PrimaryKeyRelatedField(queryset=VehicleType.objects.all())
+class CustomerDropdownSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = CustomerVehicleInfo
-        fields = ['customer', 'registration_number', 'vehicle_make', 'vehicle_model', 'vehicle_type']
+        model = Customer
+        fields = ['id', 'contact_name']
 
-
-# for oder
-class CustomerOrderOptionsSerializer(serializers.ModelSerializer):
-    customer = serializers.PrimaryKeyRelatedField(queryset=Customer.objects.all())
-
-    class Meta:
-        model = CustomerInstallation
-        fields = ['customer', 'job_required', 'preferred_install_date', 'kit_installed']
-
-
-class CustomerVehicleInfoSerializer(serializers.ModelSerializer):
-    customer = serializers.PrimaryKeyRelatedField(queryset=Customer.objects.all())
-    vehicle_make = serializers.PrimaryKeyRelatedField(queryset=VehicleMake.objects.all())
-    vehicle_model = serializers.PrimaryKeyRelatedField(queryset=VehicleModel.objects.all())
-    vehicle_type = serializers.PrimaryKeyRelatedField(queryset=VehicleType.objects.all())
-
-    class Meta:
-        model = CustomerVehicleInfo
-        fields = ['customer', 'vehicle_make', 'vehicle_model', 'vehicle_type', 'registration_number']
