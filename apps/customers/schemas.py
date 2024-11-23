@@ -54,3 +54,17 @@ customer_list_response_schema = openapi.Schema(
         }),
     })
 )
+
+customer_dropdown_response_schema = openapi.Response(
+    description="List of customer IDs and names",
+    schema=openapi.Schema(
+        type=openapi.TYPE_ARRAY,
+        items=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Customer ID"),
+                "name": openapi.Schema(type=openapi.TYPE_STRING, description="Customer Name"),
+            }
+        )
+    )
+)
