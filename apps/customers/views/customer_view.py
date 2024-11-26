@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 
 from apps.customers.models import Customer
 from apps.customers.serializers import CustomerWriteSerializer, GetCustomerSerializer
-from apps.customers.schemas import customer_list_response_schema
+from apps.customers.schemas import customer_list_response_schema, customer_create_response_schema
 import logging
 
 
@@ -45,15 +45,12 @@ class CustomerListAPIView(ListAPIView):
         return self.list(request, *args, **kwargs)
 
 
-class CustomerCreateAPIView(views.APIView):
+class CustomerCreateAPIView(APIView):
     @swagger_auto_schema(
         tags=['Customer'],
         request_body=CustomerWriteSerializer,
         responses={
-            status.HTTP_201_CREATED: openapi.Response(
-                description='Created customer',
-                schema=CustomerWriteSerializer
-            )
+            status.HTTP_201_CREATED: customer_create_response_schema
         }
     )
     def post(self, request, *args, **kwargs):

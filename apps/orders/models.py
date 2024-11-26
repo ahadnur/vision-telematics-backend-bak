@@ -8,8 +8,10 @@ class Order(BaseModel):
     current_route = models.TextField(blank=True, null=True)
     purchasing_notes = models.TextField(blank=True, null=True)
     engineer_notes = models.TextField(blank=True, null=True)
-    engineer = models.ForeignKey('engineers.Engineer', related_name='order_engineers', on_delete=models.SET_NULL, null=True, blank=True)
-    customer = models.ForeignKey('customers.Customer', related_name='order_customers', on_delete=models.SET_NULL, null=True, blank=True)
+    engineer = models.ForeignKey('engineers.Engineer', related_name='order_engineers', on_delete=models.SET_NULL,
+                                 null=True, blank=True)
+    customer = models.ForeignKey('customers.Customer', related_name='order_customers', on_delete=models.SET_NULL,
+                                 null=True, blank=True)
 
     def __str__(self):
         return f"Order created for {self.customer.contact_name}"
@@ -74,5 +76,5 @@ class Booking(BaseModel):
         unique_together = ('engineer', 'booking_date', 'booking_time')
 
     def __str__(self):
-        return f"Booking for {self.order.customer.customer_name} on {self.booking_date} at {self.booking_time}"
+        return f"Booking for {self.order.customer.contact_name} on {self.booking_date} at {self.booking_time}"
 

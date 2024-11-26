@@ -1,5 +1,7 @@
 from drf_yasg import openapi
 
+from apps.customers.serializers import CustomerWriteSerializer
+
 vehicle_info_response_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
@@ -66,5 +68,15 @@ customer_dropdown_response_schema = openapi.Response(
                 "name": openapi.Schema(type=openapi.TYPE_STRING, description="Customer Name"),
             }
         )
+    )
+)
+
+customer_create_response_schema = openapi.Response(
+    description='Created customer',
+    schema=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            **CustomerWriteSerializer().data
+        }
     )
 )

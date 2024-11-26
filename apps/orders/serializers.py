@@ -1,6 +1,13 @@
+import logging
+
+from django.db import transaction
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+
 from .models import Order, OrderItem
 from apps.products.models import ProductSKU
+
+logger = logging.getLogger(__name__)
 
 
 class OrderItemWriteSerializer(serializers.ModelSerializer):
@@ -19,7 +26,8 @@ class OrderWriteSerializer(serializers.ModelSerializer):
         model = Order
         fields = ['id', 'order_ref_number', 'description', 'current_route', 'engineer', 'customer', 'item_orders']
 
-        def validate(self, data):
+    def validate(self, data):
+        try:
             items_data = data.get('item_orders', [])
             for item_data in items_data:
                 product_sku_id = item_data.get('product_sku')
@@ -31,47 +39,50 @@ class OrderWriteSerializer(serializers.ModelSerializer):
                         raise serializers.ValidationError(
                             f"Ordered quantity of {quantity} exceeds available stock for product SKU {product_sku_id}."
                         )
-
             return data
+        except Exception as e:
+            logger.error(e)
+            raise serializers.ValidationError(e)
 
     def create(self, validated_data):
         items_data = validated_data.pop('item_orders')
-        order = Order.objects.create(**validated_data)
-        for item_data in items_data:
-            OrderItem.objects.create(order=order, **item_data)
+        with transaction.atomic():
+            order = Order.objects.create(**validated_data)
+            order_items = [
+                OrderItem(order=order, **item_data) for item_data in items_data
+            ]
+            OrderItem.objects.bulk_create(order_items)
+
         return order
 
     def update(self, instance, validated_data):
-        items_data = validated_data.pop('item_orders')
-        for key, value in validated_data.items():
-            if hasattr(instance, key):
-                setattr(instance, key, value)
-        instance.save()
-        # instance.order_ref_number = validated_data.get('order_ref_number', instance.order_ref_number)
-        # instance.description = validated_data.get('description', instance.description)
-        # instance.current_route = validated_data.get('current_route', instance.current_route)
-        # instance.engineer = validated_data.get('engineer', instance.engineer)
-        # instance.customer = validated_data.get('customer', instance.customer)
-        # instance.save()
+        items_data = validated_data.pop('item_orders', [])
 
-        for item_data in items_data:
-            item_id = item_data.get('id')
-            if item_id:
-                order_item = OrderItem.objects.get(id=item_id, order=instance)
-                for key, value in item_data.items():
-                    if hasattr(order_item, key):
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+        instance.save()
+
+        existing_item_ids = []
+        new_items_data = []
+
+        with transaction.atomic():
+            for item_data in items_data:
+                item_id = item_data.get('id')
+                if item_id:
+                    try:
+                        order_item = OrderItem.objects.get(id=item_id, order=instance)
+                    except OrderItem.DoesNotExist:
+                        raise ValidationError(f"OrderItem with id {item_id} does not exist.")
+                    for key, value in item_data.items():
                         setattr(order_item, key, value)
-                order_item.save()
-                # order_item.product_sku = item_data.get('product_sku', order_item.product_sku)
-                # order_item.price = item_data.get('price', order_item.price)
-                # order_item.quantity = item_data.get('quantity', order_item.quantity)
-                # order_item.discount = item_data.get('discount', order_item.discount)
-                # order_item.description = item_data.get('description', order_item.description)
-                # order_item.returned = item_data.get('returned', order_item.returned)
-                # order_item.credit_note = item_data.get('credit_note', order_item.credit_note)
-                # order_item.save()
-            else:
-                OrderItem.objects.create(order=instance, **item_data)
+                    order_item.save()
+                    existing_item_ids.append(item_id)
+                else:
+                    new_items_data.append(OrderItem(order=instance, **item_data))
+            if new_items_data:
+                OrderItem.objects.bulk_create(new_items_data)
+
+            OrderItem.objects.filter(order=instance).exclude(id__in=existing_item_ids).delete()
 
         return instance
 

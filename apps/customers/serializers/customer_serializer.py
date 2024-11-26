@@ -1,8 +1,12 @@
+import logging
+
 from django.db import transaction, IntegrityError
 from rest_framework import serializers
 
-from apps.accounts.serializers import logger
+from apps.accounts.models import Account
 from apps.customers.models import Customer, CustomerAddress
+
+logger = logging.getLogger(__name__)
 
 
 class CustomerAddressSerializer(serializers.ModelSerializer):
@@ -13,10 +17,11 @@ class CustomerAddressSerializer(serializers.ModelSerializer):
 
 class CustomerWriteSerializer(serializers.ModelSerializer):
     address = CustomerAddressSerializer()
+    account = serializers.PrimaryKeyRelatedField(queryset=Account.objects.all())
 
     class Meta:
         model = Customer
-        fields = ['id', 'customer_ref_number', 'contact_name', 'phone_numbers', 'email_address', 'company', 'address']
+        fields = ['id', 'customer_ref_number', 'contact_name', 'phone_numbers', 'email_address', 'account', 'address']
 
     def create(self, validated_data):
         address_data = validated_data.pop('address')
@@ -26,6 +31,7 @@ class CustomerWriteSerializer(serializers.ModelSerializer):
                 CustomerAddress.objects.create(customer=customer, **address_data)
             return customer
         except IntegrityError as e:
+            logger.error(e)
             raise serializers.ValidationError({'customer_ref_number': 'This customer reference number already exists.'})
         except Exception as e:
             logger.error(f'create customer error on: {e}')
