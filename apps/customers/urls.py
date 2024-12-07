@@ -14,4 +14,5 @@ urlpatterns = [
     path('create-vehicle-info/', CreateCustomerVehicleAPIView.as_view(), name='customer-vehicle-create'),
     path('get-vehicle-info/', GetVehicleInfoAPIView.as_view(), name='customer-get-vehicle-info'),
     path('customer-dropdown-list/', CustomerDropdownListAPIView.as_view(), name='customer-dropdown-list'),
+    # path
 ]

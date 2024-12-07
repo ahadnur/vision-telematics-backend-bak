@@ -26,7 +26,7 @@ class PO(BaseModel):
     description = models.TextField(null=True, blank=True)
     supplier = models.ForeignKey('Supplier', on_delete=models.SET_NULL, null=True, blank=True)
     item_po = models.CharField(max_length=100, null=True, blank=True)
-    product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, blank=True)
+    product_sku = models.ForeignKey('ProductSKU', on_delete=models.SET_NULL, null=True, blank=True)
     supplier_po = models.CharField(max_length=100, null=True, blank=True)
     item_ordered = models.CharField(max_length=255, null=True, blank=True)
     received = models.BooleanField(default=False)

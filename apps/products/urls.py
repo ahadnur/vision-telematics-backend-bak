@@ -1,8 +1,9 @@
 from django.urls import path
 
-from apps.products.views.category_view import *
-from apps.products.views.product_view import ProductListAPIView, ProductDetailAPIVIew, ProductCreateAPIView, \
-	ProductUpdateAPIView, ProductDestroyAPIView, GenerateProductSkuCodeAPIView
+from apps.products.views import ProductCreateAPIView, ProductListAPIView, ProductDetailAPIVIew, ProductUpdateAPIView, \
+	CategoryRetrieveAPIView, CategoryUpdateAPIView, GenerateProductSkuCodeAPIView, ProductDestroyAPIView, \
+	CategoryCreateAPIView, CategoryListAPIView, CategoryDestroyAPIView, SupplierCreateAPIView, SupplierListAPIView, \
+	SupplierDetailAPIView, SupplierUpdateAPIView, SupplierDeleteAPIView
 
 urlpatterns = [
 	path('create/', ProductCreateAPIView.as_view(), name='product_create'),
@@ -18,4 +19,10 @@ urlpatterns = [
 	path('category-update/<int:pk>/', CategoryUpdateAPIView.as_view(), name='category_update'),
 	path('category-delete/<int:pk>/', CategoryDestroyAPIView.as_view(), name='category_delete'),
 	path('generate-sku/', GenerateProductSkuCodeAPIView.as_view(), name='generate_sku'),
+
+	path('supplier-create/', SupplierCreateAPIView.as_view(), name='supplier_create'),
+	path('supplier-list/', SupplierListAPIView.as_view(), name='supplier_list'),
+	path('supplier-detail/<int:pk>/', SupplierDetailAPIView.as_view(), name='supplier_detail'),
+	path('supplier-update/<int:pk>/', SupplierUpdateAPIView.as_view(), name='supplier_update'),
+	path('supplier-delete/<int:pk>/', SupplierDeleteAPIView.as_view(), name='supplier_delete'),
 ]

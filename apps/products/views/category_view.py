@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 
 from apps.products.models import Category
 from apps.products.schemas.category_schema import category_list_reponse
-from apps.products.serializers.category_serializer import CategorySerializer
+from apps.products.serializers import CategorySerializer
 
 logger = logging.getLogger(__name__)
 

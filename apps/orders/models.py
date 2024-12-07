@@ -1,4 +1,6 @@
 from django.db import models
+
+from apps.products.models import PO
 from apps.utilities.models import BaseModel
 
 
@@ -25,21 +27,18 @@ class Order(BaseModel):
 
 # KIF
 class OrderItem(BaseModel):
-    order = models.ForeignKey('orders.Order', related_name='item_orders', on_delete=models.CASCADE, null=True,
-                              blank=True)
-    product_sku = models.ForeignKey('products.ProductSKU', related_name='order_item_skus', on_delete=models.CASCADE,
-                                    blank=True, null=True)
+    order = models.ForeignKey('orders.Order', related_name='item_orders', on_delete=models.CASCADE, null=True, blank=True)
+    product_sku = models.ForeignKey('products.ProductSKU', related_name='order_item_skus', on_delete=models.CASCADE, blank=True, null=True)
+    po = models.ForeignKey(PO, related_name='order_items', on_delete=models.SET_NULL, null=True, blank=True)  # Added field
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     quantity = models.PositiveIntegerField(default=1)
     discount = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     returned = models.BooleanField(default=False)
-    credit_note = models.ForeignKey('customers.Credit', related_name='order_item_credits', on_delete=models.SET_NULL,
-                                    null=True, blank=True)
+    credit_note = models.ForeignKey('customers.Credit', related_name='order_item_credits', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return (f"{self.quantity} x {self.product_sku.sku_code if self.product_sku.sku_code else ''} "
-                f"for Order {self.order.order_ref_number}")
+        return f"{self.quantity} x {self.product_sku.sku_code if self.product_sku.sku_code else ''} for Order {self.order.order_ref_number}"
 
     def total_price(self):
         total = self.price * self.quantity
