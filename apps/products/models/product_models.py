@@ -51,9 +51,7 @@ class ProductSKU(BaseModel):
 
 
 class Inventory(BaseModel):
-	product_sku = models.ForeignKey(
-		'ProductSKU', on_delete=models.CASCADE, related_name='inventory'
-	)
+	product_sku = models.ForeignKey('ProductSKU', on_delete=models.CASCADE, related_name='inventory')
 	stock_quantity = models.IntegerField(default=0)
 
 	def __str__(self):
@@ -63,15 +61,32 @@ class Inventory(BaseModel):
 		db_table = 'inventory'
 
 	def update_stock(self, quantity, operation_type, reason=None, reference=None):
+		"""
+		Updates the stock quantity and logs the stock movement.
+
+		:param quantity: Number of items to add or remove.
+		:param operation_type: Type of operation ('add', 'remove', 'adjust').
+		:param reason: Reason for the stock movement.
+		:param reference: Reference ID (e.g., order ID, purchase order ID).
+		"""
+		if quantity <= 0:
+			raise ValueError("Quantity must be positive.")
+
 		if operation_type == OperationChoice.REMOVE.value and quantity > self.stock_quantity:
 			raise ValueError("Not enough stock available.")
+
 		previous_quantity = self.stock_quantity
+
 		if operation_type == OperationChoice.ADD.value:
 			self.stock_quantity += quantity
 		elif operation_type == OperationChoice.REMOVE.value:
 			self.stock_quantity -= quantity
-		self.save()
+		elif operation_type == OperationChoice.ADJUST.value:
+			self.stock_quantity = quantity
+		else:
+			raise ValueError("Invalid operation type.")
 
+		self.save()
 		StockMovement.objects.create(
 			product_sku=self.product_sku,
 			inventory=self,

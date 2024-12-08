@@ -3,7 +3,8 @@ from django.urls import path
 from apps.products.views import ProductCreateAPIView, ProductListAPIView, ProductDetailAPIVIew, ProductUpdateAPIView, \
 	CategoryRetrieveAPIView, CategoryUpdateAPIView, GenerateProductSkuCodeAPIView, ProductDestroyAPIView, \
 	CategoryCreateAPIView, CategoryListAPIView, CategoryDestroyAPIView, SupplierCreateAPIView, SupplierListAPIView, \
-	SupplierDetailAPIView, SupplierUpdateAPIView, SupplierDeleteAPIView
+	SupplierDetailAPIView, SupplierUpdateAPIView, SupplierDeleteAPIView, InventoryListAPIView, StockMovementListAPIView, \
+	UpdateStockAPIView
 
 urlpatterns = [
 	path('create/', ProductCreateAPIView.as_view(), name='product_create'),
@@ -11,7 +12,6 @@ urlpatterns = [
 	path('details/<int:pk>/', ProductDetailAPIVIew.as_view(), name='product_detail'),
 	path('update/<int:pk>/', ProductUpdateAPIView.as_view(), name='product_update'),
 	path('delete/<int:pk>/', ProductDestroyAPIView.as_view(), name='product_delete'),
-
 
 	path('category-create/', CategoryCreateAPIView.as_view(), name='category_create'),
 	path('category-list/', CategoryListAPIView.as_view(), name='category_list'),
@@ -25,4 +25,8 @@ urlpatterns = [
 	path('supplier-detail/<int:pk>/', SupplierDetailAPIView.as_view(), name='supplier_detail'),
 	path('supplier-update/<int:pk>/', SupplierUpdateAPIView.as_view(), name='supplier_update'),
 	path('supplier-delete/<int:pk>/', SupplierDeleteAPIView.as_view(), name='supplier_delete'),
+
+	path('inventory-list/', InventoryListAPIView.as_view(), name='inventory_list'),
+	path('stock-movement-list/', StockMovementListAPIView.as_view(), name='stock_movement_list'),
+	path('stock-movement/<pk>/', UpdateStockAPIView.as_view(), name='stock_movement_update'),
 ]

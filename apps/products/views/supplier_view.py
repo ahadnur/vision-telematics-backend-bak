@@ -1,7 +1,8 @@
 import logging
 
-from rest_framework import generics, status
+from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView, ListAPIView, DestroyAPIView
 from rest_framework.response import Response
 
 from apps.products.models import Supplier
@@ -11,7 +12,7 @@ from apps.products.serializers import SupplierSerializer
 logger = logging.getLogger(__name__)
 
 
-class SupplierListAPIView(generics.ListAPIView):
+class SupplierListAPIView(ListAPIView):
 	serializer_class = SupplierSerializer
 
 	def get_queryset(self):
@@ -35,7 +36,7 @@ class SupplierListAPIView(generics.ListAPIView):
 		return self.list(request, *args, **kwargs)
 
 
-class SupplierCreateAPIView(generics.CreateAPIView):
+class SupplierCreateAPIView(CreateAPIView):
 	queryset = Supplier.active_objects.all()
 	serializer_class = SupplierSerializer
 
@@ -53,7 +54,7 @@ class SupplierCreateAPIView(generics.CreateAPIView):
 		return super().post(request, *args, **kwargs)
 
 
-class SupplierDetailAPIView(generics.RetrieveAPIView):
+class SupplierDetailAPIView(RetrieveAPIView):
 	queryset = Supplier.active_objects.all()
 	serializer_class = SupplierSerializer
 
@@ -70,7 +71,7 @@ class SupplierDetailAPIView(generics.RetrieveAPIView):
 		return super().get(request, *args, **kwargs)
 
 
-class SupplierUpdateAPIView(generics.UpdateAPIView):
+class SupplierUpdateAPIView(UpdateAPIView):
 	queryset = Supplier.active_objects.all()
 	serializer_class = SupplierSerializer
 
@@ -88,7 +89,7 @@ class SupplierUpdateAPIView(generics.UpdateAPIView):
 		return super().put(request, *args, **kwargs)
 
 
-class SupplierDeleteAPIView(generics.DestroyAPIView):
+class SupplierDeleteAPIView(DestroyAPIView):
 	queryset = Supplier.objects.all()
 	serializer_class = SupplierSerializer
 
