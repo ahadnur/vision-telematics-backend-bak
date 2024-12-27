@@ -21,7 +21,7 @@ to be procured, their quantities, descriptions, and associated suppliers
 
 class PO(BaseModel):
     po_ref = models.CharField(max_length=100, unique=True)
-    invoice_number = models.ForeignKey('customers.Invoice', on_delete=models.SET_NULL, null=True, blank=True)
+    invoice_number = models.CharField(max_length=255, null=True, blank=True, unique=True)
     date = models.DateField()
     description = models.TextField(null=True, blank=True)
     supplier = models.ForeignKey('Supplier', on_delete=models.SET_NULL, null=True, blank=True)

@@ -119,3 +119,27 @@ class GenerateProductSkuCodeAPIView(APIView):
 			if not ProductSKU.objects.filter(sku_code=unique_code).exists():
 				break
 		return Response({"sku_code": unique_code})
+
+
+class ProductSKUDestroyAPIView(DestroyAPIView):
+	queryset = ProductSKU.active_objects.all()
+	lookup_field = 'pk'
+
+	@swagger_auto_schema(
+		tags=['Products'],
+		responses={
+			status.HTTP_204_NO_CONTENT: "Successfully deleted product skus!",
+		}
+	)
+	def delete(self, request, *args, **kwargs):
+		return self.destroy(request, *args, **kwargs)
+
+	def destroy(self, request, *args, **kwargs):
+		try:
+			instance = self.get_object()
+			instance.is_deleted = True
+			instance.is_active = False
+			return Response(status=status.HTTP_204_NO_CONTENT)
+		except Exception as e:
+			logger.error(f'error on {e}')
+			return Response(status=status.HTTP_400_BAD_REQUEST)

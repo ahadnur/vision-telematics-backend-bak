@@ -4,7 +4,7 @@ from apps.products.views import ProductCreateAPIView, ProductListAPIView, Produc
 	CategoryRetrieveAPIView, CategoryUpdateAPIView, GenerateProductSkuCodeAPIView, ProductDestroyAPIView, \
 	CategoryCreateAPIView, CategoryListAPIView, CategoryDestroyAPIView, SupplierCreateAPIView, SupplierListAPIView, \
 	SupplierDetailAPIView, SupplierUpdateAPIView, SupplierDeleteAPIView, InventoryListAPIView, StockMovementListAPIView, \
-	UpdateStockAPIView
+	UpdateStockAPIView, ProductSKUDestroyAPIView
 
 urlpatterns = [
 	path('create/', ProductCreateAPIView.as_view(), name='product_create'),
@@ -12,6 +12,7 @@ urlpatterns = [
 	path('details/<int:pk>/', ProductDetailAPIVIew.as_view(), name='product_detail'),
 	path('update/<int:pk>/', ProductUpdateAPIView.as_view(), name='product_update'),
 	path('delete/<int:pk>/', ProductDestroyAPIView.as_view(), name='product_delete'),
+	path('sku-delete/<int:pk>/', ProductSKUDestroyAPIView.as_view(), name='product_sku_delete'),
 
 	path('category-create/', CategoryCreateAPIView.as_view(), name='category_create'),
 	path('category-list/', CategoryListAPIView.as_view(), name='category_list'),
@@ -29,4 +30,10 @@ urlpatterns = [
 	path('inventory-list/', InventoryListAPIView.as_view(), name='inventory_list'),
 	path('stock-movement-list/', StockMovementListAPIView.as_view(), name='stock_movement_list'),
 	path('stock-movement/<pk>/', UpdateStockAPIView.as_view(), name='stock_movement_update'),
+
+	# path('po/', POListView.as_view(), name='po-list'),
+	# path('po/create/', POCreateView.as_view(), name='po-create'),
+	# path('po/<int:id>/', PORetrieveView.as_view(), name='po-retrieve'),
+	# path('po/<int:id>/update/', POUpdateView.as_view(), name='po-update'),
+	# path('po/<int:id>/delete/', PODeleteView.as_view(), name='po-delete'),
 ]
