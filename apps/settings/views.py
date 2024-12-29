@@ -1,13 +1,16 @@
+import logging
+
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from requests import Response
 from rest_framework import status
 from rest_framework.generics import ListAPIView, CreateAPIView, UpdateAPIView, DestroyAPIView
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.settings.models import InstallType
 from apps.settings.serializers import InstallTypeSerializer
 
+logger = logging.getLogger(__name__)
 
 class InstallTypeCreateAPIView(CreateAPIView):
 	queryset = InstallType.objects.filter(is_active=True, is_deleted=False)
@@ -92,4 +95,5 @@ class InstallTypeDeleteAPIView(DestroyAPIView):
 			instance.is_active = False
 			return Response(status=status.HTTP_204_NO_CONTENT)
 		except Exception as e:
+			logger.error(e)
 			return Response(status=status.HTTP_400_BAD_REQUEST)
