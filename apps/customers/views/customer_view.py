@@ -1,6 +1,6 @@
 from rest_framework import status, views
 from rest_framework.response import Response
-from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.views import APIView
@@ -10,6 +10,7 @@ from apps.customers.serializers import CustomerWriteSerializer, GetCustomerSeria
 from apps.customers.schemas import customer_list_response_schema, customer_create_response_schema
 import logging
 
+from apps.products.models import Category
 
 logger = logging.getLogger(__name__)
 
@@ -101,4 +102,28 @@ class CustomerUpdateAPIView(APIView):
             return Response({'message': 'Customer updated successfully.'}, status=status.HTTP_200_OK)
         except Exception as e:
             logger.error(f"create customer error on {e}")
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class CustomerDestroyAPIView(DestroyAPIView):
+    queryset = Customer.objects.filter(is_active=True)
+
+    @swagger_auto_schema(
+        tags=['Customer'],
+        responses={
+            status.HTTP_204_NO_CONTENT: "Successfully deleted!",
+        }
+    )
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.is_deleted = True
+            instance.is_active = False
+            instance.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            logger.error(e)
             return Response(status=status.HTTP_400_BAD_REQUEST)

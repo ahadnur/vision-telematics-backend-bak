@@ -144,3 +144,29 @@ def activate(request, uidb64, token):
         return HttpResponse('Thank you for your email confirmation. Your account is now activated.')
     else:
         return HttpResponse('Activation link is invalid!')
+
+
+
+# class CustomerDestroyAPIView(DestroyAPIView):
+#     queryset = Customer.objects.filter(is_active=True)
+#
+#     @swagger_auto_schema(
+#         tags=['Customer'],
+#         responses={
+#             status.HTTP_204_NO_CONTENT: "Successfully deleted!",
+#         }
+#     )
+#     def delete(self, request, *args, **kwargs):
+#         return self.destroy(request, *args, **kwargs)
+#
+#     def destroy(self, request, *args, **kwargs):
+#         try:
+#             instance = self.get_object()
+#             instance.is_deleted = True
+#             instance.is_active = False
+#             instance.save()
+#             return Response(status=status.HTTP_204_NO_CONTENT)
+#         except Exception as e:
+#             logger.error(e)
+#             return Response(status=status.HTTP_400_BAD_REQUEST)
+

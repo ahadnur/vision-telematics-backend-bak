@@ -95,6 +95,7 @@ class CategoryDestroyAPIView(DestroyAPIView):
 			instance = self.get_object()
 			instance.is_deleted = True
 			instance.is_active = False
+			instance.save()
 			return Response(status=status.HTTP_204_NO_CONTENT)
 		except Exception as e:
 			logger.error(e)

@@ -1,5 +1,6 @@
 import logging
 
+from django.db.models import F
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -37,6 +38,23 @@ class InventoryListAPIView(ListAPIView):
 	)
 	def get(self, request, *args, **kwargs):
 		return self.list(request, *args, **kwargs)
+
+	def list(self, request, *args, **kwargs):
+		queryset = self.queryset.select_related('product_sku__product').annotate(
+			product_name=F('product_sku__product__product_name'),
+			sku_code=F('product_sku__sku_code'),
+			quantity=F('product_sku__qty'),
+			unit_price=F('product_sku__unit_price'),
+		).values('id', 'product_name', 'sku_code', 'quantity', 'unit_price').order_by('-created_at')
+
+		page = self.paginate_queryset(queryset)
+		if page is not None:
+			serializer = self.get_serializer(page, many=True)
+			return self.get_paginated_response(serializer.data)
+
+		serializer = self.get_serializer(queryset, many=True)
+		return Response(serializer.data)
+
 
 
 class StockMovementListAPIView(ListAPIView):

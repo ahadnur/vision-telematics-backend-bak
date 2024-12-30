@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED=1
 ENV PATH="/root/.local/bin:$PATH"
 
 # Metadata for the image
-LABEL maintainer="Brain Station 23 Ltd"
+LABEL maintainer="Nur Amin Sifat"
 
 # Set the working directory
 WORKDIR /app

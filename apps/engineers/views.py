@@ -3,7 +3,7 @@ import logging
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView, CreateAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView
 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -123,3 +123,26 @@ class EngineerUpdateAPIView(APIView):
             logger.error(f'Engineer with id {pk} not found for update')
             return Response({'error': 'Engineer not found'}, status=status.HTTP_404_NOT_FOUND)
 
+
+class EngineerDestroyAPIView(DestroyAPIView):
+    queryset = Engineer.active_objects.all()
+
+    @swagger_auto_schema(
+        tags=['Engineer'],
+        responses={
+            status.HTTP_204_NO_CONTENT: "Successfully deleted!",
+        }
+    )
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.is_deleted = True
+            instance.is_active = False
+            instance.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            logger.error(e)
+            return Response(status=status.HTTP_400_BAD_REQUEST)

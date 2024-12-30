@@ -7,3 +7,5 @@ drf-yasg==1.21.7
 environ==1.0
 psycopg2-binary==2.9.9
 django-cors-headers==4.4.0
+argon2-cffi==23.1.0
+setuptools==75.6.0
