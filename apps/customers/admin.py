@@ -1,17 +1,11 @@
 from django.contrib import admin
-from .models import (Customer, Invoice, InvoiceServiceLog, CustomerCompany, CustomerVehicleInfo, CustomerInstallation,
+from .models import (Customer, Invoice, InvoiceServiceLog, CustomerVehicleInfo, CustomerInstallation,
                      CustomerAddress)
 
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ['customer_ref_number', 'id']
-
-
-@admin.register(CustomerCompany)
-class CustomerCompanyAdmin(admin.ModelAdmin):
-    list_display = ['id', 'company_name']
-    fields = ['company_name']
+    list_display = ['customer_ref_number', 'contact_name', 'id']
 
 
 admin.site.register(Invoice)

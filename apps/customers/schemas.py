@@ -80,3 +80,19 @@ customer_create_response_schema = openapi.Response(
         }
     )
 )
+
+customer_vehicle_list_response_schema = openapi.Schema(
+				type=openapi.TYPE_ARRAY,
+				items=openapi.Schema(
+					type=openapi.TYPE_OBJECT,
+					properties={
+						'id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Vehicle ID'),
+						'registration_number': openapi.Schema(type=openapi.TYPE_STRING,
+															  description='Registration Number'),
+						'make': openapi.Schema(type=openapi.TYPE_INTEGER, description='Vehicle Make ID'),
+						'model': openapi.Schema(type=openapi.TYPE_INTEGER, description='Vehicle Model ID'),
+						'type': openapi.Schema(type=openapi.TYPE_INTEGER, description='Vehicle Type ID'),
+						'customer_name': openapi.Schema(type=openapi.TYPE_STRING, description='Customer Name'),
+					}
+				)
+			)

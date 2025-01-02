@@ -1,3 +1,4 @@
+from django.db.models import Prefetch
 from rest_framework import status, views
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView
@@ -9,8 +10,6 @@ from apps.customers.models import Customer
 from apps.customers.serializers import CustomerWriteSerializer, GetCustomerSerializer
 from apps.customers.schemas import customer_list_response_schema, customer_create_response_schema
 import logging
-
-from apps.products.models import Category
 
 logger = logging.getLogger(__name__)
 
@@ -67,14 +66,15 @@ class CustomerCreateAPIView(APIView):
 
 class CustomerRetrieveAPIView(RetrieveAPIView):
     serializer_class = GetCustomerSerializer
-    queryset = Customer.objects.filter(is_active=True)
+    queryset = Customer.active_objects.all()
+    lookup_field = 'pk'
 
     @swagger_auto_schema(
         tags=['Customer'],
         responses={
             status.HTTP_200_OK: openapi.Response(
                 description='Get customer',
-                schema=CustomerWriteSerializer
+                schema=GetCustomerSerializer
             )
         }
     )
