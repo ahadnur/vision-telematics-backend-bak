@@ -1,5 +1,5 @@
 from apps.common.enums import OperationChoice
-from apps.products.models import Inventory
+from apps.inventory.models import Inventory
 
 
 class InventoryService:

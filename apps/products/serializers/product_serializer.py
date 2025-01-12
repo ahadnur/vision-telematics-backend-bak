@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.db import transaction
-from apps.products.models import Category, ProductSKU, Product, Inventory
+from apps.products.models import Category, ProductSKU, Product
+from apps.inventory.models import Inventory
 
 
 class ProductSKUSerializer(serializers.Serializer):

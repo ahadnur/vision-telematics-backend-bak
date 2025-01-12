@@ -1,10 +1,11 @@
 from django.urls import path
 
-from apps.products.views import ProductCreateAPIView, ProductListAPIView, ProductDetailAPIVIew, ProductUpdateAPIView, \
-	CategoryRetrieveAPIView, CategoryUpdateAPIView, GenerateProductSkuCodeAPIView, ProductDestroyAPIView, \
-	CategoryCreateAPIView, CategoryListAPIView, CategoryDestroyAPIView, SupplierCreateAPIView, SupplierListAPIView, \
-	SupplierDetailAPIView, SupplierUpdateAPIView, SupplierDeleteAPIView, InventoryListAPIView, StockMovementListAPIView, \
-	UpdateStockAPIView, ProductSKUDestroyAPIView
+from apps.products.views import (ProductCreateAPIView, ProductListAPIView, ProductDetailAPIVIew, ProductUpdateAPIView,
+								 CategoryRetrieveAPIView, CategoryUpdateAPIView, GenerateProductSkuCodeAPIView,
+								 ProductDestroyAPIView,CategoryCreateAPIView, CategoryListAPIView,
+								 CategoryDestroyAPIView, SupplierCreateAPIView, SupplierListAPIView,
+								 SupplierDetailAPIView, SupplierUpdateAPIView, SupplierDeleteAPIView,
+								 ProductSKUDestroyAPIView)
 
 urlpatterns = [
 	path('create/', ProductCreateAPIView.as_view(), name='product_create'),
@@ -26,10 +27,6 @@ urlpatterns = [
 	path('supplier-detail/<int:pk>/', SupplierDetailAPIView.as_view(), name='supplier_detail'),
 	path('supplier-update/<int:pk>/', SupplierUpdateAPIView.as_view(), name='supplier_update'),
 	path('supplier-delete/<int:pk>/', SupplierDeleteAPIView.as_view(), name='supplier_delete'),
-
-	path('inventory-list/', InventoryListAPIView.as_view(), name='inventory_list'),
-	path('stock-movement-list/', StockMovementListAPIView.as_view(), name='stock_movement_list'),
-	path('stock-movement/<pk>/', UpdateStockAPIView.as_view(), name='stock_movement_update'),
 
 	# path('po/', POListView.as_view(), name='po-list'),
 	# path('po/create/', POCreateView.as_view(), name='po-create'),

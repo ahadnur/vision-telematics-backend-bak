@@ -1,7 +1,9 @@
 from django.db import models
 
+from apps.utilities.models import BaseModel
 
-class Dispatch(models.Model):
+
+class Dispatch(BaseModel):
     city_link_account = models.CharField(max_length=100, blank=True, null=True)
     invoice_reference = models.CharField(max_length=100, blank=True, null=True)
     company_name = models.CharField(max_length=100, blank=True, null=True)
@@ -18,6 +20,10 @@ class Dispatch(models.Model):
     sat_delivery = models.BooleanField(default=False)
     description = models.TextField(blank=True, null=True)
     labels = models.TextField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'dispatch'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.invoice_reference

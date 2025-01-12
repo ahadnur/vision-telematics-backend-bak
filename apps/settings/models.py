@@ -46,7 +46,7 @@ class InstallType(BaseModel):
     class Meta:
         db_table = 'install_type'
         verbose_name_plural = 'Installation Types'
-        managed = True
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.install_type

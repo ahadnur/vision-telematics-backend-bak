@@ -42,6 +42,7 @@ PROJECT_APPS = [
     'apps.dispatch.apps.DispatchConfig',
     'apps.products.apps.ProductsConfig',
     'apps.services.apps.ServicesConfig',
+    'apps.inventory.apps.InventoryConfig',
     # 'apps.stock',
 ]
 

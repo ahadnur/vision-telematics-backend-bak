@@ -4,7 +4,7 @@ from .models import Account, User, UserRole, Profile, AuditTrail, NotifiedBy, Bu
 
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
-    list_display = ('account_name', 'id', 'accounts_contact_name')
+    list_display = ('account_number', 'id')
 
 
 @admin.register(User)

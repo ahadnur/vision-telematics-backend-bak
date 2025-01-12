@@ -1,2 +1,2 @@
-from .product_models import *
-from .models import *
+from .product_model import *
+from .purchase_model import *

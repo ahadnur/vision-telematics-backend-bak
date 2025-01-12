@@ -23,9 +23,9 @@ order_request_schema = openapi.Schema(
             }
         ),
         'items': openapi.Schema(
-            type=openapi.TYPE_ARRAY,  # Define `items` as an array
+            type=openapi.TYPE_ARRAY,
             items=openapi.Schema(
-                type=openapi.TYPE_OBJECT,  # Each item in the array is an object
+                type=openapi.TYPE_OBJECT,
                 properties={
                     'product': openapi.Schema(
                         type=openapi.TYPE_INTEGER,

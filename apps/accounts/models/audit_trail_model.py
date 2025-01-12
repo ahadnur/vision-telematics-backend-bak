@@ -23,3 +23,5 @@ class AuditTrail(BaseModel):
     class Meta:
         verbose_name = 'Audit Trail'
         verbose_name_plural = 'Audit Trail'
+        db_table = 'audit_trail'
+        ordering = ('-created_at',)

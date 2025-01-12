@@ -9,9 +9,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.common.enums import OperationChoice
-from apps.products.models import Inventory, StockMovement
-from apps.products.serializers import InventorySerializer, StockMovementSerializer, UpdateStockMovementSerializer
-from apps.products.helpers import InventoryService
+from apps.inventory.models import Inventory, StockMovement
+from apps.inventory.serializers import InventorySerializer, StockMovementSerializer, UpdateStockMovementSerializer
+from apps.inventory.helpers import InventoryService
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +69,7 @@ class StockMovementListAPIView(ListAPIView):
 				items=openapi.Schema(
 					type=openapi.TYPE_OBJECT,
 					properties={
-						**StockMovementSerializer().data
+						# **StockMovementSerializer().data
 					}
 				)
 			),

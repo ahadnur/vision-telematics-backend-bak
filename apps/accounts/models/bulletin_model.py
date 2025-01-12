@@ -11,5 +11,9 @@ class Bulletin(BaseModel):
     bulletin = models.TextField(blank=True, null=True)
     subject = models.CharField(max_length=255, blank=True, null=True)
 
+    class Meta:
+        db_table = 'bulletin'
+        ordering = ['-created_at']
+
     def __str__(self):
         return f"{self.date} - {self.subject}"

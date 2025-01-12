@@ -1,5 +1,6 @@
 from django.db import models
 
+from apps.accounts.models import User
 from apps.utilities.models import BaseModel
 
 
@@ -25,24 +26,35 @@ class Service(BaseModel):
                                  on_delete=models.SET_NULL, null=True, blank=True)
     install_level = models.ForeignKey('accounts.InstallLevel', on_delete=models.SET_NULL, null=True, blank=True)
 
+    class Meta:
+        db_table = 'services'
+        ordering = ['-created_at']
+
     def __str__(self):
         return self.service_ref
 
 
-class CustomerCare(models.Model):
+class CustomerCare(BaseModel):
     invoice_reference = models.CharField(max_length=100, blank=True, null=True)
-    actioned_by = models.ForeignKey('accounts.User', related_name='actions_occured_by', on_delete=models.SET_NULL, null=True, blank=True)  # who initiate or perform action first.
+    actioned_by = models.ForeignKey('accounts.User', related_name='actions_occured_by',
+                                    on_delete=models.SET_NULL, null=True, blank=True)  # who initiate or perform action first.
     date = models.DateField(blank=True, null=True)
     action_title = models.CharField(max_length=255, blank=True, null=True)
     detail = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=100, blank=True, null=True)
-    resolved_by = models.ForeignKey('accounts.User', related_name='actions_resolved_by', on_delete=models.SET_NULL, null=True, blank=True)  # who resolve this issue
+    resolved_by = models.ForeignKey('accounts.User', related_name='actions_resolved_by',
+                                    on_delete=models.SET_NULL, null=True, blank=True)  # who resolve this issue
     service_call = models.CharField(max_length=100, blank=True, null=True)
     service_call_date = models.DateField(blank=True, null=True)
     action_required = models.CharField(max_length=255, blank=True, null=True)
     call_back_reason = models.CharField(max_length=100, blank=True, null=True)
-    taken_by = models.ForeignKey('accounts.User', related_name='actions_taken_by', on_delete=models.SET_NULL, null=True, blank=True)  # responsible for handle this issue
+    taken_by = models.ForeignKey('accounts.User', related_name='actions_taken_by',
+                                 on_delete=models.SET_NULL, null=True, blank=True)  # responsible for handle this issue
     tag = models.CharField(max_length=100, blank=True, null=True)
+
+    class Meta:
+        db_table = 'customer_care'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.invoice_reference

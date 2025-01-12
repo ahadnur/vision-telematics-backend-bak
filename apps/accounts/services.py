@@ -8,7 +8,7 @@ from django.conf import settings
 from rest_framework.exceptions import NotFound
 
 from .models import Account
-from .models.user import User
+from .models import User
 import logging
 
 logger = logging.getLogger(__name__)

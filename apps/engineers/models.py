@@ -9,7 +9,7 @@ class EngineerCompany(BaseModel):
     class Meta:
         db_table = 'engineer_company'
         verbose_name_plural = 'Engineer Company'
-        managed = True
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.name
@@ -39,7 +39,7 @@ class Engineer(BaseModel):
     job = models.ForeignKey('settings.InstallType', on_delete=models.SET_NULL, null=True, blank=True)
 
     is_telematics = models.BooleanField(default=False)
-    is_dashcam = models.BooleanField(default=False)
+    is_dash_cam = models.BooleanField(default=False)
     is_dvs = models.BooleanField(default=False)
     is_dvr = models.BooleanField(default=False)
     is_adr_tanker = models.BooleanField(default=False)
@@ -51,7 +51,7 @@ class Engineer(BaseModel):
     class Meta:
         db_table = 'engineer'
         verbose_name_plural = 'Engineer'
-        managed = True
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.contact_name
@@ -67,7 +67,7 @@ class EngineerInvoice(BaseModel):
     class Meta:
         db_table = 'engineer_invoice'
         verbose_name_plural = 'Engineer Invoice'
-        managed = True
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.sp_comms_ref

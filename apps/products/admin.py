@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, Category, PO, CarData, Supplier, ProductSKU, StockSuppliedTo, Inventory
+from .models import Product, Category, PO, CarData, Supplier, ProductSKU, StockSuppliedTo
 
 
 @admin.register(Product)
@@ -23,5 +23,3 @@ class ProductSKUAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ProductSKU, ProductSKUAdmin)
-
-admin.site.register(Inventory)

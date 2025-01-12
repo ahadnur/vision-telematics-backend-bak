@@ -1,5 +1,4 @@
-from django.db.models import Prefetch
-from rest_framework import status, views
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView
 from drf_yasg import openapi
@@ -15,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class CustomerListAPIView(ListAPIView):
-    queryset = Customer.objects.filter(is_active=True)
+    queryset = Customer.active_objects.all().order_by('-created_at')
     serializer_class = GetCustomerSerializer
 
     @swagger_auto_schema(

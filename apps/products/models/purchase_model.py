@@ -1,11 +1,15 @@
 from django.db import models
 from apps.utilities.models import BaseModel
-from .product_models import Product
+from .product_model import Product
 
 
 class Supplier(BaseModel):
     supplier_name = models.CharField(max_length=255, null=True, blank=True)
     category = models.CharField(max_length=255, null=True, blank=True)
+
+    class Meta:
+        db_table = 'products_supplier'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.supplier_name
@@ -33,7 +37,8 @@ class PO(BaseModel):
     qty = models.PositiveIntegerField(default=0)
 
     class Meta:
-        verbose_name_plural = "POs"
+        db_table = 'products_po'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.po_ref
@@ -42,6 +47,10 @@ class PO(BaseModel):
 class StockControlCode(BaseModel):
     code = models.CharField(max_length=100, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'products_stock_control_code'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.code
@@ -52,6 +61,8 @@ class StockSuppliedTo(BaseModel):
 
     class Meta:
         verbose_name_plural = 'StockSuppliedTos'
+        ordering = ['-created_at']
+        db_table = 'products_stock_supplied_to'
 
     def __str__(self):
         return self.stock_supplied_to
@@ -60,6 +71,10 @@ class StockSuppliedTo(BaseModel):
 class Package(BaseModel):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='packages')
     package_type = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = 'products_package'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.package_type
@@ -71,14 +86,15 @@ class CarData(BaseModel):
     from_year = models.IntegerField(blank=True, null=True)
     to_year = models.IntegerField(blank=True, null=True)
     spec_notes = models.TextField(blank=True, null=True)
-    telemute = models.BooleanField(default=False)
+    tele_mute = models.BooleanField(default=False)
     kram = models.BooleanField(default=False)
     mounting_notes = models.TextField(blank=True, null=True)
     mute_pin = models.CharField(max_length=100, blank=True, null=True)
     vehicle_notes = models.TextField(blank=True, null=True)
 
     class Meta:
-        verbose_name_plural = 'CarData'
+        db_table = 'car_data'
+        ordering = ['-created_at']
 
     def __str__(self):
         return f"{self.marque} - {self.range}"

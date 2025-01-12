@@ -13,8 +13,12 @@ class Customer(BaseModel):
     multi_site_link = models.CharField(max_length=255, blank=True, null=True)
     has_multi_site_link = models.BooleanField(default=False)
     is_web = models.BooleanField(default=False)
-    account = models.ForeignKey('accounts.Account', related_name='customer_accounts', on_delete=models.SET_NULL,
+    company = models.ForeignKey('accounts.Company', related_name='companies', on_delete=models.SET_NULL,
                                 blank=True, null=True)
+
+    class Meta:
+        db_table = 'customers'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.contact_name
