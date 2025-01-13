@@ -65,9 +65,13 @@ class LoginAPIView(views.APIView):
 		}
 	)
 	def post(self, request):
-		serializer = self.serializer_class(data=request.data)
-		serializer.is_valid(raise_exception=True)
-		return Response(serializer.data, status=status.HTTP_201_CREATED)
+		try:
+			serializer = self.serializer_class(data=request.data)
+			serializer.is_valid(raise_exception=True)
+			return Response(serializer.data, status=status.HTTP_201_CREATED)
+		except Exception as e:
+			logger.error(str(e))
+			return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserListAPIView(views.APIView):

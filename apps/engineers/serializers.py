@@ -23,7 +23,7 @@ class EngineerWriteSerializer(serializers.ModelSerializer):
             'contact_name', 'company', 'engineer_id', 'address', 'contact_number', 'office_number',
             'email_address', 'website', 'postcode_coverage', 'comments', 'insurance_expiration',
             'current_sla', 'performance_rating', 'engineer_priority', 'job',
-            'is_telematics', 'is_dashcam', 'is_dvs', 'is_dvr', 'is_adr_tanker',
+            'is_telematics', 'is_dash_cam', 'is_dvs', 'is_dvr', 'is_adr_tanker',
             'is_specialist_vehicles', 'is_insurance_on_file', 'is_current_sla', 'is_other'
         ]
 
@@ -61,7 +61,7 @@ class EngineerReadSerializer(serializers.ModelSerializer):
             'contact_name', 'company', 'engineer_id', 'address', 'contact_number', 'office_number',
             'email_address', 'website', 'postcode_coverage', 'comments', 'insurance_expiration',
             'current_sla', 'performance_rating', 'engineer_priority', 'job',
-            'is_telematics', 'is_dashcam', 'is_dvs', 'is_dvr', 'is_adr_tanker',
+            'is_telematics', 'is_dash_cam', 'is_dvs', 'is_dvr', 'is_adr_tanker',
             'is_specialist_vehicles', 'is_insurance_on_file', 'is_current_sla', 'is_other'
         ]
 

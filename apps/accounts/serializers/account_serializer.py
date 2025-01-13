@@ -5,9 +5,9 @@ from apps.accounts.models import Account
 class AccountWriteSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Account
-		fields = ('account_name', 'accounts_contact_name', 'contact_number', 'in_add', 'notes',
+		fields = ('account_number', 'account_contact',
 				  'discount', 'invoice_terms', 'confirmation_email', 'freeze_account',
-				  'hot_account', 'send_confirmation', 'sales_contact', 'sales_contact_number', 'sales_email')
+				  'hot_account', 'send_confirmation')
 
 	def create(self, validated_data):
 		account = Account.objects.create(**validated_data)
@@ -29,4 +29,4 @@ class AccountSerializer(serializers.ModelSerializer):
 class AccountListDropdownSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Account
-		fields = ['id', 'account_name']
+		fields = ['id', 'account_contact']
