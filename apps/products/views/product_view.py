@@ -1,4 +1,5 @@
 import uuid
+import logging
 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -8,11 +9,11 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.engineers.views import logger
 from apps.products.models import Product, ProductSKU
 from apps.products.schemas.product_shema import product_list_response_schema, product_detail_response_schema
 from apps.products.serializers import ProductSerializer
 
+logger = logging.getLogger(__name__)
 
 class ProductCreateAPIView(CreateAPIView):
 	serializer_class = ProductSerializer

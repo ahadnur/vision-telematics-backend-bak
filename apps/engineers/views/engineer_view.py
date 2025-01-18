@@ -8,30 +8,11 @@ from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
-from apps.engineers.models import Engineer, EngineerCompany
-from apps.engineers.serializers import (EngieerCompanyListSerializer, EngineerWriteSerializer, EngineerReadSerializer,
+from apps.engineers.models import Engineer
+from apps.engineers.serializers import (EngineerWriteSerializer, EngineerReadSerializer,
                                         GetEngineerListSerializer)
 
 logger = logging.getLogger(__name__)
-
-
-class EngineerCompanyListAPIView(ListAPIView):
-    queryset = EngineerCompany.active_objects.all()
-    serializer_class = EngieerCompanyListSerializer
-    pagination_class = None
-
-    @swagger_auto_schema(
-        tags=['Engineer'],
-        responses={
-            status.HTTP_200_OK: openapi.Response(
-                description='List of engineer companies with id and name',
-                schema=EngieerCompanyListSerializer
-            ),
-        }
-    )
-    def get(self, request, *args, **kwargs):
-        logger.info('Fetching list of Engineer Companies')
-        return self.list(request, *args, **kwargs)
 
 
 class EngineerListAPIView(ListAPIView):

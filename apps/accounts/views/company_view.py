@@ -16,14 +16,28 @@ logger = logging.getLogger(__name__)
 
 
 class CompanyListAPIView(ListAPIView):
-    queryset = Company.active_objects.all().order_by('-created_at')
     serializer_class = CompanySerializer
+
+    def get_queryset(self):
+        is_engineer = self.request.query_params.get('is_engineer', False)
+        is_engineer = is_engineer == 'true'
+        queryset = Company.active_objects.filter(is_engineer_company=is_engineer) if is_engineer \
+            else Company.active_objects.all()
+        return queryset
 
     @swagger_auto_schema(
         tags=['Company'],
         manual_parameters=[
             openapi.Parameter(
                 'paginated',
+                openapi.IN_QUERY,
+                description="Enable or disable pagination (true or false)",
+                type=openapi.TYPE_BOOLEAN,
+                required=False,
+                default=True
+            ),
+            openapi.Parameter(
+                'is_engineer',
                 openapi.IN_QUERY,
                 description="Enable or disable pagination (true or false)",
                 type=openapi.TYPE_BOOLEAN,

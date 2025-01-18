@@ -1,20 +1,15 @@
 from django.db import IntegrityError
 from rest_framework import serializers
 
+from apps.accounts.models import Company
 from apps.customers.views import logger
-from apps.engineers.models import EngineerCompany, Engineer
+from apps.engineers.models import Engineer
 from apps.settings.models import InstallType
 from apps.settings.serializers import InstallTypeSerializer
 
 
-class EngieerCompanyListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EngineerCompany
-        fields = ['id', 'name']
-
-
 class EngineerWriteSerializer(serializers.ModelSerializer):
-    company = serializers.PrimaryKeyRelatedField(queryset=EngineerCompany.objects.filter(is_active=True))
+    company = serializers.PrimaryKeyRelatedField(queryset=Company.objects.filter(is_active=True))
     job = serializers.PrimaryKeyRelatedField(queryset=InstallType.objects.filter(is_active=True))
 
     class Meta:

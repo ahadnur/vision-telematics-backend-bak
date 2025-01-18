@@ -15,5 +15,6 @@ class CompanySerializer(serializers.ModelSerializer):
             'primary_contact_phone',
             'address',
             'postal_code',
-            'notes'
+            'notes',
+            'is_engineer_company'
         ]

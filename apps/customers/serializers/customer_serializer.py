@@ -3,7 +3,7 @@ import logging
 from django.db import transaction, IntegrityError
 from rest_framework import serializers
 
-from apps.accounts.models import Account
+from apps.accounts.models import Account, Company
 from apps.customers.models import Customer, CustomerAddress, CustomerVehicleInfo
 
 logger = logging.getLogger(__name__)
@@ -17,11 +17,11 @@ class CustomerAddressSerializer(serializers.ModelSerializer):
 
 class CustomerWriteSerializer(serializers.ModelSerializer):
     address = CustomerAddressSerializer()
-    account = serializers.PrimaryKeyRelatedField(queryset=Account.objects.all())
+    company = serializers.PrimaryKeyRelatedField(queryset=Company.objects.all())
 
     class Meta:
         model = Customer
-        fields = ['id', 'customer_ref_number', 'contact_name', 'phone_numbers', 'email_address', 'account', 'address']
+        fields = ['id', 'customer_ref_number', 'contact_name', 'phone_numbers', 'email_address', 'company', 'address']
 
     def create(self, validated_data):
         address_data = validated_data.pop('address')

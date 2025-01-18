@@ -1,18 +1,8 @@
 from django.db import models
 
+from apps.accounts.models import Company
 from apps.utilities.models import BaseModel
 
-
-class EngineerCompany(BaseModel):
-    name = models.CharField(max_length=100)
-
-    class Meta:
-        db_table = 'engineer_company'
-        verbose_name_plural = 'Engineer Company'
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return self.name
 
 
 class Engineer(BaseModel):
@@ -22,7 +12,7 @@ class Engineer(BaseModel):
         ('high', 'High')
     ]
     contact_name = models.CharField(max_length=255, null=True, blank=True)
-    company = models.ForeignKey(EngineerCompany, on_delete=models.SET_NULL, null=True, blank=True)
+    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True)
     email_address = models.EmailField(unique=True, null=True, blank=True)
     engineer_id = models.CharField(max_length=50, unique=True, null=True, blank=True)
     address = models.TextField(null=True, blank=True)

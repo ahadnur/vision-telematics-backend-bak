@@ -9,8 +9,8 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.views import APIView
 
-from .models import Order, OrderItem
-from .serializers import OrderWriteSerializer, OrderReadSerializer
+from apps.orders.models import Order, OrderItem
+from apps.orders.serializers import OrderWriteSerializer, OrderReadSerializer
 
 logger = logging.getLogger(__name__)
 

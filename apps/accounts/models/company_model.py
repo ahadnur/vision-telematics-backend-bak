@@ -12,6 +12,7 @@ class Company(BaseModel):
     address = models.TextField(null=True, blank=True)
     postal_code = models.CharField(max_length=20, null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
+    is_engineer_company = models.BooleanField(default=False)
 
     def __str__(self):
         return self.company_name
