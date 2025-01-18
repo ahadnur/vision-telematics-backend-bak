@@ -22,7 +22,7 @@ class CompanyListAPIView(ListAPIView):
         is_engineer = self.request.query_params.get('is_engineer', False)
         is_engineer = is_engineer == 'true'
         queryset = Company.active_objects.filter(is_engineer_company=is_engineer) if is_engineer \
-            else Company.active_objects.all()
+            else Company.active_objects.exclude(is_engineer_company=True)
         return queryset
 
     @swagger_auto_schema(
