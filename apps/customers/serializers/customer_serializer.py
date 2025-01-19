@@ -4,7 +4,7 @@ from django.db import transaction, IntegrityError
 from rest_framework import serializers
 
 from apps.accounts.models import Account, Company
-from apps.customers.models import Customer, CustomerAddress, CustomerVehicleInfo
+from apps.customers.models import Customer, CustomerAddress, CustomerVehicle
 
 logger = logging.getLogger(__name__)
 

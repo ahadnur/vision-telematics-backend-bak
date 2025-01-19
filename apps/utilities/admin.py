@@ -5,17 +5,17 @@ from .models import (PhoneModel, VehicleModel, VehicleMake, VehicleType, OrderTy
 
 @admin.register(VehicleMake)
 class VehicleMakeAdmin(admin.ModelAdmin):
-    list_display = ['vehicle_make', 'id']
+    list_display = ['make_name', 'id']
 
 
 @admin.register(VehicleType)
 class VehicleTypeAdmin(admin.ModelAdmin):
-    list_display = ['vehicle_type', 'id']
+    list_display = ['type_name', 'id']
 
 
 @admin.register(VehicleModel)
 class VehicleModelAdmin(admin.ModelAdmin):
-    list_display = ['vehicle_model', 'id']
+    list_display = ['name', 'id']
 
 
 admin.site.register(OrderType)

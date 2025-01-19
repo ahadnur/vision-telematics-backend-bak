@@ -25,7 +25,7 @@ class Customer(BaseModel):
 
 
 class CustomerAddress(BaseModel):
-    customer = models.OneToOneField(Customer, on_delete=models.CASCADE)
+    customer = models.OneToOneField(Customer, related_name='address', on_delete=models.CASCADE)
     address_line_1 = models.CharField(max_length=255)
     address_line_2 = models.CharField(max_length=255, blank=True, null=True)
     address_line_3 = models.CharField(max_length=255, blank=True, null=True)
@@ -38,15 +38,19 @@ class CustomerAddress(BaseModel):
         return f"{self.customer.contact_name} - {self.address_type}"
 
 
-class CustomerVehicleInfo(BaseModel):
+class CustomerVehicle(BaseModel):
     customer = models.ForeignKey(Customer, related_name='vehicles', on_delete=models.CASCADE)
     registration_number = models.CharField(max_length=20)
-    vehicle_make = models.ForeignKey(VehicleMake, on_delete=models.SET_NULL, null=True, blank=True)
-    vehicle_model = models.ForeignKey(VehicleModel, on_delete=models.SET_NULL, null=True, blank=True)
-    vehicle_type = models.ForeignKey(VehicleType, on_delete=models.SET_NULL, null=True, blank=True)
+    vehicle_make = models.ForeignKey(VehicleMake, related_name="make", on_delete=models.SET_NULL, null=True, blank=True)
+    vehicle_model = models.ForeignKey(VehicleModel, related_name='model', on_delete=models.SET_NULL, null=True, blank=True)
+    vehicle_type = models.ForeignKey(VehicleType, related_name='type', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return f"{self.customer.contact_name} - {self.registration_number}"
+
+    class Meta:
+        db_table = 'customer_vehicles'
+        ordering = ['-created_at']
 
 
 class CustomerInstallation(BaseModel):

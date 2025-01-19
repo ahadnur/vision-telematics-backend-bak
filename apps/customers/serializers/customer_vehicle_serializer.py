@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.customers.models import Customer, CustomerVehicleInfo
+from apps.customers.models import Customer, CustomerVehicle
 from apps.utilities.models import VehicleMake, VehicleModel, VehicleType
 
 
@@ -10,7 +10,7 @@ class CustomerVehicleInfoSerializer(serializers.ModelSerializer):
 	vehicle_type = serializers.PrimaryKeyRelatedField(queryset=VehicleType.objects.all())
 
 	class Meta:
-		model = CustomerVehicleInfo
+		model = CustomerVehicle
 		fields = ['customer', 'vehicle_make', 'vehicle_model', 'vehicle_type', 'registration_number']
 
 
@@ -21,7 +21,7 @@ class CustomerVehicleSerializer(serializers.ModelSerializer):
 	vehicle_type = serializers.PrimaryKeyRelatedField(queryset=VehicleType.objects.all())
 
 	class Meta:
-		model = CustomerVehicleInfo
+		model = CustomerVehicle
 		fields = ['customer', 'registration_number', 'vehicle_make', 'vehicle_model', 'vehicle_type']
 
 
@@ -32,7 +32,7 @@ class CustomerVehicleListSerializer(serializers.ModelSerializer):
 	type = serializers.CharField(read_only=True, required=False)
 
 	class Meta:
-		model = CustomerVehicleInfo
+		model = CustomerVehicle
 		fields = ['id', 'registration_number', 'make', 'model', 'type', 'customer_name']
 
 class VehicleCustomer(serializers.ModelSerializer):

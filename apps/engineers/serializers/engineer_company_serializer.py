@@ -8,7 +8,3 @@ class EngineerCompanyListSerializer(serializers.ModelSerializer):
         model = Company
         fields = ['id', 'company_name']
 
-class EngineerCompanySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Company
-        fields = '__all__'

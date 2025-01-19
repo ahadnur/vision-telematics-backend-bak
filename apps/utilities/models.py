@@ -59,25 +59,25 @@ class Company(BaseModel):
 
 
 class VehicleType(BaseModel):
-    vehicle_type = models.CharField(max_length=100, unique=True, null=True, blank=True)
+    type_name = models.CharField(max_length=100, unique=True, null=True, blank=True)
 
     def __str__(self):
-        return self.vehicle_type
+        return self.type_name
 
 
 class VehicleMake(BaseModel):
-    vehicle_make = models.CharField(max_length=50, unique=True, null=True, blank=True)
+    make_name = models.CharField(max_length=50, unique=True, null=True, blank=True)
 
     def __str__(self):
-        return self.vehicle_make
+        return self.make_name
 
 
 class VehicleModel(BaseModel):
-    vehicle_model = models.CharField(max_length=50, unique=True, null=True, blank=True)
+    name = models.CharField(max_length=50, unique=True, null=True, blank=True)
     vehicle_make = models.ForeignKey(VehicleMake, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return self.vehicle_model
+        return self.name
 
 
 class PhoneModel(BaseModel):
