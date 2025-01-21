@@ -58,11 +58,11 @@ class CustomerWriteSerializer(serializers.ModelSerializer):
 
 
 class GetCustomerSerializer(serializers.ModelSerializer):
-    address = CustomerAddressSerializer(source='customeraddress')
+    customer_address = CustomerAddressSerializer(source='address')
 
     class Meta:
         model = Customer
-        fields = ['id', 'customer_ref_number', 'contact_name', 'phone_numbers', 'email_address',  'address']
+        fields = ['id', 'customer_ref_number', 'contact_name', 'phone_numbers', 'email_address',  'customer_address']
 
 
 class CustomerDropdownSerializer(serializers.ModelSerializer):
