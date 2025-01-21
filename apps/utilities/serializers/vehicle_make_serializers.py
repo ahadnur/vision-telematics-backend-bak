@@ -3,6 +3,6 @@ from apps.utilities.models import VehicleMake
 
 
 class VehicleMakeSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = VehicleMake
-		fields = '__all__'
+    class Meta:
+        model = VehicleMake
+        fields = ['id', 'make_name']
