@@ -36,9 +36,22 @@ class ProductListAPIView(ListAPIView):
 
 	@swagger_auto_schema(
 		tags=['Products'],
+		manual_parameters=[
+			openapi.Parameter(
+				'paginated',
+				openapi.IN_QUERY,
+				description="Enable or disable pagination (true or false)",
+				type=openapi.TYPE_BOOLEAN,
+				required=False,
+				default=True
+			),
+		],
 		responses=product_list_response_schema
 	)
 	def get(self, request, *args, **kwargs):
+		paginated = request.query_params.get('paginated', 'true').lower() == 'true'
+		if not paginated:
+			self.pagination_class = None
 		return self.list(request, *args, **kwargs)
 
 

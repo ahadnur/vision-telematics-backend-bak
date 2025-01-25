@@ -1,6 +1,4 @@
 from django.db import models
-
-from apps.common.enums import OperationChoice
 from apps.utilities.models import BaseModel
 
 
@@ -38,7 +36,7 @@ class ProductSKU(BaseModel):
 		verbose_name_plural = 'ProductSKUs'
 
 	def __str__(self):
-		return str(self.id)
+		return f"{self.product.product_name}-{self.sku_code}"
 
 	def save(self, *args, **kwargs):
 		if self.unit_price is not None and self.qty is not None:

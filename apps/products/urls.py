@@ -5,7 +5,7 @@ from apps.products.views import (ProductCreateAPIView, ProductListAPIView, Produ
 								 ProductDestroyAPIView,CategoryCreateAPIView, CategoryListAPIView,
 								 CategoryDestroyAPIView, SupplierCreateAPIView, SupplierListAPIView,
 								 SupplierDetailAPIView, SupplierUpdateAPIView, SupplierDeleteAPIView,
-								 ProductSKUDestroyAPIView)
+								 ProductSKUDestroyAPIView, ProductSkusListByProductID)
 
 urlpatterns = [
 	path('create/', ProductCreateAPIView.as_view(), name='product_create'),
@@ -27,6 +27,7 @@ urlpatterns = [
 	path('supplier-detail/<int:pk>/', SupplierDetailAPIView.as_view(), name='supplier_detail'),
 	path('supplier-update/<int:pk>/', SupplierUpdateAPIView.as_view(), name='supplier_update'),
 	path('supplier-delete/<int:pk>/', SupplierDeleteAPIView.as_view(), name='supplier_delete'),
+	path('product-skus/<product_id>/', ProductSkusListByProductID.as_view(), name='product_skus_by_product_id'),
 
 	# path('po/', POListView.as_view(), name='po-list'),
 	# path('po/create/', POCreateView.as_view(), name='po-create'),
