@@ -1,19 +1,19 @@
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import RetrieveAPIView, ListAPIView
 
 from apps.products.models import ProductSKU
 from apps.products.serializers import GetProductSKUByProductIDSerializer
 
 
-class ProductSkusListByProductID(RetrieveAPIView):
+class ProductSkusListByProductID(ListAPIView):
     serializer_class = GetProductSKUByProductIDSerializer
     lookup_field = 'product_id'
 
     def get_queryset(self):
         product_id = self.kwargs.get(self.lookup_field)
-        return ProductSKU.objects.filter(product__id=product_id, is_active=True)
+        return ProductSKU.objects.filter(product__id=product_id, is_active=True).order_by('-created_at')
 
 
     @swagger_auto_schema(
@@ -24,4 +24,4 @@ class ProductSkusListByProductID(RetrieveAPIView):
         }
     )
     def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
+        return self.list(request, *args, **kwargs)
