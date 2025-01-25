@@ -1,13 +1,17 @@
 from rest_framework import serializers
-from apps.accounts.models import Account
+from apps.accounts.models import Account, Company
+from apps.customers.models import Customer
 
 
 class AccountWriteSerializer(serializers.ModelSerializer):
+	owner_company = serializers.PrimaryKeyRelatedField(required=False, queryset=Company.objects.all())
+	owner_customer = serializers.PrimaryKeyRelatedField(required=False, queryset=Customer.objects.all())
+
 	class Meta:
 		model = Account
-		fields = ('account_number', 'account_contact',
+		fields = ('account_contact', 'account_number', 'account_type', 'owner_company',
 				  'discount', 'invoice_terms', 'confirmation_email', 'freeze_account',
-				  'hot_account', 'send_confirmation')
+				  'hot_account', 'send_confirmation', 'owner_customer')
 
 	def create(self, validated_data):
 		account = Account.objects.create(**validated_data)

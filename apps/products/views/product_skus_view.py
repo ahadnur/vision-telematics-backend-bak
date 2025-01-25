@@ -19,9 +19,22 @@ class ProductSkusListByProductID(ListAPIView):
     @swagger_auto_schema(
         tags=['Product SKUs'],
         description='Get product SKUs by product id',
+        manual_parameters=[
+            openapi.Parameter(
+                'paginated',
+                openapi.IN_QUERY,
+                description="Enable or disable pagination (true or false)",
+                type=openapi.TYPE_BOOLEAN,
+                required=False,
+                default=True
+            ),
+        ],
         responses={
             status.HTTP_200_OK: openapi.Response('Product SKU', GetProductSKUByProductIDSerializer),
         }
     )
     def get(self, request, *args, **kwargs):
+        paginated = request.query_params.get('paginated', 'true').lower() == 'true'
+        if not paginated:
+            self.pagination_class = None
         return self.list(request, *args, **kwargs)

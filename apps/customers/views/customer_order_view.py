@@ -16,6 +16,7 @@ class CustomerVehicleForOrderDropdown(RetrieveAPIView):
 		return CustomerVehicle.active_objects.select_related('vehicle_make').filter(
 			id=self.kwargs.get(self.lookup_field)
 		).distinct().values('id', 'vehicle_make')
+
 	@swagger_auto_schema(
 		tags=['Orders'],
 		responses={

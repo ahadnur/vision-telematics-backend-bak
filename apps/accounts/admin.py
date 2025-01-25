@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Account, User, UserRole, Profile, AuditTrail, NotifiedBy, Bulletin, Staff, InstallLevel
+from .models import Account, User, UserRole, Profile, AuditTrail, NotifiedBy, Bulletin, Staff, InstallLevel, Company
 
 
 @admin.register(Account)
@@ -27,4 +27,7 @@ admin.site.register(NotifiedBy)
 admin.site.register(Bulletin)
 admin.site.register(Staff)
 admin.site.register(InstallLevel)
+
+admin.site.register(Company)
+
 

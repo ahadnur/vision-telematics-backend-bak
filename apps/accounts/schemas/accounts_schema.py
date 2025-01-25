@@ -3,23 +3,48 @@ from drf_yasg import openapi
 base_account_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
-        'account_name': openapi.Schema(type=openapi.TYPE_STRING, description="company name"),
-        'in_add': openapi.Schema(type=openapi.TYPE_STRING, description="invoice address"),
-        'accounts_contact_name': openapi.Schema(type=openapi.TYPE_STRING, description="This is company name"),
-        'contact_number': openapi.Schema(type=openapi.TYPE_STRING),
-        'notes': openapi.Schema(type=openapi.TYPE_STRING),
-        'discount': openapi.Schema(type=openapi.TYPE_NUMBER),
-        'invoice_terms': openapi.Schema(type=openapi.TYPE_STRING),
-        'opened': openapi.Schema(type=openapi.TYPE_STRING),
-        'opened_by': openapi.Schema(type=openapi.TYPE_INTEGER),
-        'confirmation_email': openapi.Schema(type=openapi.TYPE_STRING),
-        'send_confirmation': openapi.Schema(type=openapi.TYPE_BOOLEAN, default=False),
-        'sales_contact': openapi.Schema(type=openapi.TYPE_STRING),
-        'sales_contact_number': openapi.Schema(type=openapi.TYPE_STRING),
-        'sales_email': openapi.Schema(type=openapi.TYPE_STRING),
-        'freeze_account': openapi.Schema(type=openapi.TYPE_BOOLEAN, default=False),
-        'hot_account': openapi.Schema(type=openapi.TYPE_BOOLEAN, default=False)
+        'account_contact': openapi.Schema(type=openapi.TYPE_STRING, description="Contact person for the account"),
+        'account_number': openapi.Schema(type=openapi.TYPE_STRING, description="Unique account number"),
+        'account_type': openapi.Schema(
+            type=openapi.TYPE_STRING,
+            description="Type of account (company or individual)",
+            enum=["company", "individual"]
+        ),
+        'owner_company': openapi.Schema(type=openapi.TYPE_INTEGER, description="ID of the associated company"),
+        'owner_customer': openapi.Schema(type=openapi.TYPE_INTEGER, description="ID of the associated customer"),
+        'discount': openapi.Schema(
+            type=openapi.TYPE_NUMBER,
+            format="decimal",
+            description="Discount percentage (e.g., 10.00 for 10%)"
+        ),
+        'invoice_terms': openapi.Schema(type=openapi.TYPE_STRING, description="Terms for invoice payments"),
+        'freeze_account': openapi.Schema(
+            type=openapi.TYPE_BOOLEAN,
+            description="Indicates if the account is frozen",
+            default=False
+        ),
+        'hot_account': openapi.Schema(
+            type=openapi.TYPE_BOOLEAN,
+            description="Indicates if the account is marked as high priority",
+            default=False
+        ),
+        'reseller_account': openapi.Schema(
+            type=openapi.TYPE_BOOLEAN,
+            description="Indicates if the account belongs to a reseller",
+            default=False
+        ),
+        'confirmation_email': openapi.Schema(
+            type=openapi.TYPE_STRING,
+            format="email",
+            description="Email for account confirmation"
+        ),
+        'send_confirmation': openapi.Schema(
+            type=openapi.TYPE_BOOLEAN,
+            description="Indicates if confirmation should be sent",
+            default=False
+        ),
     },
+    required=['account_number', 'account_type']
 )
 
 account_write_request_schema = openapi.Schema(

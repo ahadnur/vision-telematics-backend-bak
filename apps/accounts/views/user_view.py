@@ -57,7 +57,13 @@ class LoginAPIView(views.APIView):
 
 	@swagger_auto_schema(
 		tags=['Users'],
-		request_body=AuthenticationSerializer,
+		request_body=openapi.Schema(
+			type=openapi.TYPE_OBJECT,
+			properties={
+				"email": openapi.Schema(type=openapi.TYPE_STRING, default="admin@yopmail.com"),
+				"password": openapi.Schema(type=openapi.TYPE_STRING, default="admin"),
+			}
+		),
 		responses={
 			status.HTTP_201_CREATED: openapi.Response(
 				description='Account created successfully',
