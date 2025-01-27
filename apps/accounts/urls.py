@@ -3,7 +3,8 @@ from apps.accounts.views import (activate, CreateAccountAPIView, UpdateAccountAP
                                  ResetUserPasswordAPIView, GetUserAPIView, AccountListAPIView, LoginAPIView,
                                  UserListAPIView, UserUpdateAPIView, AccountDropdownListAPIView, GetAccountAPIView,
                                  CompanyCreateAPIView, CompanyUpdateAPIView, CompanyListAPIView, CompanyRetrieveAPIView,
-                                 CompanyDestroyAPIView)
+                                 CompanyDestroyAPIView, UserRoleDestroyAPIView, UserRoleCreateAPIView,
+                                 UserRoleUpdateAPIView, UserRoleListAPIView, UserRoleRetrieveAPIView)
 
 
 urlpatterns = [
@@ -27,4 +28,10 @@ urlpatterns = [
     path('company-list/', CompanyListAPIView.as_view(), name='company_list'),
     path('company-retrieve/<int:pk>/', CompanyRetrieveAPIView.as_view(), name='company_retrieve'),
     path('company-delete/<int:pk>/', CompanyDestroyAPIView.as_view(), name='company_delete'),
+] + [
+    path('user-role-create/', UserRoleCreateAPIView.as_view(), name='user_create_role'),
+    path('user-role-update/<pk>/', UserRoleUpdateAPIView.as_view(), name='user_update_role'),
+    path('user-role-list/', UserRoleListAPIView.as_view(), name='user_role_list'),
+    path('user-role-delete/<pk>/', UserRoleDestroyAPIView.as_view(), name='user_delete_role'),
+    path('user-role-retrieve/<pk>/', UserRoleRetrieveAPIView.as_view(), name='user_retrieve_role'),
 ]
