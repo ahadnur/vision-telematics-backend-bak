@@ -85,7 +85,7 @@ class UserRoleUpdateAPIView(APIView):
             )
         }
     )
-    def post(self, request, pk):
+    def put(self, request, pk):
         try:
             user_role = UserRole.objects.get(id=pk)
             serializer = UserRoleSerializer(instance=user_role, data=request.data)
