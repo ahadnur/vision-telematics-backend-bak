@@ -12,8 +12,8 @@ class UserWriteSerializer(serializers.Serializer):
 	first_name = serializers.CharField(write_only=True)
 	last_name = serializers.CharField(write_only=True)
 	email = serializers.EmailField(write_only=True, required=False)
-	password = serializers.CharField(write_only=True)
-	user_type = serializers.PrimaryKeyRelatedField(queryset=UserRole.objects.all())
+	password = serializers.CharField(write_only=True, required=False)
+	user_type = serializers.PrimaryKeyRelatedField(queryset=UserRole.active_objects.all())
 
 	def validate(self, data):
 		if self.instance:

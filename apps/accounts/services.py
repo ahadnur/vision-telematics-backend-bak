@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.utils.crypto import get_random_string
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
@@ -19,7 +20,7 @@ def get_user(_id):
 
 
 def get_general_user_list():
-    return User.objects.filter(user_type_id=2)
+    return User.active_objects.filter(~Q(user_type__name__icontains='admin')).order_by('-created_at')
 
 
 class AccountService:

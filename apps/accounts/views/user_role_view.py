@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 class UserRoleListAPIView(ListAPIView):
     serializer_class = UserRoleSerializer
-    queryset = UserRole.active_objects.all()
+    queryset = UserRole.active_objects.all().order_by('-created_at')
 
     @swagger_auto_schema(
         tags=['UserRole'],
