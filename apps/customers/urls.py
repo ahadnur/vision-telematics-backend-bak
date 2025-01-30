@@ -1,8 +1,8 @@
 from django.urls import path
-from apps.customers.views import CustomerCreateAPIView, CreateCustomerVehicleAPIView, \
-    GetVehicleInfoAPIView, CustomerUpdateAPIView, CustomerListAPIView, CustomerRetrieveAPIView, CustomerDestroyAPIView
-from apps.customers.views.customer_utils_view import CustomerDropdownListAPIView, CustomerVehicleListAPIView, \
-    CustomerSpecificVehicleListAPIView
+from apps.customers.views import (CustomerCreateAPIView, CreateCustomerVehicleAPIView,
+    GetVehicleInfoAPIView, CustomerUpdateAPIView, CustomerListAPIView, CustomerRetrieveAPIView, CustomerDestroyAPIView)
+from apps.customers.views.customer_utils_view import (CustomerDropdownListAPIView, CustomerVehicleListAPIView,
+    CustomerSpecificVehicleListAPIView)
 
 app_name = 'customers'
 

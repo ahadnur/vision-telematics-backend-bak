@@ -3,17 +3,23 @@ from rest_framework import serializers
 from apps.customers.models import CustomerVehicle
 
 
-class CustomerVehicleDropdownForOrderSerializer(serializers.ModelSerializer):
-    vehicle_make = serializers.CharField(source='vehicle_make.make_name')
+class CustomerVehicleMakerSerializer(serializers.ModelSerializer):
+    vehicle_make = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomerVehicle
         fields = ['id', 'vehicle_make']
 
+    def get_vehicle_make(self, obj):
+        return obj.vehicle_make.make_name
 
-class CustomerVehicleSerializer(serializers.ModelSerializer):
-    vehicle_model = serializers.CharField(source='vehicle_model.model_name')
+
+class CustomerVehicleModelSerializer(serializers.ModelSerializer):
+    vehicle_model = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomerVehicle
         fields = ['id', 'vehicle_model', 'vehicle_type', 'registration_number']
+
+    def get_vehicle_model(self, obj):
+        return obj.vehicle_model.name

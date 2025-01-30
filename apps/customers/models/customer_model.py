@@ -46,7 +46,7 @@ class CustomerVehicle(BaseModel):
     vehicle_type = models.ForeignKey(VehicleType, related_name='type', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.customer.contact_name} - {self.registration_number}"
+        return f"{self.customer.contact_name} - {self.registration_number} - {self.vehicle_make} - {self.vehicle_model}"
 
     class Meta:
         db_table = 'customer_vehicles'

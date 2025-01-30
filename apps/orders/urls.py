@@ -16,6 +16,6 @@ urlpatterns = [
 	path('delete/<int:pk>/', OrderDestroyAPIView.as_view(), name='order-delete'),
 
 	path('customer-vehicles/<customer_id>/', CustomerVehicleForOrderDropdown.as_view(), name='customer-vehicle-list'),
-	path('customer-vehicle-model/<vehicle_make_id>', CustomerVehicleModelForOrderDropdown.as_view(),
+	path('customer-vehicle-model/<vehicle_make_name>', CustomerVehicleModelForOrderDropdown.as_view(),
 		 name='customer-vehicle-model-list'),
 ]

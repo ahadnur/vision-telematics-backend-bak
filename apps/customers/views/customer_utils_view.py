@@ -40,9 +40,9 @@ class CustomerVehicleListAPIView(ListAPIView):
 	def get_queryset(self):
 		return CustomerVehicle.active_objects.annotate(
 			customer_name=F('customer__contact_name'),
-			make=F('vehicle_make__vehicle_make'),
-			model=F('vehicle_model__vehicle_model'),
-			type=F('vehicle_type__vehicle_type'),
+			make=F('vehicle_make__make_name'),
+			model=F('vehicle_model__name'),
+			type=F('vehicle_type__type_name'),
 		).values('id', 'registration_number', 'customer_name', 'make', 'model', 'type', )
 
 	@swagger_auto_schema(

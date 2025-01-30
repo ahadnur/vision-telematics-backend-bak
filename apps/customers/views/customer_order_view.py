@@ -1,24 +1,34 @@
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import RetrieveAPIView, ListAPIView
 
-from apps.customers.models import Customer, CustomerVehicle
-from apps.customers.serializers import CustomerVehicleDropdownForOrderSerializer
+from apps.customers.models import CustomerVehicle
+from apps.customers.serializers import CustomerVehicleMakerSerializer, CustomerVehicleModelSerializer
 
 
-class CustomerVehicleForOrderDropdown(RetrieveAPIView):
+class CustomerVehicleForOrderDropdown(ListAPIView):
 	queryset = CustomerVehicle.active_objects.all()
-	serializer_class = CustomerVehicleDropdownForOrderSerializer
+	serializer_class = CustomerVehicleMakerSerializer
 	lookup_field = 'customer_id'
 
 	def get_queryset(self, *args, **kwargs):
 		return CustomerVehicle.active_objects.select_related('vehicle_make').filter(
 			id=self.kwargs.get(self.lookup_field)
-		).distinct().values('id', 'vehicle_make')
+		).distinct()
 
 	@swagger_auto_schema(
 		tags=['Orders'],
+		manual_parameters=[
+			openapi.Parameter(
+				'paginated',
+				openapi.IN_QUERY,
+				description="Enable or disable pagination (true or false)",
+				type=openapi.TYPE_BOOLEAN,
+				required=False,
+				default=True
+			),
+		],
 		responses={
 			status.HTTP_200_OK: openapi.Schema(
 				type=openapi.TYPE_OBJECT,
@@ -30,31 +40,39 @@ class CustomerVehicleForOrderDropdown(RetrieveAPIView):
 		}
 	)
 	def get(self, request, *args, **kwargs):
-		return self.retrieve(request, *args, **kwargs)
+		paginated = request.query_params.get('paginated', 'true').lower() == 'true'
+		if not paginated:
+			self.pagination_class = None
+		return self.list(request, *args, **kwargs)
 
 
-class CustomerVehicleModelForOrderDropdown(RetrieveAPIView):
+class CustomerVehicleModelForOrderDropdown(ListAPIView):
 	queryset = CustomerVehicle.active_objects.all()
-	lookup_field = 'vehicle_make_id'
+	serializer_class = CustomerVehicleModelSerializer
+	lookup_field = 'vehicle_make_name'
 
 	def get_queryset(self, *args, **kwargs):
-		return CustomerVehicle.active_objects.select_related('vehicle_make').filter(
-			vehicle_make_id=self.kwargs.get(self.lookup_field)
-		).values('id', 'vehicle_model', 'vehicle_type', 'registration_number')
+		queryset = (CustomerVehicle.active_objects.select_related('vehicle_make', 'vehicle_model', 'vehicle_type')
+		.filter(
+			vehicle_make__make_name=self.kwargs.get(self.lookup_field)
+		))
+		return queryset
 
 	@swagger_auto_schema(
 		tags=['Orders'],
-		responses={
-			status.HTTP_200_OK: openapi.Schema(
-				type=openapi.TYPE_OBJECT,
-				properties={
-					'id': openapi.Schema(type=openapi.TYPE_INTEGER),
-					'vehicle_model': openapi.Schema(type=openapi.TYPE_STRING),
-					'vehicle_type': openapi.Schema(type=openapi.TYPE_STRING),
-					'registration_number': openapi.Schema(type=openapi.TYPE_STRING),
-				}
-			)
-		}
+		manual_parameters=[
+			openapi.Parameter(
+				'paginated',
+				openapi.IN_QUERY,
+				description="Enable or disable pagination (true or false)",
+				type=openapi.TYPE_BOOLEAN,
+				required=False,
+				default=True
+			),
+		],
 	)
 	def get(self, request, *args, **kwargs):
-		return self.retrieve(request, *args, **kwargs)
+		paginated = request.query_params.get('paginated', 'true').lower() == 'true'
+		if not paginated:
+			self.pagination_class = None
+		return self.list(request, *args, **kwargs)
