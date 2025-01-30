@@ -4,8 +4,8 @@ from apps.customers.models import Customer
 
 
 class AccountWriteSerializer(serializers.ModelSerializer):
-	owner_company = serializers.PrimaryKeyRelatedField(required=False, queryset=Company.objects.all())
-	owner_customer = serializers.PrimaryKeyRelatedField(required=False, queryset=Customer.objects.all())
+	owner_company = serializers.PrimaryKeyRelatedField(required=False, queryset=Company.objects.all(), allow_null=True)
+	owner_customer = serializers.PrimaryKeyRelatedField(required=False, queryset=Customer.objects.all(), allow_null=True)
 
 	class Meta:
 		model = Account
