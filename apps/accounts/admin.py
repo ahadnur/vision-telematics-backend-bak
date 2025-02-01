@@ -28,6 +28,8 @@ admin.site.register(Bulletin)
 admin.site.register(Staff)
 admin.site.register(InstallLevel)
 
-admin.site.register(Company)
+@admin.register(Company)
+class CompanyAdmin(admin.ModelAdmin):
+    list_display = ('company_name', 'id')
 
 

@@ -4,7 +4,7 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from .models import Order, OrderItem
+from apps.orders.models import Order, OrderItem
 from apps.products.models import ProductSKU
 
 logger = logging.getLogger(__name__)

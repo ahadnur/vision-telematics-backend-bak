@@ -2,8 +2,6 @@ from django.db import models
 from apps.utilities.models import BaseModel, VehicleMake, VehicleType, VehicleModel
 
 
-
-
 class Customer(BaseModel):
     customer_ref_number = models.CharField(max_length=100, unique=True)
     actinic_reference = models.CharField(max_length=100, blank=True, null=True)
@@ -15,6 +13,7 @@ class Customer(BaseModel):
     is_web = models.BooleanField(default=False)
     company = models.ForeignKey('accounts.Company', related_name='companies', on_delete=models.SET_NULL,
                                 blank=True, null=True)
+    payment_reference = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
         db_table = 'customers'
@@ -42,7 +41,8 @@ class CustomerVehicle(BaseModel):
     customer = models.ForeignKey(Customer, related_name='vehicles', on_delete=models.CASCADE)
     registration_number = models.CharField(max_length=20)
     vehicle_make = models.ForeignKey(VehicleMake, related_name="make", on_delete=models.SET_NULL, null=True, blank=True)
-    vehicle_model = models.ForeignKey(VehicleModel, related_name='model', on_delete=models.SET_NULL, null=True, blank=True)
+    vehicle_model = models.ForeignKey(VehicleModel, related_name='model', on_delete=models.SET_NULL, null=True,
+                                      blank=True)
     vehicle_type = models.ForeignKey(VehicleType, related_name='type', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
@@ -123,7 +123,8 @@ class CustomerMiscellaneous(BaseModel):
     is_purchasing_complete = models.BooleanField(default=False)
     purchasing_complete_time = models.DateTimeField(blank=True, null=True)
     sold_by = models.ForeignKey('accounts.User', related_name='sales', on_delete=models.SET_NULL, blank=True, null=True)
-    customer_confirmed_by = models.ForeignKey('accounts.User', related_name='confirmed_customers', on_delete=models.SET_NULL, blank=True, null=True)
+    customer_confirmed_by = models.ForeignKey('accounts.User', related_name='confirmed_customers',
+                                              on_delete=models.SET_NULL, blank=True, null=True)
     customer_confirmed_time = models.DateTimeField(blank=True, null=True)
     acc_inv_raised_date = models.DateField(blank=True, null=True)
     acc_inv_paid = models.CharField(max_length=255, blank=True, null=True)
