@@ -15,6 +15,7 @@ from apps.accounts.models import Account
 from apps.customers.models import CustomerVehicle
 from apps.orders.models import Order, OrderItem, OrderOptionsData, OrderPaymentOptions
 from apps.orders.serializers import OrderSerializer, OptionDataSerializer, PaymentDataSerializer
+from apps.orders.swagger_schema import order_list_schema
 from apps.products.models import ProductSKU
 
 logger = logging.getLogger(__name__)
@@ -41,7 +42,7 @@ class OrderCreateAPIView(APIView):
             serializer.is_valid(raise_exception=True)
             data = serializer.validated_data
             customer = data.get('customer')
-            customer_vehicle_info = data.pop('customer_vehicle_info') if data.get('customer_vehicle_info') else None
+            customer_vehicle_info = data.pop('vehicle') if data.get('vehicle') else None
             order_options = data.pop('order_options') if data.get('order_options') else None
             order_product_skus = data.pop('order_product_skus') if data.get('order_product_skus') else None
             payment_data = data.pop('payment_data') if data.get('payment_data') else None
@@ -112,6 +113,18 @@ class OrderCreateAPIView(APIView):
 
 
 class OrderUpdateAPIView(APIView):
+    @swagger_auto_schema(
+        tags=['Orders'],
+        request_body=OrderSerializer,
+        responses={
+            status.HTTP_200_OK: openapi.Response(
+                description="Order updated successfully",
+                schema=OrderSerializer() 
+            ),
+            status.HTTP_400_BAD_REQUEST: "Bad Request",
+            status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal Server Error",
+        }
+    )
     def put(self, request, pk, *args, **kwargs):
         try:
             order = get_object_or_404(Order, pk=pk, is_active=True, is_deleted=False)
@@ -208,23 +221,15 @@ class OrderUpdateAPIView(APIView):
 
 
 class OrderRetrieveAPIView(RetrieveAPIView):
-    queryset = Order.objects.prefetch_related(
+    queryset = Order.objects.filter(is_deleted=False, is_active=True).prefetch_related(
         Prefetch('item_orders', queryset=OrderItem.objects.all())
     ).all()
     serializer_class = OrderSerializer
 
     @swagger_auto_schema(
         tags=['Orders'],
-        responses={
-            status.HTTP_200_OK: openapi.Response(
-                description='Order retrieved successfully',
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={
-                        **OrderSerializer().data,
-                    }
-                )
-            )
+        responses= {
+            status.HTTP_200_OK: order_list_schema
         }
     )
     def get(self, request, *args, **kwargs):
@@ -232,7 +237,7 @@ class OrderRetrieveAPIView(RetrieveAPIView):
 
 
 class OrderListAPIView(ListAPIView):
-    queryset = Order.objects.prefetch_related(
+    queryset = Order.objects.filter(is_deleted=False, is_active=True).prefetch_related(
         Prefetch("item_orders", queryset=OrderItem.objects.filter(is_active=True)),
     ).order_by('-created_at')
     serializer_class = OrderSerializer
@@ -240,18 +245,7 @@ class OrderListAPIView(ListAPIView):
     @swagger_auto_schema(
         tags=['Orders'],
         responses={
-            status.HTTP_200_OK: openapi.Response(
-                description='Order list',
-                schema=openapi.Schema(
-                    type=openapi.TYPE_ARRAY,
-                    items=openapi.Schema(
-                        type=openapi.TYPE_OBJECT,
-                        properties={
-                            **OrderSerializer().data,
-                        }
-                    )
-                )
-            )
+            status.HTTP_200_OK: order_list_schema
         }
     )
     def get(self, request, *args, **kwargs):
@@ -274,9 +268,12 @@ class OrderDestroyAPIView(DestroyAPIView):
     def destroy(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
+
             instance.is_deleted = True
             instance.is_active = False
+            instance.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
+
         except Exception as e:
             logger.error(f'error on {e}')
             return Response(status=status.HTTP_400_BAD_REQUEST)
