@@ -48,10 +48,10 @@ class OptionDataSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     payment_data = PaymentDataSerializer(required=False)
     order_product_skus = OrderProductSKUSerializer(many=True, required=False)
-    customer_vehicle_info = OrderCustomerVehicleSerializer(allow_null=False)
+    customer_vehicle_info = OrderCustomerVehicleSerializer(source='vehicle', allow_null=False)
     order_options = OptionDataSerializer(required=False)
 
     class Meta:
         model = Order
         fields = ['id', 'customer', 'purchasing_notes', 'engineer_notes', 'order_options', 'customer_vehicle_info',
-                  'order_product_skus', 'payment_data', 'shipping_charge', 'shipping_address', 'billing_address']
+                  'order_product_skus', 'payment_data', 'shipping_charge', 'shipping_address', 'billing_address', 'order_ref_number']
