@@ -2,7 +2,7 @@ from django.urls import path
 
 from apps.customers.views import CustomerVehicleForOrderDropdown, CustomerVehicleModelForOrderDropdown
 from apps.orders.views import OrderCreateAPIView, OrderListAPIView, OrderRetrieveAPIView, OrderUpdateAPIView, \
-	OrderDestroyAPIView
+	OrderDestroyAPIView, OrderStatusChangeAPIView
 
 # from apps.customers.views
 
@@ -14,6 +14,7 @@ urlpatterns = [
 	path('detail/<int:pk>/', OrderRetrieveAPIView.as_view(), name='order-retrieve'),
 	path('update/<int:pk>/', OrderUpdateAPIView.as_view(), name='order-update'),
 	path('delete/<int:pk>/', OrderDestroyAPIView.as_view(), name='order-delete'),
+	path('change-status/<int:pk>/', OrderStatusChangeAPIView.as_view(), name='order-status-change'),
 
 	path('customer-vehicles/<customer_id>/', CustomerVehicleForOrderDropdown.as_view(), name='customer-vehicle-list'),
 	path('customer-vehicle-model/<vehicle_make_name>', CustomerVehicleModelForOrderDropdown.as_view(),
