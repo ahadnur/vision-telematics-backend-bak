@@ -4,13 +4,14 @@ from django.db.models import F
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import DestroyAPIView
 
 from apps.common.enums import OperationChoice
 from apps.inventory.models import Inventory, StockMovement
-from apps.inventory.serializers import InventorySerializer, StockMovementSerializer, UpdateStockMovementSerializer
+from apps.inventory.serializers import InventorySerializer, InventoryCreateSerializer, StockMovementSerializer, UpdateStockMovementSerializer, InventoryUpdateSerializer, InventoryDestroySerializer
 from apps.inventory.helpers import InventoryService
 
 logger = logging.getLogger(__name__)
@@ -37,23 +38,95 @@ class InventoryListAPIView(ListAPIView):
 		}
 	)
 	def get(self, request, *args, **kwargs):
-		return self.list(request, *args, **kwargs)
+		return super().get(request, *args, **kwargs)
 
-	def list(self, request, *args, **kwargs):
-		queryset = self.queryset.select_related('product_sku__product').annotate(
-			product_name=F('product_sku__product__product_name'),
-			sku_code=F('product_sku__sku_code'),
-			quantity=F('product_sku__qty'),
-			unit_price=F('product_sku__unit_price'),
-		).values('id', 'product_name', 'sku_code', 'quantity', 'unit_price').order_by('-created_at')
 
-		page = self.paginate_queryset(queryset)
-		if page is not None:
-			serializer = self.get_serializer(page, many=True)
-			return self.get_paginated_response(serializer.data)
+class InventoryCreateAPIView(CreateAPIView):
+	queryset = Inventory.active_objects.all()
+	serializer_class = InventoryCreateSerializer
 
-		serializer = self.get_serializer(queryset, many=True)
-		return Response(serializer.data)
+	@swagger_auto_schema(
+		tags=['Inventory'],
+		request_body=InventoryCreateSerializer,
+		responses={
+			status.HTTP_201_CREATED: "Inventory Created",
+			status.HTTP_400_BAD_REQUEST: "Bad Request",
+			status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal Server Error"
+		}
+	)
+	
+	def post(self, request, *args, **kwargs):
+		return super().post(request, *args, **kwargs)
+
+
+class InventoryUpdateAPIView(APIView):
+    @swagger_auto_schema(
+        tags=['Inventory'],
+        request_body=InventoryUpdateSerializer,
+    )
+
+    def put(self, request, pk=None, *args, **kwargs):
+        serializer = InventoryUpdateSerializer(data=request.data)
+        if serializer.is_valid():
+            product_sku = serializer.validated_data['product_sku']
+            quantity = serializer.validated_data['quantity']
+            operation_type = serializer.validated_data['operation_type']
+            reason = serializer.validated_data.get('reason')
+            reference = serializer.validated_data.get('reference')
+
+            try:
+                if operation_type == OperationChoice.ADD.value:
+                    InventoryService.add_stock(product_sku, quantity, reason, reference)
+                elif operation_type == OperationChoice.REMOVE.value:
+                    InventoryService.remove_stock(product_sku, quantity, reason, reference)
+                elif operation_type == OperationChoice.ADJUST.value:
+                    InventoryService.adjust_stock(product_sku, quantity, reason)
+                else:
+                    return Response({"detail": "Invalid operation type."}, status=status.HTTP_400_BAD_REQUEST)
+                
+                return Response({"detail": "Inventory updated successfully."}, status=status.HTTP_200_OK)
+            except Exception as e:
+                logger.error(e)
+                return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            logger.error(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class InventoryDestroyAPIView(APIView):
+    queryset = Inventory.active_objects.all()
+    serializer_class = InventoryDestroySerializer
+
+    def get_serializer(self, *args, **kwargs):
+        return self.serializer_class(*args, **kwargs)
+    
+    def get_queryset(self):
+        return self.queryset
+
+    @swagger_auto_schema(
+        tags=['Inventory'],
+        request_body=InventoryDestroySerializer,
+    )
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        product_sku = serializer.validated_data['product_sku']
+
+        try:
+            instance = self.get_queryset().get(product_sku=product_sku)
+        except Inventory.DoesNotExist:
+            return Response({"detail": "Inventory not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Custom soft-delete logic
+        instance.is_active = False 
+        instance.is_deleted = True
+        instance.save()
+
+        return Response({"detail": "Inventory deleted successfully."}, status=status.HTTP_200_OK)
 
 
 
