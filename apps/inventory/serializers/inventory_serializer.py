@@ -1,17 +1,26 @@
 from rest_framework import serializers
-from apps.inventory.models import StockMovement, Inventory
+from apps.inventory.models import StockMovement, Inventory, StockThreshold
 from apps.products.models import ProductSKU
 from apps.common.enums import OperationChoice
+
 
 class InventorySerializer(serializers.ModelSerializer):
     product_sku = serializers.PrimaryKeyRelatedField(queryset=ProductSKU.objects.all())
     product_name = serializers.CharField(source='product_sku.product.product_name', read_only=True)
     sku_code = serializers.CharField(source='product_sku.sku_code', read_only=True)
     unit_price = serializers.DecimalField(source='product_sku.unit_price', max_digits=10, decimal_places=2, read_only=True)
-    
+    is_low_stock = serializers.SerializerMethodField()
+
+
     class Meta:
         model = Inventory
-        fields = ['id', 'product_sku', 'product_name', 'sku_code', 'unit_price', 'stock_quantity']
+        fields = ['id', 'product_sku', 'product_name', 'sku_code', 'unit_price', 'stock_quantity', 'is_low_stock']
+
+    def get_is_low_stock(self, obj):
+        threshold = StockThreshold.objects.first()
+        if threshold:
+            return obj.stock_quantity < threshold.min_quantity
+        return False
 
 
 class InventoryCreateSerializer(serializers.ModelSerializer):
@@ -82,3 +91,9 @@ class UpdateStockMovementSerializer(serializers.Serializer):
         if value <= 0:
             raise serializers.ValidationError("Quantity must be greater than zero.")
         return value
+
+
+class StockThresholdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StockThreshold
+        fields = ['min_quantity']
