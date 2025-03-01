@@ -1,28 +1,84 @@
 from rest_framework import serializers
-from apps.inventory.models import StockMovement
+from apps.inventory.models import StockMovement, Inventory
+from apps.products.models import ProductSKU
+from apps.common.enums import OperationChoice
+
+class InventorySerializer(serializers.ModelSerializer):
+    product_sku = serializers.PrimaryKeyRelatedField(queryset=ProductSKU.objects.all())
+    product_name = serializers.CharField(source='product_sku.product.product_name', read_only=True)
+    sku_code = serializers.CharField(source='product_sku.sku_code', read_only=True)
+    unit_price = serializers.DecimalField(source='product_sku.unit_price', max_digits=10, decimal_places=2, read_only=True)
+    
+    class Meta:
+        model = Inventory
+        fields = ['id', 'product_sku', 'product_name', 'sku_code', 'unit_price', 'stock_quantity']
 
 
-class InventorySerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    product_name = serializers.CharField(max_length=255)
-    quantity = serializers.IntegerField()
-    sku_code = serializers.CharField(max_length=255)
-    unit_price = serializers.DecimalField(max_digits=10, decimal_places=2)
+class InventoryCreateSerializer(serializers.ModelSerializer):
+    product_sku = serializers.PrimaryKeyRelatedField(queryset=ProductSKU.objects.all())
+    
+    class Meta:
+        model = Inventory
+        fields = ['product_sku', 'stock_quantity']
 
+    def validate_stock_quantity(self, value):
+        if value < 0:
+            raise serializers.ValidationError("Stock quantity cannot be negative.")
+        return value
+    
+    def validate_product_sku(self, value):
+        if Inventory.active_objects.filter(product_sku=value).exists():
+            raise serializers.ValidationError("Inventory already exists for this product.")
+        return value
+
+
+class InventoryUpdateSerializer(serializers.Serializer):
+    product_sku = serializers.PrimaryKeyRelatedField(queryset=ProductSKU.active_objects.all())
+    quantity = serializers.IntegerField(min_value=1)
+    operation_type = serializers.ChoiceField(choices=[
+        (OperationChoice.ADD.value, 'Add'),
+        (OperationChoice.REMOVE.value, 'Remove'),
+        (OperationChoice.ADJUST.value, 'Adjust')
+    ])
+    reason = serializers.CharField(required=False, allow_blank=True)
+    reference = serializers.CharField(required=False, allow_blank=True)
+
+    def validate_product_sku(self, value):
+        if Inventory.active_objects.filter(product_sku=value).exists():
+            return value
+        raise serializers.ValidationError("Inventory does not exist for this product.")
+
+
+class InventoryDestroySerializer(serializers.Serializer):
+    product_sku = serializers.PrimaryKeyRelatedField(queryset=ProductSKU.active_objects.all())
+
+    def validate_product_sku(self, value):
+        if Inventory.active_objects.filter(product_sku=value).exists():
+            return value
+        raise serializers.ValidationError("Inventory does not exist for this product.")
 
 
 class StockMovementSerializer(serializers.ModelSerializer):
+    product_sku = serializers.PrimaryKeyRelatedField(queryset=ProductSKU.objects.all())
+    inventory = serializers.PrimaryKeyRelatedField(queryset=Inventory.objects.all())
+    sku_code = serializers.CharField(source='product_sku.sku_code', read_only=True)
+
     class Meta:
         model = StockMovement
         fields = [
-            'id', 'product_sku', 'inventory', 'operation_type',
-            'quantity', 'previous_quantity', 'new_quantity',
-            'reason', 'reference', 'created_at'
+            'id', 'product_sku', 'sku_code', 'inventory', 'operation_type',
+            'quantity', 'previous_quantity', 'new_quantity', 'reason', 'reference', 'created_at'
         ]
 
 
-class UpdateStockMovementSerializer(serializers.ModelSerializer):
+class UpdateStockMovementSerializer(serializers.Serializer):
+    product_sku = serializers.PrimaryKeyRelatedField(queryset=ProductSKU.objects.all())
+    quantity = serializers.IntegerField()
+    operation_type = serializers.ChoiceField(choices=OperationChoice.choices)
+    reason = serializers.CharField(required=False, allow_blank=True)
+    reference = serializers.CharField(required=False, allow_blank=True)
 
-    class Meta:
-        model = StockMovement
-        fields = ['product_sku', 'quantity', 'operation_type', 'reason', 'reference', 'created_at']
+    def validate_quantity(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("Quantity must be greater than zero.")
+        return value

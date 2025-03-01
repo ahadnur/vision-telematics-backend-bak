@@ -1,1 +1,1 @@
-from .inventory_serializer import InventorySerializer, StockMovementSerializer, UpdateStockMovementSerializer
+from .inventory_serializer import InventorySerializer, StockMovementSerializer, UpdateStockMovementSerializer, InventoryCreateSerializer, InventoryUpdateSerializer, InventoryDestroySerializer

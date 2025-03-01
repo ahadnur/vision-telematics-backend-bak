@@ -6,7 +6,7 @@ from apps.utilities.models import BaseModel
 
 
 class Inventory(BaseModel):
-	product_sku = models.ForeignKey(ProductSKU, on_delete=models.CASCADE, related_name='product_skus')
+	product_sku = models.ForeignKey(ProductSKU, on_delete=models.CASCADE, related_name='inventories')
 	stock_quantity = models.IntegerField(default=0)
 
 	def __str__(self):
