@@ -10,9 +10,18 @@ from rest_framework.views import APIView
 from rest_framework.generics import DestroyAPIView
 
 from apps.common.enums import OperationChoice
-from apps.inventory.models import Inventory, StockMovement
-from apps.inventory.serializers import InventorySerializer, InventoryCreateSerializer, StockMovementSerializer, UpdateStockMovementSerializer, InventoryUpdateSerializer, InventoryDestroySerializer
+from apps.inventory.models import Inventory, StockMovement, StockThreshold
+from apps.inventory.serializers import (
+	InventorySerializer,
+	InventoryCreateSerializer, 
+	StockMovementSerializer, 
+	UpdateStockMovementSerializer, 
+	InventoryUpdateSerializer, 
+	InventoryDestroySerializer,
+	StockThresholdSerializer,
+)
 from apps.inventory.helpers import InventoryService
+from apps.inventory.swagger_schema import inventory_list_schema, stock_movement_list_schema
 
 logger = logging.getLogger(__name__)
 
@@ -24,15 +33,7 @@ class InventoryListAPIView(ListAPIView):
 	@swagger_auto_schema(
 		tags=['Inventory'],
 		responses={
-			status.HTTP_200_OK: openapi.Schema(
-				type=openapi.TYPE_ARRAY,
-				items=openapi.Schema(
-					type=openapi.TYPE_OBJECT,
-					properties={
-						**InventorySerializer().data
-					}
-				)
-			),
+			status.HTTP_200_OK: inventory_list_schema,
 			status.HTTP_400_BAD_REQUEST: "Bad Request",
 			status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal Server Error"
 		}
@@ -137,15 +138,7 @@ class StockMovementListAPIView(ListAPIView):
 	@swagger_auto_schema(
 		tags=['Inventory'],
 		responses={
-			status.HTTP_200_OK: openapi.Schema(
-				type=openapi.TYPE_ARRAY,
-				items=openapi.Schema(
-					type=openapi.TYPE_OBJECT,
-					properties={
-						# **StockMovementSerializer().data
-					}
-				)
-			),
+			status.HTTP_200_OK: stock_movement_list_schema,
 			status.HTTP_400_BAD_REQUEST: "Bad Request",
 			status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal Server Error"
 		}
@@ -189,3 +182,49 @@ class UpdateStockAPIView(APIView):
 		else:
 			logger.error(serializer.errors)
 			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class StockThresholdAPIView(APIView):
+
+    @swagger_auto_schema(
+        tags=['Stock Threshold'],
+        operation_description="Retrieve the global minimum stock threshold.",
+        responses={
+            status.HTTP_200_OK: StockThresholdSerializer(),
+            status.HTTP_400_BAD_REQUEST: "Bad Request",
+            status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal Server Error"
+        },
+    )
+    def get(self, request, *args, **kwargs):
+
+        threshold, created = StockThreshold.objects.get_or_create(
+            pk=1, defaults={'min_quantity': 15}
+        )
+        serializer = StockThresholdSerializer(threshold)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    @swagger_auto_schema(
+        tags=['Stock Threshold'],
+        operation_description="Update the global minimum stock threshold.",
+        request_body=StockThresholdSerializer,
+        responses={
+            status.HTTP_200_OK: StockThresholdSerializer(),
+            status.HTTP_400_BAD_REQUEST: "Bad Request",
+            status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal Server Error"
+        },
+    )
+    def put(self, request, *args, **kwargs):
+		
+        threshold, created = StockThreshold.objects.get_or_create(
+            pk=1, defaults={'min_quantity': 15}
+        )
+        serializer = StockThresholdSerializer(threshold, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

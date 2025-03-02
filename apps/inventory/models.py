@@ -79,3 +79,12 @@ class StockMovement(BaseModel):
 		ordering = ['-created_at']
 
 
+
+class StockThreshold(BaseModel):
+    min_quantity = models.PositiveIntegerField(default=15)
+
+    class Meta:
+        db_table = "stock_threshold"
+
+    def __str__(self):
+        return f"Minimum Stock Threshold: {self.min_quantity}"
