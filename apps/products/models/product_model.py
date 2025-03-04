@@ -32,6 +32,17 @@ class ProductSKU(BaseModel):
 	discount = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
 	total = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
+	'''
+	Multiple Suppliers per SKU: A single SKU can be supplied by different suppliers.
+	Multiple SKUs per Supplier: A single supplier can offer multiple SKUs.
+	'''
+	suppliers = models.ManyToManyField(
+		'products.Supplier', 
+		related_name='product_skus', 
+		blank=True
+	)
+
+
 	class Meta:
 		verbose_name_plural = 'ProductSKUs'
 
