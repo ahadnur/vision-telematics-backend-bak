@@ -14,14 +14,15 @@ class GetProductSKUByProductIDSerializer(serializers.ModelSerializer):
             'description',
             'unit_price',
             'qty',
-            'discount'
+            'discount',
+            'suppliers',
         ]
         read_only_fields = (
             'id',
             'sku_code',
             'description',
             'discount',
-            'unit_price'
+            'unit_price',
         )
 
     def get_product_name(self, obj):

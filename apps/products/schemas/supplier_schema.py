@@ -7,7 +7,8 @@ supplier_response_schema = openapi.Schema(
 	items=openapi.Schema(
 		type=openapi.TYPE_OBJECT,
 		properties={
-			**SupplierSerializer().data
+			"id": openapi.Schema(type=openapi.TYPE_INTEGER),
+			"name": openapi.Schema(type=openapi.TYPE_STRING),
 		}
 	)
 )
