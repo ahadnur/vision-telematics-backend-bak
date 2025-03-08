@@ -1,10 +1,20 @@
 from django.urls import path
 
 from apps.customers.views import CustomerVehicleForOrderDropdown, CustomerVehicleModelForOrderDropdown
-from apps.orders.views import OrderCreateAPIView, OrderListAPIView, OrderRetrieveAPIView, OrderUpdateAPIView, \
-	OrderDestroyAPIView, OrderStatusChangeAPIView
+from apps.orders.views import (
+	OrderCreateAPIView, 
+	OrderListAPIView, 
+	OrderRetrieveAPIView, 
+	OrderUpdateAPIView, 
+	OrderDestroyAPIView, 
+	OrderStatusChangeAPIView,
+	OrderReturnCreateAPIView,
+	OrderReturnUpdateAPIView,
+	OrderReturnRetrieveAPIView,
+	OrderReturnDestroyAPIView,
+	OrderReturnListAPIView
+)
 
-# from apps.customers.views
 
 app_name = 'orders'
 
@@ -19,4 +29,11 @@ urlpatterns = [
 	path('customer-vehicles/<customer_id>/', CustomerVehicleForOrderDropdown.as_view(), name='customer-vehicle-list'),
 	path('customer-vehicle-model/<vehicle_make_name>', CustomerVehicleModelForOrderDropdown.as_view(),
 		 name='customer-vehicle-model-list'),
+	
+	# return & refunds
+	path('return/list/', OrderReturnListAPIView.as_view(), name='order-return-list'),
+	path('return/<int:pk>/', OrderReturnRetrieveAPIView.as_view(), name='order-return-retrieve'),
+	path('return/create/', OrderReturnCreateAPIView.as_view(), name='order-return-create'),
+	path('return/update/<int:pk>/', OrderReturnUpdateAPIView.as_view(), name='order-return-update'),
+	path('return/delete/<int:pk>/', OrderReturnDestroyAPIView.as_view(), name='order-return-delete'),
 ]

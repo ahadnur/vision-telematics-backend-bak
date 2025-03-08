@@ -1,11 +1,18 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 
 from apps.accounts.models import Account, User
-from apps.common.enums import OrderStatusChoice, OrderItemStatusChoice, CustomerPaymentStatusType
 from apps.customers.models import CustomerVehicle
 from apps.products.models import PO
 from apps.settings.models import InstallType
 from apps.utilities.models import BaseModel
+from apps.common.enums import (
+    OrderStatusChoice, 
+    OrderItemStatusChoice, 
+    CustomerPaymentStatusType, 
+    ReturnStatusType,
+    ShipmentMode
+)
 
 
 class Order(BaseModel):
@@ -146,3 +153,70 @@ class OrderPaymentOptions(BaseModel):
         db_table = 'order_payment_options'
         ordering = ['-created_at']
 
+
+class OrderRefund(BaseModel):
+    order = models.ForeignKey(Order, related_name='refunds', on_delete=models.CASCADE)
+    # payment = models.OneToOneField(Payment, related_name='refund', on_delete=models.RESTRICT, null=True, blank=True)
+    refund_reason = models.TextField(null=True, blank=True)
+    refund_initiated = models.DateTimeField(null=True, blank=True)
+    refund_completed = models.DateTimeField(null=True, blank=True)
+    notes = models.TextField(null=True, blank=True)
+    admin_approved = models.BooleanField(default=False)
+    approved_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'order_refunds'
+        ordering = ('-created_at',)
+        verbose_name = 'Order Refund'
+        verbose_name_plural = 'Order Refunds'
+
+    def __str__(self):
+        return f'Refund {self.id} of Order {self.order.order_ref_number}'
+
+    def total_refund_amount(self):
+        return sum(item.refund_amount for item in self.return_items.all())  # Calculated dynamically
+
+
+class ReturnItem(BaseModel):
+    order_refund = models.ForeignKey(
+        OrderRefund, 
+        related_name='return_items', 
+        on_delete=models.RESTRICT,
+        null=True, blank=True
+    )
+    order_item = models.ForeignKey(OrderItem, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    return_status = models.CharField(
+        max_length=20, 
+        choices=ReturnStatusType.choices, 
+        default=ReturnStatusType.REQUESTED
+    )
+    refund_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.0) # auto calculate on save
+    pickup_address = models.JSONField(default=dict, null=True, blank=True)
+    drop_off_address = models.JSONField(default=dict, null=True, blank=True)
+    # user_id = models.UUIDField(db_index=True)
+    reason = models.TextField(null=True, blank=True)
+    shipment_mode = models.CharField(max_length=32, choices=ShipmentMode.choices, default=ShipmentMode.DROPOFF)
+    cancellation_charges = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    return_rejected_reason = models.TextField(null=True, blank=True)
+    return_rejected_by = models.CharField(max_length=50, null=True, blank=True)
+    notes = models.TextField(null=True, blank=True)
+
+    is_restocked = models.BooleanField(default=False)
+    restocked_at = models.DateTimeField(null=True, blank=True)
+
+
+    class Meta:
+        db_table = 'return_items'
+
+    def __str__(self):
+        return f'Return Item {self.id} of Order {self.order_item.order.order_ref_number}'
+
+    def save(self, *args, **kwargs):
+        if self.quantity > self.order_item.quantity:
+            raise ValidationError("Return quantity exceeds original order quantity")
+
+        self.refund_amount = (
+            self.order_item.price * self.quantity - (self.order_item.discount or 0)
+        )
+        super().save(*args, **kwargs)
