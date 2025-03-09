@@ -26,9 +26,14 @@ from apps.orders.serializers import (
     OrderSerializer, 
     OptionDataSerializer, 
     PaymentDataSerializer, 
+
     OrderReturnSerializer,
     OrderReturnCreateSerializer,
-    OrderReturnUpdateSerializer
+    OrderReturnUpdateSerializer,
+    
+    OrderRefundSerializer,
+    OrderRefundCreateSerializer,
+    OrderRefundUpdateSerializer,
 )
 from apps.orders.swagger_schema import order_return_schema
 from apps.products.models import ProductSKU
@@ -173,6 +178,15 @@ class OrderReturnDestroyAPIView(DestroyAPIView):
     queryset = ReturnItem.objects.filter(is_active=True, is_deleted=False)
     lookup_field = 'pk'
 
+    @swagger_auto_schema(
+        tags=['Return & Refund'],
+        responses={
+            status.HTTP_204_NO_CONTENT: "Successfully deleted!",
+        }
+    )
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
     def destroy(self, request, *args, **kwargs):
         with transaction.atomic():
             instance = self.get_object()
@@ -193,4 +207,112 @@ class OrderReturnDestroyAPIView(DestroyAPIView):
                 order_refund.is_active = False
                 order_refund.save()
 
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+class OrderRefundListAPIView(ListAPIView):
+    queryset = OrderRefund.objects.filter(is_active=True, is_deleted=False) \
+        .select_related('order') \
+        .prefetch_related('return_items') \
+        .order_by('-created_at')
+    serializer_class = OrderRefundSerializer
+
+    @swagger_auto_schema(
+        tags=['Return & Refund'],
+        responses={
+            status.HTTP_200_OK: openapi.Response(
+                description="List of Order Refunds",
+                schema=OrderRefundSerializer(many=True)
+            )
+        }
+    )
+    def get(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+
+class OrderRefundRetrieveAPIView(RetrieveAPIView):
+    queryset = OrderRefund.objects.filter(is_active=True, is_deleted=False) \
+        .select_related('order') \
+        .prefetch_related('return_items')
+    serializer_class = OrderRefundSerializer
+    lookup_field = 'pk'
+
+    @swagger_auto_schema(
+        tags=['Return & Refund'],
+        responses={
+            status.HTTP_200_OK: openapi.Response(
+                description="Refund details",
+                schema=OrderRefundSerializer
+            )
+        }
+    )
+    def get(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+
+class OrderRefundCreateAPIView(CreateAPIView):
+    serializer_class = OrderRefundCreateSerializer
+    queryset = OrderRefund.objects.all()
+
+    @swagger_auto_schema(
+        tags=['Return & Refund'],
+        request_body=OrderRefundCreateSerializer,
+        responses={
+            status.HTTP_201_CREATED: openapi.Response(
+                description="Order Refund created successfully",
+                schema=OrderRefundSerializer
+            )
+        },
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+
+class OrderRefundUpdateAPIView(APIView):
+    @swagger_auto_schema(
+        tags=['Return & Refund'],
+        request_body=OrderRefundUpdateSerializer,
+        responses={
+            status.HTTP_200_OK: openapi.Response(
+                description="Order Refund updated successfully",
+                schema=OrderRefundSerializer()
+            ),
+        }
+    )
+    def put(self, request, pk, *args, **kwargs):
+        try:
+            refund_instance = get_object_or_404(OrderRefund, pk=pk, is_active=True, is_deleted=False)
+            serializer = OrderRefundUpdateSerializer(refund_instance, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            with transaction.atomic():
+                serializer.save()
+            updated_serializer = OrderRefundSerializer(refund_instance)
+            return Response(updated_serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"OrderRefund update error (pk={pk}): {e}")
+            return Response({'error': 'Internal error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class OrderRefundDestroyAPIView(DestroyAPIView):
+    queryset = OrderRefund.objects.filter(is_active=True, is_deleted=False)
+    serializer_class = OrderRefundSerializer
+    lookup_field = 'pk'
+
+    @swagger_auto_schema(
+        tags=['Return & Refund'],
+        responses={
+            status.HTTP_204_NO_CONTENT: "Successfully deleted!",
+        }
+    )
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        with transaction.atomic():
+            refund_instance = self.get_object()
+            refund_instance.is_active = False
+            refund_instance.is_deleted = True
+            refund_instance.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
