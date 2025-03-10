@@ -1,5 +1,6 @@
 import logging
 
+from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
@@ -27,7 +28,7 @@ from apps.orders.serializers import (
     OptionDataSerializer, 
     PaymentDataSerializer, 
 
-    OrderReturnSerializer,
+    OrderReturnDetailSerializer,
     OrderReturnCreateSerializer,
     OrderReturnUpdateSerializer,
     
@@ -47,7 +48,7 @@ class OrderReturnListAPIView(ListAPIView):
     queryset = ReturnItem.objects.filter(is_deleted=False, is_active=True).select_related(
         'order_refund', 'order_item', 'order_item__order', 'order_item__product_sku'
     ).order_by('-created_at')
-    serializer_class = OrderReturnSerializer
+    serializer_class = OrderReturnDetailSerializer
 
     @swagger_auto_schema(
         tags=['Return & Refund'],
@@ -141,6 +142,7 @@ class OrderReturnUpdateAPIView(APIView):
 
                         return_item.restocked_at = timezone.now()
                         order_item.returned = True
+                        order_item.order_refund.refund_completed = timezone.now()
                         order_item.save()
 
                 for attr, value in validated_data.items():
@@ -148,8 +150,10 @@ class OrderReturnUpdateAPIView(APIView):
                 return_item.save()
 
                 if new_status == ReturnStatusType.APPROVED:
-                    return_item.refund_initiated = timezone.now()
-                    return_item.save()
+                    order_refund = return_item.order_refund
+                    if not order_refund.refund_initiated:
+                        order_refund.refund_initiated = timezone.now()
+                        order_refund.save()
 
                 return Response(OrderReturnSerializer(return_item).data, status=status.HTTP_200_OK)
 
@@ -164,7 +168,7 @@ class OrderReturnRetrieveAPIView(RetrieveAPIView):
     queryset = ReturnItem.objects.filter(is_deleted=False, is_active=True).select_related(
         'order_refund', 'order_item', 'order_item__order', 'order_item__product_sku'
     )
-    serializer_class = OrderReturnSerializer
+    serializer_class = OrderReturnDetailSerializer
 
     @swagger_auto_schema(
         tags=['Return & Refund'],
@@ -208,8 +212,6 @@ class OrderReturnDestroyAPIView(DestroyAPIView):
                 order_refund.save()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 
 
 class OrderRefundListAPIView(ListAPIView):

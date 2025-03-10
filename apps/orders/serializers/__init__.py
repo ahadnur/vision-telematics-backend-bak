@@ -4,7 +4,7 @@ from .order_serializer import (
     PaymentDataSerializer
 )
 from .order_return_refund_serializer import (
-    OrderReturnSerializer,
+    OrderReturnDetailSerializer,
     OrderReturnCreateSerializer,
     OrderReturnUpdateSerializer,
 

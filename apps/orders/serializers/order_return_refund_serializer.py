@@ -2,14 +2,20 @@ from rest_framework import serializers
 
 from apps.orders.models import ReturnItem, OrderRefund
 from apps.orders.serializers import OrderSerializer
+from apps.products.serializers import ProductSKUSerializer
 
 
-class OrderReturnSerializer(serializers.ModelSerializer):
+
+class OrderReturnDetailSerializer(serializers.ModelSerializer):
+    order = OrderSerializer(source='order_item.order', read_only=True)
+    product = ProductSKUSerializer(source='order_item.product_sku', read_only=True)
+
     class Meta:
         model = ReturnItem
         fields = [
             'id',
-            'order_refund',
+            'order',
+            'product',
             'order_item',
             'quantity',
             'return_status',
@@ -30,7 +36,6 @@ class OrderReturnCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReturnItem
         fields = [
-            'order_refund',
             'order_item',
             'quantity',
             'pickup_address',
@@ -61,11 +66,12 @@ class OrderReturnUpdateSerializer(serializers.ModelSerializer):
             'is_restocked',
             'restocked_at',
         ]
+        read_only = ['order_refund', 'order_item', 'quantity', 'restocked_at']
 
 
 class OrderRefundSerializer(serializers.ModelSerializer):
     order = OrderSerializer(read_only=True)
-    return_items = OrderReturnSerializer(many=True, read_only=True)
+    return_items = OrderReturnDetailSerializer(many=True, read_only=True)
     total_refund_amount = serializers.SerializerMethodField()
 
     class Meta:
@@ -110,3 +116,4 @@ class OrderRefundUpdateSerializer(serializers.ModelSerializer):
             'admin_approved',
             'approved_at',
         ]
+        read_only = ['refund_initiated', 'refund_completed', 'approved_at']
