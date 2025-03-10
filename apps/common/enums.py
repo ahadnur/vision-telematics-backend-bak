@@ -27,5 +27,14 @@ class CustomerPaymentStatusType(models.TextChoices):
     PAID = 'paid', 'Paid'
 
 
+class ReturnStatusType(models.TextChoices):
+    REQUESTED = 'requested', 'Requested',
+    APPROVED = 'approved', 'Approved',
+    REJECTED = 'rejected', 'Rejected',
+    COMPLETED = 'completed', 'Completed'
 
 
+class ShipmentMode(models.TextChoices):
+    PICKUP = 'pickup', 'Customer Pickup',
+    DROPOFF = 'dropoff', 'Dropoff at Center',
+    COURIER = 'courier', 'Courier Service'
