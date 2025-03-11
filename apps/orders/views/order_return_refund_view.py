@@ -38,7 +38,7 @@ from apps.orders.serializers import (
 )
 from apps.orders.swagger_schema import order_return_schema
 from apps.products.models import ProductSKU
-from apps.common.enums import ReturnStatusType, ShipmentMode
+from apps.common.enums import ReturnStatusType, ShipmentMode, OperationChoice
 from apps.inventory.models import Inventory
 
 logger = logging.getLogger(__name__)
@@ -142,7 +142,7 @@ class OrderReturnUpdateAPIView(APIView):
 
                         return_item.restocked_at = timezone.now()
                         order_item.returned = True
-                        order_item.order_refund.refund_completed = timezone.now()
+                        return_item.order_refund.refund_completed = timezone.now()
                         order_item.save()
 
                 for attr, value in validated_data.items():
@@ -155,7 +155,7 @@ class OrderReturnUpdateAPIView(APIView):
                         order_refund.refund_initiated = timezone.now()
                         order_refund.save()
 
-                return Response(OrderReturnSerializer(return_item).data, status=status.HTTP_200_OK)
+                return Response(OrderReturnDetailSerializer(return_item).data, status=status.HTTP_200_OK)
 
         except ValidationError as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
