@@ -1,11 +1,34 @@
 from django.urls import path
 
-from apps.products.views import (ProductCreateAPIView, ProductListAPIView, ProductDetailAPIVIew, ProductUpdateAPIView,
-								 CategoryRetrieveAPIView, CategoryUpdateAPIView, GenerateProductSkuCodeAPIView,
-								 ProductDestroyAPIView,CategoryCreateAPIView, CategoryListAPIView,
-								 CategoryDestroyAPIView, SupplierCreateAPIView, SupplierListAPIView,
-								 SupplierDetailAPIView, SupplierUpdateAPIView, SupplierDeleteAPIView,
-								 ProductSKUDestroyAPIView, ProductSkusListByProductID)
+from apps.products.views import (
+	ProductCreateAPIView, 
+	ProductListAPIView, 
+	ProductDetailAPIVIew, 
+	ProductUpdateAPIView,
+	ProductDestroyAPIView,
+
+	CategoryCreateAPIView, 
+	CategoryListAPIView,
+	CategoryRetrieveAPIView, 
+	CategoryUpdateAPIView, 
+	CategoryDestroyAPIView, 
+	
+	SupplierCreateAPIView, 
+	SupplierListAPIView,
+	SupplierDetailAPIView, 
+	SupplierUpdateAPIView, 
+	SupplierDeleteAPIView,
+
+	GenerateProductSkuCodeAPIView,
+	ProductSKUDestroyAPIView, 
+	ProductSkusListByProductID,
+
+	POListView,
+	POCreateView,
+	PORetrieveView,
+	POUpdateView,
+	PODeleteView,
+)
 
 urlpatterns = [
 	path('create/', ProductCreateAPIView.as_view(), name='product_create'),
@@ -29,9 +52,9 @@ urlpatterns = [
 	path('supplier-delete/<int:pk>/', SupplierDeleteAPIView.as_view(), name='supplier_delete'),
 	path('product-skus/<product_id>/', ProductSkusListByProductID.as_view(), name='product_skus_by_product_id'),
 
-	# path('po/', POListView.as_view(), name='po-list'),
-	# path('po/create/', POCreateView.as_view(), name='po-create'),
-	# path('po/<int:id>/', PORetrieveView.as_view(), name='po-retrieve'),
-	# path('po/<int:id>/update/', POUpdateView.as_view(), name='po-update'),
-	# path('po/<int:id>/delete/', PODeleteView.as_view(), name='po-delete'),
+	path('po/', POListView.as_view(), name='po-list'),
+	path('po/create/', POCreateView.as_view(), name='po-create'),
+	path('po/<int:id>/', PORetrieveView.as_view(), name='po-retrieve'),
+	path('po/<int:id>/update/', POUpdateView.as_view(), name='po-update'),
+	path('po/<int:id>/delete/', PODeleteView.as_view(), name='po-delete'),
 ]
