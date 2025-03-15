@@ -44,11 +44,16 @@ class InstallTypeUpdateAPIView(APIView):
 		}
 	)
 	def put(self, request, pk):
-		queryset = InstallType.objects.filter(id=pk, is_active=True, is_deleted=False)
-		serializer = InstallTypeSerializer(instance=queryset, data=request.data)
+		try:
+			instance = InstallType.active_objects.get(id=pk)
+		except InstallType.DoesNotExist:
+			return Response({"error": "InstallType not found"}, status=status.HTTP_404_NOT_FOUND)
+
+		serializer = InstallTypeSerializer(instance=instance, data=request.data, partial=True)
 		serializer.is_valid(raise_exception=True)
 		serializer.save()
-		return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+		return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class InstallTypeListAPIView(ListAPIView):
@@ -77,7 +82,7 @@ class InstallTypeListAPIView(ListAPIView):
 
 class InstallTypeDeleteAPIView(DestroyAPIView):
 	serializer_class = InstallTypeSerializer
-	queryset = InstallType.objects.filter(is_active=True, is_deleted=False)
+	queryset = InstallType.active_objects.all()
 
 	@swagger_auto_schema(
 		tags=['Settings'],
@@ -93,6 +98,7 @@ class InstallTypeDeleteAPIView(DestroyAPIView):
 			instance = self.get_object()
 			instance.is_deleted = True
 			instance.is_active = False
+			instance.save()
 			return Response(status=status.HTTP_204_NO_CONTENT)
 		except Exception as e:
 			logger.error(e)

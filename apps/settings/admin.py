@@ -6,7 +6,7 @@ from .models import (InstallType, CreditReason, CallBackReason, CallBackReasonOl
 @admin.register(InstallType)
 class AccountAdmin(admin.ModelAdmin):
     list_display = ['id', 'install_type']
-    fields = ['install_type']
+    
 admin.site.register(CreditReason)
 admin.site.register(CallBackReason)
 admin.site.register(CallBackReasonOld)

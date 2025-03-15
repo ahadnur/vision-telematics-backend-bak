@@ -88,36 +88,30 @@ class VehicleMakeRetrieveAPIView(RetrieveAPIView):
 
 
 class VehicleMakeUpdateAPIView(APIView):
-	serializer_class = VehicleMakeSerializer
+    serializer_class = VehicleMakeSerializer
+    queryset = VehicleMake.active_objects.all()
 
-	@swagger_auto_schema(
-		tags=["Configuration"],
-		request_body=VehicleMakeSerializer,
-		responses={
-			status.HTTP_200_OK: openapi.Response(
-				description="Vehicle make created!",
-				schema=openapi.Schema(
-					type=openapi.TYPE_OBJECT,
-					properties={
-						**VehicleMakeSerializer().data,
-					}
-				)
-			)
-		}
-	)
-	def put(self, request, *args, **kwargs):
-		return self.update(request, *args, **kwargs)
+    @swagger_auto_schema(
+        tags=["Configuration"],
+        request_body=VehicleMakeSerializer,
+        responses={
+            status.HTTP_200_OK: openapi.Response(
+                description="Vehicle make updated!",
+                schema=VehicleMakeSerializer()
+            )
+        }
+    )
+    def put(self, request, pk):
+        try:
+            instance = VehicleMake.active_objects.get(id=pk)
+        except VehicleMake.DoesNotExist:
+            return Response({"error": "Vehicle make not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = VehicleMakeSerializer(instance=instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
-	def update(self, request, pk):
-		try:
-			instance = VehicleMake.objects.filter(id=pk, is_active=True).first()
-			serializer = self.serializer_class(instance, data=request.data)
-			serializer.is_valid(raise_exception=True)
-			serializer.save()
-			return Response(status=status.HTTP_200_OK)
-		except Exception as e:
-			logger.error(e)
-			return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class VehicleMakeDeleteAPIView(DestroyAPIView):
