@@ -13,6 +13,8 @@ from apps.products.serializers import (
     POUpdateSerializer,
     PORetrieveSerializer
 )
+from apps.inventory.models import Inventory, StockMovement
+from apps.common.enums import OperationChoice
 
 
 class POListView(generics.ListAPIView):
@@ -47,7 +49,23 @@ class POCreateView(generics.CreateAPIView):
         }
     )
     def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
+        with transaction.atomic():
+            response = super().post(request, *args, **kwargs)
+            po_instance = self.get_queryset().filter(po_ref=response.data['po_ref']).first()
+            if po_instance and po_instance.received:
+                inventory, _ = Inventory.objects.get_or_create(product_sku=po_instance.product_sku)
+
+                inventory.update_stock(
+                    quantity=po_instance.qty,
+                    operation_type=OperationChoice.ADD.value,
+                    reason="Purchase Order Received",
+                    reference=po_instance.po_ref
+                )
+                # Update ProductSKU quantity
+                product_sku = po_instance.product_sku
+                product_sku.qty += po_instance.qty
+                product_sku.save()
+        return response
 
 
 class PORetrieveView(generics.RetrieveAPIView):
@@ -84,7 +102,24 @@ class POUpdateView(generics.UpdateAPIView):
         }
     )
     def put(self, request, *args, **kwargs):
-        return super().put(request, *args, **kwargs)
+        with transaction.atomic():
+            response = super().put(request, *args, **kwargs)
+            po_instance = self.get_queryset().filter(id=kwargs['id']).first()
+            if po_instance and po_instance.received:
+                inventory, _ = Inventory.objects.get_or_create(product_sku=po_instance.product_sku)
+
+                inventory.update_stock(
+                    quantity=po_instance.qty,
+                    operation_type=OperationChoice.ADD.value,
+                    reason="Purchase Order Received",
+                    reference=po_instance.po_ref
+                )
+                # Update ProductSKU quantity
+                product_sku = po_instance.product_sku
+                product_sku.qty += po_instance.qty
+                product_sku.save()
+                
+        return response
 
 
 class PODeleteView(generics.DestroyAPIView):
