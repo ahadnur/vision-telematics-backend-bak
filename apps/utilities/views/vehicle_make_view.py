@@ -13,18 +13,38 @@ logger = logging.getLogger(__name__)
 
 
 class VehicleMakeCreateAPIView(CreateAPIView):
-	queryset = VehicleMake.active_objects.all()
-	serializer_class = VehicleMakeSerializer
+    queryset = VehicleMake.active_objects.all()
+    serializer_class = VehicleMakeSerializer
 
-	@swagger_auto_schema(
-		tags=["Configuration"],
-		request_body=VehicleMakeSerializer,
-		responses={
-			status.HTTP_201_CREATED: "Created Vehicle make successfully",
-		}
-	)
-	def post(self, request, *args, **kwargs):
-		return self.create(request, *args, **kwargs)
+    @swagger_auto_schema(
+        tags=["Configuration"],
+        request_body=VehicleMakeSerializer,
+        responses={
+            status.HTTP_201_CREATED: "Created Vehicle make successfully",
+            status.HTTP_400_BAD_REQUEST: "Vehicle make with this name already exists!"
+        }
+    )
+    def post(self, request, *args, **kwargs):
+        make_name = request.data.get("make_name")
+
+        existing_make = VehicleMake.objects.filter(make_name=make_name).first()
+
+        if existing_make:
+            if existing_make.is_deleted:
+                existing_make.is_deleted = False
+                existing_make.is_active = True
+                existing_make.save()
+                return Response(
+                    VehicleMakeSerializer(existing_make).data,
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"error": "Vehicle make with this name already exists!"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+        return super().post(request, *args, **kwargs)
 
 
 class VehicleMakeListAPIView(ListAPIView):
@@ -51,7 +71,8 @@ class VehicleMakeListAPIView(ListAPIView):
 					items=openapi.Schema(
 						type=openapi.TYPE_OBJECT,
 						properties={
-							**VehicleMakeSerializer().data,
+						"id": openapi.Schema(type=openapi.TYPE_INTEGER),
+						"make_name": openapi.Schema(type=openapi.TYPE_STRING),
 						}
 					)
 				)
@@ -77,7 +98,8 @@ class VehicleMakeRetrieveAPIView(RetrieveAPIView):
 				schema=openapi.Schema(
 					type=openapi.TYPE_OBJECT,
 					properties={
-						**VehicleMakeSerializer().data,
+						"id": openapi.Schema(type=openapi.TYPE_INTEGER),
+						"make_name": openapi.Schema(type=openapi.TYPE_STRING),
 					}
 				)
 			)
@@ -89,16 +111,13 @@ class VehicleMakeRetrieveAPIView(RetrieveAPIView):
 
 class VehicleMakeUpdateAPIView(APIView):
     serializer_class = VehicleMakeSerializer
-    queryset = VehicleMake.active_objects.all()
 
     @swagger_auto_schema(
         tags=["Configuration"],
         request_body=VehicleMakeSerializer,
         responses={
-            status.HTTP_200_OK: openapi.Response(
-                description="Vehicle make updated!",
-                schema=VehicleMakeSerializer()
-            )
+            status.HTTP_200_OK: "Vehicle make updated successfully!",
+            status.HTTP_400_BAD_REQUEST: "Vehicle make with this name already exists!",
         }
     )
     def put(self, request, pk):
@@ -106,8 +125,26 @@ class VehicleMakeUpdateAPIView(APIView):
             instance = VehicleMake.active_objects.get(id=pk)
         except VehicleMake.DoesNotExist:
             return Response({"error": "Vehicle make not found"}, status=status.HTTP_404_NOT_FOUND)
-        
-        serializer = VehicleMakeSerializer(instance=instance, data=request.data, partial=True)
+
+        new_name = request.data.get("make_name")
+        existing_make = VehicleMake.objects.filter(make_name=new_name).first()
+
+        if existing_make:
+            if existing_make.is_deleted:
+                existing_make.is_deleted = False
+                existing_make.is_active = True
+                existing_make.save()
+                return Response(
+                    VehicleMakeSerializer(existing_make).data,
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"error": "Vehicle make with this name already exists!"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+        serializer = VehicleMakeSerializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
