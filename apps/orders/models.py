@@ -216,7 +216,8 @@ class ReturnItem(BaseModel):
         if self.quantity > self.order_item.quantity:
             raise ValidationError("Return quantity exceeds original order quantity")
 
-        self.refund_amount = (
-            self.order_item.price * self.quantity - (self.order_item.discount or 0)
-        )
+        if self.order_item.order.customer_payment_status == CustomerPaymentStatusType.PAID:
+            self.refund_amount = (
+                self.order_item.price * self.quantity - (self.order_item.discount or 0)
+            )
         super().save(*args, **kwargs)
