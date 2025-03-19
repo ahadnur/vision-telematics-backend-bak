@@ -38,7 +38,7 @@ from apps.orders.serializers import (
 )
 from apps.orders.swagger_schema import order_return_schema
 from apps.products.models import ProductSKU
-from apps.common.enums import ReturnStatusType, ShipmentMode, OperationChoice
+from apps.common.enums import ReturnStatusType, ShipmentMode, OperationChoice, CustomerPaymentStatusType
 from apps.inventory.models import Inventory
 
 logger = logging.getLogger(__name__)
@@ -67,8 +67,14 @@ class OrderReturnCreateAPIView(CreateAPIView):
     def perform_create(self, serializer):
         order_item = serializer.validated_data['order_item']
         order = order_item.order
-        order_refund, created = OrderRefund.objects.get_or_create(order=order)
-        serializer.save(order_refund=order_refund)
+
+        if order_item.order.customer_payment_status == CustomerPaymentStatusType.PAID:
+            order_refund, created = OrderRefund.objects.get_or_create(order=order)
+            order_refund.refund_initiated = timezone.now()
+            order_refund.save()
+            serializer.save(order_refund=order_refund)
+        else:
+            serializer.save()
 
     @swagger_auto_schema(
         tags=['Return & Refund'],
@@ -129,7 +135,7 @@ class OrderReturnUpdateAPIView(APIView):
                         product_sku.save()
 
                         try:
-                            inventory = Inventory.objects.get(product_sku=product_sku)
+                            inventory = Inventory.active_objects.get(product_sku=product_sku)
                         except Inventory.DoesNotExist:
                             raise ValidationError(f"Inventory not found for SKU {product_sku.sku_code}")
 
@@ -137,12 +143,14 @@ class OrderReturnUpdateAPIView(APIView):
                             quantity=quantity,
                             operation_type=OperationChoice.ADD,
                             reason=f"ReturnItem {return_item.id} restock",
-                            reference=return_item.order_refund.order.order_ref_number
+                            reference=return_item.order_item.order.order_ref_number
                         )
 
                         return_item.restocked_at = timezone.now()
                         order_item.returned = True
-                        return_item.order_refund.refund_completed = timezone.now()
+                        if return_item.order_refund:
+                            return_item.order_refund.refund_completed = timezone.now()
+                            return_item.order_refund.save()
                         order_item.save()
 
                 for attr, value in validated_data.items():
@@ -151,7 +159,7 @@ class OrderReturnUpdateAPIView(APIView):
 
                 if new_status == ReturnStatusType.APPROVED:
                     order_refund = return_item.order_refund
-                    if not order_refund.refund_initiated:
+                    if order_refund and not order_refund.refund_initiated:
                         order_refund.refund_initiated = timezone.now()
                         order_refund.save()
 
