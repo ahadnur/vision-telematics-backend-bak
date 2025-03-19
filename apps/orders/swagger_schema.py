@@ -211,3 +211,105 @@ order_return_schema = openapi.Schema(
         }
     )
 )
+
+booking_list_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'count': openapi.Schema(
+            type=openapi.TYPE_INTEGER,
+        ),
+        'next': openapi.Schema(
+            type=openapi.TYPE_STRING,
+        ),
+        'previous': openapi.Schema(
+            type=openapi.TYPE_STRING,
+        ),
+        'results': openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'order': openapi.Schema(type=openapi.TYPE_INTEGER),
+                'engineer': openapi.Schema(type=openapi.TYPE_INTEGER),
+                'booking_date': openapi.Schema(type=openapi.TYPE_STRING),
+                'booking_time': openapi.Schema(type=openapi.TYPE_STRING),
+                'duration': openapi.Schema(type=openapi.TYPE_STRING),
+                'booking_status': openapi.Schema(type=openapi.TYPE_STRING),
+                'remarks': openapi.Schema(type=openapi.TYPE_STRING),
+            }
+        )
+    },
+)
+
+booking_details_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        "order": openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "id": openapi.Schema(type=openapi.TYPE_INTEGER),
+                "customer": openapi.Schema(type=openapi.TYPE_INTEGER),
+                "purchasing_notes": openapi.Schema(type=openapi.TYPE_STRING),
+                "engineer_notes": openapi.Schema(type=openapi.TYPE_STRING),
+                "customer_vehicle_info": openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "id": openapi.Schema(type=openapi.TYPE_INTEGER),
+                        "vehicle_make": openapi.Schema(type=openapi.TYPE_INTEGER),
+                        "vehicle_model": openapi.Schema(type=openapi.TYPE_INTEGER),
+                        "vehicle_type": openapi.Schema(type=openapi.TYPE_INTEGER),
+                        "registration_number": openapi.Schema(type=openapi.TYPE_STRING),
+                    }
+                ),
+                "shipping_charge": openapi.Schema(type=openapi.TYPE_STRING, format="decimal"),
+                "shipping_address": openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "postcode": openapi.Schema(type=openapi.TYPE_STRING),
+                        "address_line_1": openapi.Schema(type=openapi.TYPE_STRING),
+                    }
+                ),
+                "billing_address": openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "postcode": openapi.Schema(type=openapi.TYPE_STRING),
+                        "address_line_1": openapi.Schema(type=openapi.TYPE_STRING),
+                    }
+                ),
+                "order_ref_number": openapi.Schema(type=openapi.TYPE_STRING),
+            }
+        ),
+        "engineer": openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "contact_name": openapi.Schema(type=openapi.TYPE_STRING),
+                "company": openapi.Schema(type=openapi.TYPE_INTEGER),
+                "engineer_id": openapi.Schema(type=openapi.TYPE_STRING),
+                "address": openapi.Schema(type=openapi.TYPE_STRING),
+                "contact_number": openapi.Schema(type=openapi.TYPE_STRING),
+                "office_number": openapi.Schema(type=openapi.TYPE_STRING, nullable=True),
+                "email_address": openapi.Schema(type=openapi.TYPE_STRING),
+                "website": openapi.Schema(type=openapi.TYPE_STRING, nullable=True),
+                "postcode_coverage": openapi.Schema(type=openapi.TYPE_STRING),
+                "comments": openapi.Schema(type=openapi.TYPE_STRING),
+                "insurance_expiration": openapi.Schema(type=openapi.TYPE_STRING, format="date-time", nullable=True),
+                "current_sla": openapi.Schema(type=openapi.TYPE_STRING, nullable=True),
+                "performance_rating": openapi.Schema(type=openapi.TYPE_STRING),
+                "engineer_priority": openapi.Schema(type=openapi.TYPE_STRING),
+                "job": openapi.Schema(type=openapi.TYPE_STRING, nullable=True),
+                "is_telematics": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                "is_dash_cam": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                "is_dvs": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                "is_dvr": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                "is_adr_tanker": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                "is_specialist_vehicles": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                "is_insurance_on_file": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                "is_current_sla": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                "is_other": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+            }
+        ),
+        "booking_date": openapi.Schema(type=openapi.TYPE_STRING, format="date"),
+        "booking_time": openapi.Schema(type=openapi.TYPE_STRING, format="time"),
+        "duration": openapi.Schema(type=openapi.TYPE_STRING, description="Duration in HH:MM:SS format"),
+        "booking_status": openapi.Schema(type=openapi.TYPE_STRING),
+        "remarks": openapi.Schema(type=openapi.TYPE_STRING),
+    }
+)

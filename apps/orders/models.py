@@ -11,7 +11,8 @@ from apps.common.enums import (
     OrderItemStatusChoice, 
     CustomerPaymentStatusType, 
     ReturnStatusType,
-    ShipmentMode
+    ShipmentMode,
+    BookingStatusType,
 )
 
 
@@ -104,17 +105,12 @@ class Booking(BaseModel):
     engineer = models.ForeignKey('engineers.Engineer', on_delete=models.CASCADE)
     booking_date = models.DateField()
     booking_time = models.TimeField()
-    duration = models.DurationField()
+    duration = models.DurationField()  #==> example: P0DT2H30M0S (for 2hr 30 mins)
     is_pending = models.BooleanField(default=True)
     booking_status = models.CharField(
         max_length=20,
-        choices=[
-            ('scheduled', 'Scheduled'),
-            ('in_progress', 'In Progress'),
-            ('completed', 'Completed'),
-            ('cancelled', 'Cancelled')
-        ],
-        default='scheduled'
+        choices=BookingStatusType.choices,
+        default=BookingStatusType.SCHEDULED,
     )
     remarks = models.TextField(null=True, blank=True)
 
