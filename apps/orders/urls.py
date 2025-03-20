@@ -24,6 +24,9 @@ from apps.orders.views import (
 
 	BookingListAPIView,
 	BookingDetailsAPIView,
+	BookingCreateAPIView,
+	BookingDestroyAPIView,
+	BookingUpdateAPIView
 )
 
 
@@ -58,4 +61,7 @@ urlpatterns = [
 	# booking
 	path('booking/list/', BookingListAPIView.as_view(), name='booking-list'),
 	path('booking/<int:pk>/', BookingDetailsAPIView.as_view(), name='booking-retrieve'),
+	path('booking/create/', BookingCreateAPIView.as_view(), name='booking-create'),
+	path('booking/update/<int:pk>/', BookingUpdateAPIView.as_view(), name='booking-update'),
+	path('booking/delete/<int:pk>/', BookingDestroyAPIView.as_view(), name='booking-delete'),
 ]

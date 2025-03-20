@@ -48,11 +48,25 @@ logger = logging.getLogger(__name__)
 
 
 class BookingListAPIView(ListAPIView):
-    queryset = Booking.active_objects.all().order_by('-created_at')
     serializer_class = BookingSerializer
+
+    def get_queryset(self):
+        queryset = Booking.active_objects.all().order_by('-created_at')
+        engineer_id = self.request.query_params.get('engineer')
+        if engineer_id:
+            queryset = queryset.filter(engineer_id=engineer_id)
+        return queryset
 
     @swagger_auto_schema(
         tags=['Booking'],
+        manual_parameters=[
+            openapi.Parameter(
+                'engineer', 
+                openapi.IN_QUERY, 
+                description="Filter bookings by engineer ID", 
+                type=openapi.TYPE_INTEGER
+            ),
+        ],
         responses={
             status.HTTP_200_OK: booking_list_schema
         }
@@ -75,3 +89,68 @@ class BookingDetailsAPIView(RetrieveAPIView):
     )
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
+
+
+class BookingCreateAPIView(CreateAPIView):
+    serializer_class = BookingSerializer
+    queryset = Booking.active_objects.all()
+
+    @swagger_auto_schema(
+        tags=['Booking'],
+        request_body=BookingSerializer,
+        responses={
+            status.HTTP_201_CREATED: openapi.Response(
+                description='Booking created',
+                schema=BookingSerializer,
+            )
+        }
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+
+class BookingUpdateAPIView(APIView):
+    @swagger_auto_schema(
+        tags=['Booking'],
+        request_body=BookingSerializer,
+        responses={
+            status.HTTP_200_OK: openapi.Response(
+                description='Booking update success',
+                schema=BookingSerializer(),
+            )
+        }
+    )
+    def put(self, request, pk, *args, **kwargs):
+        try:
+            booking = get_object_or_404(Booking, pk=pk, is_active=True, is_deleted=False)
+            serializer = BookingSerializer(booking, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            validated_data = serializer.validated_data
+            serializer.save()
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        except Booking.DoesNotExist:
+            return Response({'error':'An error occurred'})
+
+
+class BookingDestroyAPIView(DestroyAPIView):
+    queryset = Booking.active_objects.all()
+    serializer_class = BookingSerializer
+    lookup_field = 'pk'
+
+    @swagger_auto_schema(
+        tags=['Booking'],
+        responses={
+            status.HTTP_204_NO_CONTENT: 'successfully deleted!',
+        }
+    )
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        with transaction.atomic():
+            booking_instance = self.get_object()
+            booking_instance.is_active = False
+            booking_instance.is_deleted = True
+            booking_instance.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
