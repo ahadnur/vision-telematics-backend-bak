@@ -24,24 +24,12 @@ from apps.orders.models import (
     ReturnItem
 )
 from apps.orders.serializers import (
-    OrderSerializer, 
-    OptionDataSerializer, 
-    PaymentDataSerializer, 
-
-    OrderReturnDetailSerializer,
-    OrderReturnCreateSerializer,
-    OrderReturnUpdateSerializer,
-    
-    OrderRefundSerializer,
-    OrderRefundCreateSerializer,
-    OrderRefundUpdateSerializer,
-
     BookingSerializer, 
     BookingDetailsSerializer,
 )
 from apps.orders.swagger_schema import booking_list_schema, booking_details_schema
 from apps.products.models import ProductSKU
-from apps.common.enums import ReturnStatusType, ShipmentMode, OperationChoice, CustomerPaymentStatusType
+from apps.common.enums import BookingStatusType
 from apps.inventory.models import Inventory
 
 logger = logging.getLogger(__name__)
@@ -52,9 +40,14 @@ class BookingListAPIView(ListAPIView):
 
     def get_queryset(self):
         queryset = Booking.active_objects.all().order_by('-created_at')
+
         engineer_id = self.request.query_params.get('engineer')
+        booking_status = self.request.query_params.get('booking_status')
+
         if engineer_id:
             queryset = queryset.filter(engineer_id=engineer_id)
+        if booking_status:
+            queryset = queryset.filter(booking_status=booking_status)
         return queryset
 
     @swagger_auto_schema(
@@ -65,6 +58,12 @@ class BookingListAPIView(ListAPIView):
                 openapi.IN_QUERY, 
                 description="Filter bookings by engineer ID", 
                 type=openapi.TYPE_INTEGER
+            ),
+            openapi.Parameter(
+                'booking_status', 
+                openapi.IN_QUERY, 
+                description="Filter bookings by Booking Status", 
+                type=openapi.TYPE_STRING
             ),
         ],
         responses={
@@ -122,7 +121,15 @@ class BookingUpdateAPIView(APIView):
     )
     def put(self, request, pk, *args, **kwargs):
         try:
-            booking = get_object_or_404(Booking, pk=pk, is_active=True, is_deleted=False)
+            booking = get_object_or_404(
+                Booking, pk=pk, is_active=True, is_deleted=False, 
+                booking_status=BookingStatusType.SCHEDULED
+            )
+
+            new_status = request.data.get('booking_status')
+            if new_status != BookingStatusType.SCHEDULED or new_status != BookingStatusType.CANCELLED:
+                return Response(f"You can only change status to: {BookingStatusType.CANCELLED}")
+
             serializer = BookingSerializer(booking, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             validated_data = serializer.validated_data
