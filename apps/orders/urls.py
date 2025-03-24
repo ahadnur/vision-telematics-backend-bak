@@ -21,6 +21,12 @@ from apps.orders.views import (
 	OrderRefundCreateAPIView,
 	OrderRefundUpdateAPIView,
 	OrderRefundDestroyAPIView,
+
+	BookingListAPIView,
+	BookingDetailsAPIView,
+	BookingCreateAPIView,
+	BookingDestroyAPIView,
+	BookingUpdateAPIView
 )
 
 
@@ -51,4 +57,11 @@ urlpatterns = [
 	path('refund/create/', OrderRefundCreateAPIView.as_view(), name='order-refund-create'),
 	path('refund/update/<int:pk>/', OrderRefundUpdateAPIView.as_view(), name='order-refund-update'),
 	path('refund/delete/<int:pk>/', OrderRefundDestroyAPIView.as_view(), name='order-refund-delete'),
+
+	# booking
+	path('booking/list/', BookingListAPIView.as_view(), name='booking-list'),
+	path('booking/<int:pk>/', BookingDetailsAPIView.as_view(), name='booking-retrieve'),
+	path('booking/create/', BookingCreateAPIView.as_view(), name='booking-create'),
+	path('booking/update/<int:pk>/', BookingUpdateAPIView.as_view(), name='booking-update'),
+	path('booking/delete/<int:pk>/', BookingDestroyAPIView.as_view(), name='booking-delete'),
 ]

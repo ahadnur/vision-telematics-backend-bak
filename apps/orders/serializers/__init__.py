@@ -12,3 +12,8 @@ from .order_return_refund_serializer import (
     OrderRefundCreateSerializer,
     OrderRefundUpdateSerializer,
 )
+
+from .booking_serializer import (
+    BookingSerializer,
+    BookingDetailsSerializer,
+)

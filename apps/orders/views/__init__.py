@@ -13,3 +13,11 @@ from .order_return_refund_view import (
 	OrderRefundUpdateAPIView,
 	OrderRefundDestroyAPIView,
 )
+
+from .booking_view import (
+	BookingListAPIView,
+	BookingDetailsAPIView,
+	BookingCreateAPIView,
+	BookingDestroyAPIView,
+	BookingUpdateAPIView,
+)

@@ -38,3 +38,10 @@ class ShipmentMode(models.TextChoices):
     PICKUP = 'pickup', 'Customer Pickup',
     DROPOFF = 'dropoff', 'Dropoff at Center',
     COURIER = 'courier', 'Courier Service'
+
+
+class BookingStatusType(models.TextChoices):
+    SCHEDULED = 'scheduled', 'Scheduled'
+    IN_PROGRESS = 'in_progress', 'In Progress'
+    COMPLETED = 'completed', 'Completed'
+    CANCELLED = 'cancelled', 'Cancelled'
