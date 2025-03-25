@@ -31,6 +31,9 @@ from apps.products.views import (
 
 	SubscriptionPlanListAPIView,
 	SubscriptionPlanDetailsAPIView,
+	SubscriptionPlanCreateAPIView,
+	SubscriptionPlanUpdateAPIView,
+	DeleteSubscriptionPlanAPIView,
 )
 
 urlpatterns = [
@@ -67,6 +70,8 @@ urlpatterns = [
 
 	# Subscription plan
 	path('subscription-plan/list/', SubscriptionPlanListAPIView.as_view(), name='subscription-plan-list'),
-	path('subscription-plan/details/<int:id>/', SubscriptionPlanDetailsAPIView.as_view(), name='subscription-plan-details'),
-	
+	path('subscription-plan/details/<int:pk>/', SubscriptionPlanDetailsAPIView.as_view(), name='subscription-plan-details'),
+	path('subscription-plan/create/', SubscriptionPlanCreateAPIView.as_view(), name='subscription-plan-create'),
+	path('subscription-plan/update/<int:pk>/', SubscriptionPlanUpdateAPIView.as_view(), name='subscription-plan-update'),
+	path('subscription-plan/delete/<int:pk>/', DeleteSubscriptionPlanAPIView.as_view(), name='subscription-plan-delete')
 ]
