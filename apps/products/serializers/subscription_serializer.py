@@ -5,6 +5,7 @@ from apps.products.models import (
     UsageMetrics,
     SubscriptionTransaction
 )
+from apps.accounts.models import Company
 
 
 class SubscriptionPlanSerializer(serializers.ModelSerializer):
@@ -19,14 +20,23 @@ class SubscriptionPlanSerializer(serializers.ModelSerializer):
     
 
 class CompanySubscriptionSerializer(serializers.ModelSerializer):
+    company_name = serializers.SerializerMethodField()
+    plan_name = serializers.SerializerMethodField()
+
     class Meta:
         model = CompanySubscription
         fields = [
-            'id', 'company', 'plan', 'status'
-            'current_start_date', 'current_end_date',
+            'id', 'company', 'company_name', 'plan', 'plan_name', 
+            'status', 'current_start_date', 'current_end_date',
             'auto_renew'
         ]
         read_only_fields = ['id', 'current_end_date']
+    
+    def get_company_name(self, obj):
+        return obj.company.company_name if obj.company else None
+
+    def get_plan_name(self, obj):
+        return obj.plan.name if obj.plan else None
 
 
 class UsageMetricsSerializer(serializers.ModelSerializer):

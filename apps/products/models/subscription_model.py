@@ -22,6 +22,14 @@ class SubscriptionPlan(BaseModel):
     )
     features = models.JSONField() # i do not have enough info from client to add, so i added json field for now
 
+    class Meta:
+        db_table = 'Subscription Plans'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['tier']),
+            models.Index(fields=['billing_cycle']),
+        ]
+
     def __str__(self):
         return f"{self.name} - {self.tier} - {self.price} - {self.billing_cycle}"
 
@@ -46,6 +54,16 @@ class CompanySubscription(BaseModel):
                 self.current_end_date = self.current_start_date + timedelta(days=365)
         
         super().save(*args, **kwargs)
+    
+    class Meta:
+        db_table = 'Company Subscriptions'
+        ordering = ['-created_at']
+        unique_together = ('company', 'plan')
+        indexes = [
+            models.Index(fields=['company']),
+            models.Index(fields=['plan']),
+            models.Index(fields=['status']),
+        ]
 
     def __str__(self):
         return f"{self.company.company_name} - {self.plan.name} - {self.status}"
