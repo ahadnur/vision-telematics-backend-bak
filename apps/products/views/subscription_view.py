@@ -5,6 +5,8 @@ from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView, DestroyAPIView, UpdateAPIView
 from rest_framework.response import Response
+from datetime import timedelta
+from django.utils.timezone import now
 
 from apps.products.models import (
     SubscriptionPlan,
@@ -249,7 +251,24 @@ class CompanySubscribeCreateAPIView(CreateAPIView):
         }
     )
     def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
+        response = super().post(request, *args, **kwargs)
+        
+        if response.status_code == status.HTTP_201_CREATED:
+            subscription = CompanySubscription.objects.get(id=response.data['id'])
+            
+            # Create SubscriptionTransaction
+            SubscriptionTransaction.objects.create(
+                company=subscription.company,
+                plan=subscription.plan,
+                amount_paid=subscription.plan.price,
+                start_date=subscription.current_start_date or now().date(),
+                end_date=subscription.current_end_date,
+                status=SubscriptionStatusChoices.ACTIVE,
+                payment_reference="INITIAL_PAYMENT"
+            )
+        
+        return response
+
 
 
 class ChangeSubscriptionPlanAndStatusAPIView(UpdateAPIView):
@@ -272,9 +291,29 @@ class ChangeSubscriptionPlanAndStatusAPIView(UpdateAPIView):
     def put(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
+            old_plan = instance.plan
+            old_status = instance.status
+
             serializer = self.get_serializer(instance, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return Response(serializer.data)
+            
+            updated_instance = self.get_object()  # updated instance
+            new_plan = updated_instance.plan
+            new_status = updated_instance.status
+
+            # Check if the plan or status has changed
+            if old_plan != new_plan or old_status != new_status:
+                SubscriptionTransaction.objects.create(
+                    company=updated_instance.company,
+                    plan=new_plan,
+                    amount_paid=new_plan.price,
+                    start_date=now().date(),
+                    status=new_status,
+                    payment_reference="PLAN_UPDATE_PAYMENT"
+                )
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
         except CompanySubscription.DoesNotExist:
             return Response({'error': 'subscription tier not found'}, status=status.HTTP_404_NOT_FOUND)
