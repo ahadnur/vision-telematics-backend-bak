@@ -45,3 +45,20 @@ class BookingStatusType(models.TextChoices):
     IN_PROGRESS = 'in_progress', 'In Progress'
     COMPLETED = 'completed', 'Completed'
     CANCELLED = 'cancelled', 'Cancelled'
+
+
+class SubscriptionTierChoices(models.TextChoices):
+    BASIC = 'basic', 'Basic'
+    PRO = 'pro', 'Pro'
+    ENTERPRISE = 'enterprise', 'Enterprise'
+
+
+class BillingCycleChoices(models.TextChoices):
+    MONTHLY = 'monthly', 'Monthly'
+    ANNUAL = 'annual', 'Annual'
+
+
+class SubscriptionStatusChoices(models.TextChoices):
+    ACTIVE = 'active', 'Active'
+    EXPIRED = 'expired', 'Expired'
+    CANCELED = 'canceled', 'Canceled'

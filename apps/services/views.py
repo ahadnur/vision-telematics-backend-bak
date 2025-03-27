@@ -61,6 +61,7 @@ class ServiceRetrieveView(RetrieveAPIView):
 
 
 class ServiceUpdateView(UpdateAPIView):
+	http_method_names = ['put']
 	queryset = Service.objects.all()
 	serializer_class = ServiceSerializer
 	lookup_field = 'pk'

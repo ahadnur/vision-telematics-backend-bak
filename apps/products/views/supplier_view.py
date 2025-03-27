@@ -72,6 +72,7 @@ class SupplierDetailAPIView(RetrieveAPIView):
 
 
 class SupplierUpdateAPIView(UpdateAPIView):
+	http_method_names = ['put']
 	queryset = Supplier.active_objects.all()
 	serializer_class = SupplierSerializer
 

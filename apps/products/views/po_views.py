@@ -87,6 +87,7 @@ class PORetrieveView(generics.RetrieveAPIView):
 
 
 class POUpdateView(generics.UpdateAPIView):
+    http_method_names = ['put']
     serializer_class = POUpdateSerializer
     queryset = PO.active_objects.all()
     lookup_field = 'id'
