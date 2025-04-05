@@ -1,3 +1,4 @@
+from datetime import date
 from datetime import timedelta
 from django.db import models
 from django.utils.timezone import now
@@ -47,11 +48,14 @@ class CompanySubscription(BaseModel):
     auto_renew = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
-        if not self.current_end_date:
+        if self.current_start_date:
             if self.plan.billing_cycle == BillingCycleChoices.MONTHLY:
                 self.current_end_date = self.current_start_date + timedelta(days=30)
             elif self.plan.billing_cycle == BillingCycleChoices.ANNUAL:
                 self.current_end_date = self.current_start_date + timedelta(days=365)
+        
+        if self.status == SubscriptionStatusChoices.CANCELED:
+            self.current_end_date = date.today()
         
         super().save(*args, **kwargs)
     

@@ -46,6 +46,15 @@ class OrderReturnCreateSerializer(serializers.ModelSerializer):
             'notes',
         ]
 
+    def validate(self, data):
+        order_item = data['order_item']
+        return_quantity = data['quantity']
+
+        if return_quantity > order_item.quantity:
+            raise serializers.ValidationError("Return quantity exceeds original order quantity.")
+
+        return data
+
 
 class OrderReturnUpdateSerializer(serializers.ModelSerializer):
     class Meta:
