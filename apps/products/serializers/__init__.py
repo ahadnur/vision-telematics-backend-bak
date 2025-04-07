@@ -14,7 +14,7 @@ from .po_serializer import (
 )
 from .subscription_serializer import (
     SubscriptionPlanSerializer,
-    CompanySubscriptionSerializer,
+    SubscribeAPlanSerializer,
     UsageMetricsSerializer,
     SubscriptionTransactionSerializer,
 )

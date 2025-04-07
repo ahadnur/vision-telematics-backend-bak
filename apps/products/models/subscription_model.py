@@ -107,7 +107,7 @@ class UsageMetrics(models.Model):
     subscriber = GenericForeignKey('subscriber_type', 'subscriber_id')
 
     discount = models.DecimalField(max_digits=4, decimal_places=2, default=0.00)
-    discount_remaining = models.PositiveIntegerField(default=0)
+    discount_count = models.PositiveIntegerField(default=0)
     discount_used = models.PositiveIntegerField(default=0)
     reset_date = models.DateField()
 
@@ -126,10 +126,10 @@ class UsageMetrics(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.subscriber} - Remaining: {self.discount_remaining}"
+        return f"{self.subscriber} - Remaining: {self.discount_count}"
 
     def reset(self):
-        self.discount_remaining = self.discount_used = 0
+        self.discount_count = self.discount_used = 0
         self.reset_date = now().date()
         self.save()
 
@@ -179,13 +179,13 @@ class SubscriptionTransaction(BaseModel):
             subscriber_id=self.subscriber_id,
             defaults={
                 'discount': self.plan.features['discount'],
-                'discount_remaining': self.plan.features['discount_count'],
+                'discount_count': self.plan.features['discount_count'],
                 'reset_date': self.end_date
             }
         )
         
         if not created:
             metrics.discount = self.plan.features['discount']
-            metrics.discount_remaining = self.plan.features['discount_count']
+            metrics.discount_count = self.plan.features['discount_count']
             metrics.reset_date = self.end_date
             metrics.save()

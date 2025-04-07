@@ -1,11 +1,13 @@
 from rest_framework import serializers
 from django.contrib.contenttypes.models import ContentType
-from .models import (
+from apps.products.models import (
     SubscriptionPlan,
     SubscribeAPlan,
     UsageMetrics,
     SubscriptionTransaction
 )
+from apps.accounts.models import Company, Customer
+from apps.common.enums import SubscriptionStatusChoices
 
 
 class ContentTypeField(serializers.Field):
@@ -60,8 +62,8 @@ class SubscribeAPlanSerializer(serializers.ModelSerializer):
     subscriber_id = serializers.IntegerField(write_only=True)
     plan_name = serializers.CharField(source='plan.name', read_only=True)
     status = serializers.ChoiceField(
-        choices=SubscribeAPlan.SubscriptionStatusChoices.choices,
-        default=SubscribeAPlan.SubscriptionStatusChoices.ACTIVE
+        choices=SubscriptionStatusChoices.choices,
+        default=SubscriptionStatusChoices.ACTIVE
     )
 
     class Meta:
@@ -71,7 +73,7 @@ class SubscribeAPlanSerializer(serializers.ModelSerializer):
             'plan', 'plan_name', 'current_start_date', 'current_end_date',
             'status', 'auto_renew'
         ]
-        read_only_fields = ['id', 'current_start_date', 'current_end_date']
+        read_only_fields = ['id', 'current_end_date']
         extra_kwargs = {
             'plan': {'write_only': True}
         }
@@ -93,7 +95,7 @@ class UsageMetricsSerializer(serializers.ModelSerializer):
         model = UsageMetrics
         fields = [
             'id', 'subscriber', 'subscriber_type', 'subscriber_id',
-            'discount', 'discount_remaining', 'discount_used', 'reset_date'
+            'discount', 'discount_count', 'discount_used', 'reset_date'
         ]
         read_only_fields = ['id', 'reset_date']
 

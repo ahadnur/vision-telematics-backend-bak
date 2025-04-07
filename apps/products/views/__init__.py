@@ -31,14 +31,22 @@ from .po_views import (
     PODeleteView
 )
 from .subscription_view import (
+    # plan
     SubscriptionPlanListAPIView,
-    SubscriptionPlanDetailsAPIView,
+    SubscriptionPlanRetrieveAPIView,
     SubscriptionPlanCreateAPIView,
     SubscriptionPlanUpdateAPIView,
-    DeleteSubscriptionPlanAPIView,
+    SubscriptionPlanDestroyAPIView,
 
-    CompanySubscribeCreateAPIView,
-    SubscribedCompanyDetailsAPIView,
-    SubscribedCompanyListAPIView,
-    ChangeSubscriptionPlanAndStatusAPIView,
+    # subscribe
+    SubscriptionListAPIView,
+    SubscriptionRetrieveAPIView,
+    SubscriptionCreateAPIView,
+    SubscriptionUpdateAPIView,
+    
+    # transsactions
+    TransactionHistoryAPIView,
+
+    # usage
+    UsageMetricsAPIView,
 )
