@@ -147,7 +147,7 @@ class SubscriptionTransaction(BaseModel):
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
     start_date = models.DateField()
     end_date = models.DateField()
-    payment_reference = models.CharField(max_length=100, unique=True)
+    payment_reference = models.CharField(max_length=100, unique=True, null=True, blank=True)
     note = models.TextField(blank=True)
 
     class Meta:

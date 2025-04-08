@@ -79,11 +79,27 @@ class SubscribeAPlanSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, data):
-        if data['subscriber_type'].model not in ['company', 'customer']:
-            raise serializers.ValidationError(
-                "Subscriber must be a Company or Customer"
-            )
+        subscriber_type = data.get('subscriber_type')
+        subscriber_id = data.get('subscriber_id')
+
+        if subscriber_type.model not in ['company', 'customer']:
+            raise serializers.ValidationError("Subscriber must be a Company or Customer")
+
+        model_class = subscriber_type.model_class()
+        if not model_class.objects.filter(id=subscriber_id).exists():
+            raise serializers.ValidationError("Subscriber does not exist.")
+
         return data
+    
+    def create(self, validated_data):
+        subscriber_type = validated_data.pop('subscriber_type')
+        subscriber_id = validated_data.pop('subscriber_id')
+
+        return SubscribeAPlan.objects.create(
+            subscriber_type=subscriber_type,
+            subscriber_id=subscriber_id,
+            **validated_data
+        )
 
 
 class UsageMetricsSerializer(serializers.ModelSerializer):
