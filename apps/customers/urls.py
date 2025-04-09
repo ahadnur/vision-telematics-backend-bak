@@ -1,6 +1,6 @@
 from django.urls import path
 from apps.customers.views import (CustomerCreateAPIView, CreateCustomerVehicleAPIView,
-    GetVehicleInfoAPIView, CustomerUpdateAPIView, CustomerListAPIView, CustomerRetrieveAPIView, CustomerDestroyAPIView)
+    GetVehicleInfoAPIView, CustomerUpdateAPIView, CustomerListAPIView, CustomerRetrieveAPIView, CustomerDestroyAPIView, CustomerFeedbackListAPIView, CustomerFeedbackRetrieveAPIView)
 from apps.customers.views.customer_utils_view import (CustomerDropdownListAPIView, CustomerVehicleListAPIView,
     CustomerSpecificVehicleListAPIView)
 
@@ -18,4 +18,11 @@ urlpatterns = [
     path('customer-vehicle-list/', CustomerVehicleListAPIView.as_view(), name='customer-vehicle-list'),
     path('custmer-specifiv-vehicle-list/<customer_id>/', CustomerSpecificVehicleListAPIView.as_view(),
          name='customer-specific-vehicle-list'),
+
+    # feedbacks
+    path('feedback/list/', CustomerFeedbackListAPIView.as_view(), name='customer-feedback-list'),
+    path('feedback/<int:pk>/', CustomerFeedbackRetrieveAPIView.as_view(), name='customer-feedback-retrieve'),
+    # path('feedback/create/', CustomerFeedbackCreateAPIView.as_view(), name='customer-feedback-create'),
+    # path('feedback/<int:pk>/update/', CustomerFeedbackUpdateAPIView.as_view(), name='customer-feedback-update'),
+    # path('feedback/<int:pk>/delete/', CustomerFeedbackDestroyAPIView.as_view(), name='customer-feedback-delete'),
 ]
