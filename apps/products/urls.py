@@ -29,16 +29,24 @@ from apps.products.views import (
 	POUpdateView,
 	PODeleteView,
 
-	SubscriptionPlanListAPIView,
-	SubscriptionPlanDetailsAPIView,
-	SubscriptionPlanCreateAPIView,
-	SubscriptionPlanUpdateAPIView,
-	DeleteSubscriptionPlanAPIView,
+    # subscription plan
+    SubscriptionPlanListAPIView,
+    SubscriptionPlanRetrieveAPIView,
+    SubscriptionPlanCreateAPIView,
+    SubscriptionPlanUpdateAPIView,
+    SubscriptionPlanDestroyAPIView,
 
-	SubscribedCompanyListAPIView,
-	SubscribedCompanyDetailsAPIView,
-	CompanySubscribeCreateAPIView,
-	ChangeSubscriptionPlanAndStatusAPIView,
+    # subscribe
+    SubscriptionListAPIView,
+    SubscriptionRetrieveAPIView,
+    SubscriptionCreateAPIView,
+    SubscriptionUpdateAPIView,
+    
+    # transsactions
+    TransactionHistoryAPIView,
+
+    # usage
+    UsageMetricsAPIView,
 )
 
 urlpatterns = [
@@ -73,16 +81,22 @@ urlpatterns = [
 	path('po/<int:id>/update/', POUpdateView.as_view(), name='po-update'),
 	path('po/<int:id>/delete/', PODeleteView.as_view(), name='po-delete'),
 
-	# Subscription plan
-	path('subscription-plan/list/', SubscriptionPlanListAPIView.as_view(), name='subscription-plan-list'),
-	path('subscription-plan/details/<int:pk>/', SubscriptionPlanDetailsAPIView.as_view(), name='subscription-plan-details'),
-	path('subscription-plan/create/', SubscriptionPlanCreateAPIView.as_view(), name='subscription-plan-create'),
-	path('subscription-plan/update/<int:pk>/', SubscriptionPlanUpdateAPIView.as_view(), name='subscription-plan-update'),
-	path('subscription-plan/delete/<int:pk>/', DeleteSubscriptionPlanAPIView.as_view(), name='subscription-plan-delete'),
+	# subscription plans
+    path("subscription/plans/", SubscriptionPlanListAPIView.as_view(), name="subscription-plan-list"),
+    path("subscription/plans/create/", SubscriptionPlanCreateAPIView.as_view(), name="subscription-plan-create"),
+    path("subscription/plans/<int:pk>/", SubscriptionPlanRetrieveAPIView.as_view(), name="subscription-plan-detail"),
+    path("subscription/plans/<int:pk>/update/", SubscriptionPlanUpdateAPIView.as_view(), name="subscription-plan-update"),
+    path("subscription/plans/<int:pk>/delete/", SubscriptionPlanDestroyAPIView.as_view(), name="subscription-plan-delete"),
 
-	# subscribes
-	path('company-subscription-list/', SubscribedCompanyListAPIView.as_view(), name='company-subscription-list'),
-	path('company-subscription-details/<int:pk>/', SubscribedCompanyDetailsAPIView.as_view(), name='company-subscription-details'),
-	path('subscribe-new-company/', CompanySubscribeCreateAPIView.as_view(), name='subscribe-new-company'),
-	path('change-company-subscription-info/<int:pk>/', ChangeSubscriptionPlanAndStatusAPIView.as_view(), name='change-subscription-info'),
+    # Subscriptions 
+    path("subscriptions/", SubscriptionListAPIView.as_view(), name="subscription-list"),
+    path("subscriptions/create/", SubscriptionCreateAPIView.as_view(), name="subscription-create"),
+    path("subscriptions/<int:pk>/", SubscriptionRetrieveAPIView.as_view(), name="subscription-detail"),
+    path("subscriptions/<int:pk>/update/", SubscriptionUpdateAPIView.as_view(), name="subscription-update"),
+
+    # Transactions
+    path("subscriptions/transactions/", TransactionHistoryAPIView.as_view(), name="transaction-history"),
+
+    # Usage Metrics
+    path("subscriptions/usage-metrics/<str:subscriber_type>/<int:subscriber_id>/", UsageMetricsAPIView.as_view(), name="usage-metrics"),
 ]

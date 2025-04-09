@@ -13,7 +13,7 @@ from .purchase_model import (
 )
 from .subscription_model import (
     SubscriptionPlan,
-    CompanySubscription,
+    SubscribeAPlan,
     UsageMetrics,
     SubscriptionTransaction
 )

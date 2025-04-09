@@ -1,30 +1,29 @@
+from datetime import timedelta
 import logging
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.exceptions import NotFound
-from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView, DestroyAPIView, UpdateAPIView
+from rest_framework.exceptions import NotFound, PermissionDenied, APIException
+from rest_framework.generics import (
+    ListAPIView, RetrieveAPIView, CreateAPIView, UpdateAPIView, DestroyAPIView
+)
 from rest_framework.response import Response
-from datetime import timedelta
+from django.db import transaction, IntegrityError
 from django.utils.timezone import now
+from django.contrib.contenttypes.models import ContentType
 
 from apps.products.models import (
-    SubscriptionPlan,
-    SubscriptionTransaction,
-    UsageMetrics,
-    CompanySubscription,
+    SubscriptionPlan, SubscribeAPlan, UsageMetrics, SubscriptionTransaction
 )
 from apps.products.serializers import (
-    SubscriptionPlanSerializer,
-    SubscriptionTransactionSerializer,
-    UsageMetricsSerializer,
-    CompanySubscriptionSerializer,
+    SubscriptionPlanSerializer, SubscriptionTransactionSerializer,
+    UsageMetricsSerializer, SubscribeAPlanSerializer
 )
+from apps.accounts.models import Company, Customer
 from apps.common.enums import (
-    SubscriptionTierChoices, 
-    SubscriptionStatusChoices, 
-    BillingCycleChoices
+    SubscriptionStatusChoices, SubscriptionTierChoices, BillingCycleChoices
 )
+from apps.products.utils import get_subscriber_content_type
 
 logger = logging.getLogger(__name__)
 
@@ -34,286 +33,264 @@ class SubscriptionPlanListAPIView(ListAPIView):
     queryset = SubscriptionPlan.active_objects.all()
 
     @swagger_auto_schema(
-        tags=['Subscription Plan'],
+        tags=['Subscription Plans'],
         manual_parameters=[
-            openapi.Parameter(
-                'paginated',
-                openapi.IN_QUERY,
-                description='Enable or disable pagination',
-                type=openapi.TYPE_BOOLEAN,
-                default=True,
-                required=False
-            )
-        ],
-        responses={
-            status.HTTP_200_OK: openapi.Response(
-                description='Subscription Plan List',
-                schema=SubscriptionPlanSerializer()
-            )
-        }
+            openapi.Parameter('tier', openapi.IN_QUERY, type=openapi.TYPE_STRING, enum=SubscriptionTierChoices.values, required=False),
+            openapi.Parameter('billing_cycle', openapi.IN_QUERY, type=openapi.TYPE_STRING, enum=BillingCycleChoices.values, required=False)
+        ]
     )
     def get(self, request, *args, **kwargs):
-        pagination = self.request.query_params.get('paginated', 'true').lower() == 'true'
-        if not pagination:
-            self.pagination_class = None
+        return self.list(request, *args, **kwargs)
 
-        return super().get(request, *args, **kwargs)
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        params = self.request.query_params
+
+        if tier := params.get('tier'):
+            queryset = queryset.filter(tier__iexact=tier)
+        if cycle := params.get('billing_cycle'):
+            queryset = queryset.filter(billing_cycle__iexact=cycle)
+
+        return queryset
 
 
-class SubscriptionPlanDetailsAPIView(RetrieveAPIView):
-    queryset = SubscriptionPlan.active_objects.all()
+class SubscriptionPlanRetrieveAPIView(RetrieveAPIView):
     serializer_class = SubscriptionPlanSerializer
+    queryset = SubscriptionPlan.active_objects.all()
     lookup_field = 'pk'
 
-    @swagger_auto_schema(
-        tags=['Subscription Plan'],
-        responses={
-            status.HTTP_200_OK: openapi.Response(
-                description='Subscription Plan Details',
-                schema=SubscriptionPlanSerializer
-            )
-        }
-    )
+    @swagger_auto_schema(tags=['Subscription Plans'])
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
 
 class SubscriptionPlanCreateAPIView(CreateAPIView):
     serializer_class = SubscriptionPlanSerializer
+    queryset = SubscriptionPlan.active_objects.all()
 
-    @swagger_auto_schema(
-        tags=['Subscription Plan'],
-        request_body=SubscriptionPlanSerializer,
-        responses={
-            status.HTTP_201_CREATED: openapi.Response(description='Subscription plan created successfully'),
-            status.HTTP_400_BAD_REQUEST: openapi.Response(description='An error occurred'),
-            status.HTTP_401_UNAUTHORIZED: openapi.Response(description='You are not authorized to create a lesson')
-        }
-    )
+    def get_permissions(self):
+        if not self.request.user.is_superuser:
+            raise PermissionDenied("Only admins can create subscription plans")
+        return super().get_permissions()
+
+    @swagger_auto_schema(tags=['Subscription Plans'], request_body=SubscriptionPlanSerializer)
     def post(self, request, *args, **kwargs):
-        if request.user.is_superuser:
-            return super().post(request, *args, **kwargs)
-        return Response({'error':"You are not authorized to create a plan"}, status=status.HTTP_401_UNAUTHORIZED)
+        return super().post(request, *args, **kwargs)
 
 
 class SubscriptionPlanUpdateAPIView(UpdateAPIView):
+    serializer_class = SubscriptionPlanSerializer
+    queryset = SubscriptionPlan.active_objects.all()
+    lookup_field = 'pk'
     http_method_names = ['put']
-    serializer_class = SubscriptionPlanSerializer
-    queryset = SubscriptionPlan.active_objects.all()
 
-    def get_object(self):
-        return self.queryset.get(pk=self.kwargs.get('pk'))
-    
-    @swagger_auto_schema(
-        tags=['Subscription Plan'],
-        request_body= SubscriptionPlanSerializer,
-        responses={
-            status.HTTP_200_OK: openapi.Response(description='Subscription plan updated successfully'),
-            status.HTTP_400_BAD_REQUEST: openapi.Response(description='An error occurred'),
-            status.HTTP_404_NOT_FOUND: openapi.Response(description='Subscription plan not found'),
-            status.HTTP_401_UNAUTHORIZED: openapi.Response(description='you are not authorized to edit Subscription plan')
-        }
-    )
+    def get_permissions(self):
+        if not self.request.user.is_superuser:
+            raise PermissionDenied("Only admins can update subscription plans")
+        return super().get_permissions()
+
+    @swagger_auto_schema(tags=['Subscription Plans'], request_body=SubscriptionPlanSerializer)
     def put(self, request, *args, **kwargs):
-        if request.user.is_superuser:
-            try:
-                instance = self.get_object()
-                serializer = self.get_serializer(instance, data=request.data, partial=True)
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-                return Response(serializer.data)
-            except SubscriptionPlan.DoesNotExist:
-                return Response({'error' : 'Subscription plan not found'}, status=status.HTTP_404_NOT_FOUND)
-        else:
-            return Response({'error' : "you are not authorized to edit subscription plan"}, status.HTTP_401_UNAUTHORIZED)
+        return super().put(request, *args, **kwargs)
 
 
-class DeleteSubscriptionPlanAPIView(DestroyAPIView):
+class SubscriptionPlanDestroyAPIView(DestroyAPIView):
     serializer_class = SubscriptionPlanSerializer
     queryset = SubscriptionPlan.active_objects.all()
+    lookup_field = 'pk'
 
-    def get_object(self):
-        return self.queryset.get(pk=self.kwargs.get('pk'))
-    
-    @swagger_auto_schema(
-        tags=['Subscription Plan'],
-        responses={
-            status.HTTP_204_NO_CONTENT: openapi.Response(description='Subscription Plan deleted successfully'),
-            status.HTTP_400_BAD_REQUEST: openapi.Response(description='An error occurred'),
-            status.HTTP_404_NOT_FOUND: openapi.Response(description='Subscription Plan not found'),
-            status.HTTP_401_UNAUTHORIZED: openapi.Response(description='you are not authorized to delete Subscription Plan')
-        }
-    )
+    def get_permissions(self):
+        if not self.request.user.is_superuser:
+            raise PermissionDenied("Only admins can delete subscription plans")
+        return super().get_permissions()
+
+    @swagger_auto_schema(tags=['Subscription Plans'])
     def delete(self, request, *args, **kwargs):
-        if request.user.is_superuser:
-            return self.destroy(request, *args, **kwargs)
-        return Response({'error':'you are not authorized to delete Subscription Plan'})
-    
-    def destroy(request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            instance.is_active = False
-            instance.is_deleted = True
-            instance.save()
-            return Response({'success' : 'subscription plan deleted'})
-        except SubscriptionPlan.DoesNotExist:
-            return Response({'error': 'Subscription plan not found'})
+        return self.destroy(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        with transaction.atomic():
+            plan = self.get_object()
+            plan.is_active = False
+            plan.is_deleted = True
+            plan.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-########## Subscribed ##########
+class SubscriptionListAPIView(ListAPIView):
+    serializer_class = SubscribeAPlanSerializer
+    queryset = SubscribeAPlan.active_objects.all()
 
-class SubscribedCompanyListAPIView(ListAPIView):
-    serializer_class = CompanySubscriptionSerializer
-    
+    @swagger_auto_schema(
+        tags=['Subscriptions'],
+        manual_parameters=[
+            openapi.Parameter('subscriber_type', openapi.IN_QUERY, type=openapi.TYPE_STRING, enum=['company', 'customer'], required=False),
+            openapi.Parameter('subscriber_id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, required=False),
+            openapi.Parameter('status', openapi.IN_QUERY, type=openapi.TYPE_STRING, enum=SubscriptionStatusChoices.values, required=False)
+        ]
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
     def get_queryset(self):
-        queryset = CompanySubscription.active_objects.all()
-        plan_id = self.request.query_params.get('plan_id')
-        status = self.request.query_params.get('status')
-        tier = self.request.query_params.get('tier')
+        queryset = super().get_queryset()
+        params = self.request.query_params
 
-        if plan_id:
-            queryset = queryset.filter(plan=plan_id)
-        if status:
-            queryset = queryset.filter(status=status.lower())
-        if tier:
-            queryset = queryset.filter(company__tier=tier.lower())
+        if sub_type := params.get('subscriber_type'):
+            try:
+                content_type = get_subscriber_content_type(sub_type)
+                queryset = queryset.filter(subscriber_type=content_type)
+            except ValueError:
+                raise NotFound("Invalid subscriber type")
+
+        if sub_id := params.get('subscriber_id'):
+            queryset = queryset.filter(subscriber_id=sub_id)
+
+        if status := params.get('status'):
+            queryset = queryset.filter(status__iexact=status)
 
         return queryset
 
-    @swagger_auto_schema(
-        tags=['Subscribed Company'],
-        manual_parameters=[
-            openapi.Parameter(
-                'plan_id',
-                openapi.IN_QUERY,
-                description='Filter by plan id',
-                type=openapi.TYPE_INTEGER,
-                required=False,
-            ),
-            openapi.Parameter(
-                'status',
-                openapi.IN_QUERY,
-                description='Filter by status (active, expired, canceled)',
-                type=openapi.TYPE_STRING,
-                required=False,
-            ),
-            openapi.Parameter(
-                'tier',
-                openapi.IN_QUERY,
-                description='Filter by tier (basic, pro, enterprise)',
-                type=openapi.TYPE_STRING,
-                required=False,
-            ),
-        ]
-    )
-    def get(self, request, *args, **kwargs):        
+
+class SubscriptionRetrieveAPIView(RetrieveAPIView):
+    serializer_class = SubscribeAPlanSerializer
+    queryset = SubscribeAPlan.active_objects.all()
+    lookup_field = 'pk'
+
+    @swagger_auto_schema(tags=['Subscriptions'])
+    def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
 
-class SubscribedCompanyDetailsAPIView(RetrieveAPIView):
-    queryset = CompanySubscription.active_objects.all()
-    serializer_class = CompanySubscriptionSerializer
+class SubscriptionCreateAPIView(CreateAPIView):
+    serializer_class = SubscribeAPlanSerializer
+    queryset = SubscribeAPlan.active_objects.all()
 
     @swagger_auto_schema(
-        tags=['Subscribed Company'],
-        responses={
-            status.HTTP_200_OK: openapi.Response(description='Subscribed company details'),
-            status.HTTP_400_BAD_REQUEST: openapi.Response(description='An error occurred'),
-            status.HTTP_404_NOT_FOUND: openapi.Response(description='subscribed company not found or company is not subscribed any tier')
-        }
-    )
-    def get(self, request, *args, **kwargs):
-        try:
-            subscribed_company = self.get_object()
-            serializer = self.get_serializer(subscribed_company)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except CompanySubscription.DoesNotExist:
-            return Response({'error' : 'subscribed company not found or company is not subscribed any tier'}, status=status.HTTP_404_NOT_FOUND)
-        
-    def get_object(self):
-        id = self.kwargs.get('pk')
-
-        try:
-            subscribed_company = self.queryset.get(pk=id)
-        except CompanySubscription.DoesNotExist:
-            raise NotFound("subscribed company not found or company is not subscribed any tier")
-        return subscribed_company
-
-
-class CompanySubscribeCreateAPIView(CreateAPIView):
-    serializer_class = CompanySubscriptionSerializer
-    
-    @swagger_auto_schema(
-        tags=['Subscribed Company'],
-        request_body=CompanySubscriptionSerializer,
-        responses={
-            status.HTTP_201_CREATED: openapi.Response(description='Successfully Subscribed to a plan!')
-        }
+        tags=['Subscriptions'], 
+        request_body=SubscribeAPlanSerializer
     )
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
-        
+
         if response.status_code == status.HTTP_201_CREATED:
-            subscription = CompanySubscription.objects.get(id=response.data['id'])
-            
-            # Create SubscriptionTransaction
-            SubscriptionTransaction.objects.create(
-                company=subscription.company,
-                plan=subscription.plan,
-                amount_paid=subscription.plan.price,
-                start_date=subscription.current_start_date or now().date(),
-                end_date=subscription.current_end_date,
-                status=SubscriptionStatusChoices.ACTIVE,
-                payment_reference="INITIAL_PAYMENT"
-            )
-        
+            subscription_id = response.data.get("id")
+            try:
+                subscription = SubscribeAPlan.objects.get(id=subscription_id)
+
+                SubscriptionTransaction.objects.create(
+                    subscriber_type=subscription.subscriber_type,
+                    subscriber_id=subscription.subscriber_id,
+                    plan=subscription.plan,
+                    amount_paid=subscription.plan.price,
+                    start_date=subscription.current_start_date,
+                    end_date=subscription.current_end_date,
+                    note="New Subscription Added."
+                )
+
+
+            except IntegrityError as e:
+                return Response(
+                    {"detail": "Transaction creation failed due to integrity error.", "error": str(e)},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            except Exception as e:
+                return Response(
+                    {"detail": "Unexpected error occurred.", "error": str(e)},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+
         return response
 
 
-
-class ChangeSubscriptionPlanAndStatusAPIView(UpdateAPIView):
-    serializer_class = CompanySubscriptionSerializer
-    queryset = CompanySubscription.active_objects.all()
+class SubscriptionUpdateAPIView(UpdateAPIView):
+    serializer_class = SubscribeAPlanSerializer
+    queryset = SubscribeAPlan.active_objects.all()
+    lookup_field = 'pk'
     http_method_names = ['put']
 
-    def get_object(self):
-        return self.queryset.get(pk=self.kwargs.get('pk'))
-    
     @swagger_auto_schema(
-        tags=['Subscribed Company'],
-        request_body=CompanySubscriptionSerializer,
-        responses={
-            status.HTTP_200_OK: openapi.Response(description='subscription tier updated successfully'),
-            status.HTTP_400_BAD_REQUEST: openapi.Response(description='An error occurred'),
-            status.HTTP_404_NOT_FOUND: openapi.Response(description='subscription tier not found'),
-        }
+        tags=['Subscriptions'], 
+        request_body=SubscribeAPlanSerializer
     )
     def put(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            old_plan = instance.plan
-            old_status = instance.status
+        instance = self.get_object()
+        old_plan = instance.plan
+        response = super().put(request, *args, **kwargs)
 
-            serializer = self.get_serializer(instance, data=request.data, partial=True)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            
-            updated_instance = self.get_object()  # updated instance
-            new_plan = updated_instance.plan
-            new_status = updated_instance.status
-
-            # Check if the plan or status has changed
-            if old_plan != new_plan or old_status != new_status:
+        if response.status_code == status.HTTP_200_OK:
+            new_plan = instance.plan
+            if old_plan != new_plan:
+                end_date = now().today() + timedelta(days=30) if new_plan.billing_cycle == BillingCycleChoices.MONTHLY else now().today() + timedelta(days=365)
                 SubscriptionTransaction.objects.create(
-                    company=updated_instance.company,
+                    subscriber_type=instance.subscriber_type,
+                    subscriber_id=instance.subscriber_id,
                     plan=new_plan,
                     amount_paid=new_plan.price,
-                    start_date=now().date(),
-                    status=new_status,
-                    payment_reference="PLAN_UPDATE_PAYMENT"
+                    start_date=now().today(),
+                    end_date=end_date,
+                    note="Subscription Tier Updated"
                 )
+        return response
 
-            return Response(serializer.data, status=status.HTTP_200_OK)
 
-        except CompanySubscription.DoesNotExist:
-            return Response({'error': 'subscription tier not found'}, status=status.HTTP_404_NOT_FOUND)
+class TransactionHistoryAPIView(ListAPIView):
+    serializer_class = SubscriptionTransactionSerializer
+    queryset = SubscriptionTransaction.active_objects.all()
+
+    @swagger_auto_schema(
+        tags=['Transactions'],
+        manual_parameters=[
+            openapi.Parameter('subscriber_type', openapi.IN_QUERY, type=openapi.TYPE_STRING, enum=['company', 'customer'], required=False),
+            openapi.Parameter('subscriber_id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, required=False)
+        ]
+    )
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+        
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        params = self.request.query_params
+
+        if sub_type := params.get('subscriber_type'):
+            try:
+                content_type = get_subscriber_content_type(sub_type)
+                queryset = queryset.filter(subscriber_type=content_type)
+            except ValueError:
+                raise NotFound("Invalid subscriber type")
+
+        if sub_id := params.get('subscriber_id'):
+            queryset = queryset.filter(subscriber_id=sub_id)
+
+        return queryset
+
+
+class UsageMetricsAPIView(RetrieveAPIView):
+    serializer_class = UsageMetricsSerializer
+
+    @swagger_auto_schema(
+        tags=['Usage Metrics'],
+        manual_parameters=[
+            openapi.Parameter('subscriber_type', openapi.IN_PATH, type=openapi.TYPE_STRING, enum=['company', 'customer']),
+            openapi.Parameter('subscriber_id', openapi.IN_PATH, type=openapi.TYPE_INTEGER)
+        ]
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    def get_object(self):
+        subscriber_type = self.kwargs.get('subscriber_type')
+        subscriber_id = self.kwargs.get('subscriber_id')
+
+        try:
+            content_type = get_subscriber_content_type(subscriber_type)
+        except ValueError:
+            raise NotFound("Invalid subscriber type")
+
+        try:
+            return UsageMetrics.objects.get(
+                subscriber_type=content_type,
+                subscriber_id=subscriber_id
+            )
+        except UsageMetrics.DoesNotExist:
+            raise NotFound("Usage metrics not found for the given subscriber")
