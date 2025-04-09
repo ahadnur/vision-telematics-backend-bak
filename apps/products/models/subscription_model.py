@@ -64,21 +64,6 @@ class SubscribeAPlan(BaseModel):
     )
     auto_renew = models.BooleanField(default=True)
 
-<<<<<<< HEAD
-    def save(self, *args, **kwargs):
-        if self.current_start_date:
-            if self.plan.billing_cycle == BillingCycleChoices.MONTHLY:
-                self.current_end_date = self.current_start_date + timedelta(days=30)
-            elif self.plan.billing_cycle == BillingCycleChoices.ANNUAL:
-                self.current_end_date = self.current_start_date + timedelta(days=365)
-        
-        if self.status == SubscriptionStatusChoices.CANCELED:
-            self.current_end_date = date.today()
-        
-        super().save(*args, **kwargs)
-    
-=======
->>>>>>> subscription
     class Meta:
         db_table = 'subscribed_plans'
         ordering = ['-created_at']
