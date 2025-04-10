@@ -1,6 +1,8 @@
 from django.urls import path
 from apps.customers.views import (CustomerCreateAPIView, CreateCustomerVehicleAPIView,
-    GetVehicleInfoAPIView, CustomerUpdateAPIView, CustomerListAPIView, CustomerRetrieveAPIView, CustomerDestroyAPIView, CustomerFeedbackListAPIView, CustomerFeedbackRetrieveAPIView)
+    GetVehicleInfoAPIView, CustomerUpdateAPIView, CustomerListAPIView, CustomerRetrieveAPIView, CustomerDestroyAPIView, CustomerFeedbackListAPIView, CustomerFeedbackRetrieveAPIView,
+    CustomerFeedbackCreateAPIView, CustomerFeedbackUpdateAPIView, CustomerFeedbackDestroyAPIView
+    )
 from apps.customers.views.customer_utils_view import (CustomerDropdownListAPIView, CustomerVehicleListAPIView,
     CustomerSpecificVehicleListAPIView)
 
@@ -22,7 +24,7 @@ urlpatterns = [
     # feedbacks
     path('feedback/list/', CustomerFeedbackListAPIView.as_view(), name='customer-feedback-list'),
     path('feedback/<int:pk>/', CustomerFeedbackRetrieveAPIView.as_view(), name='customer-feedback-retrieve'),
-    # path('feedback/create/', CustomerFeedbackCreateAPIView.as_view(), name='customer-feedback-create'),
-    # path('feedback/<int:pk>/update/', CustomerFeedbackUpdateAPIView.as_view(), name='customer-feedback-update'),
-    # path('feedback/<int:pk>/delete/', CustomerFeedbackDestroyAPIView.as_view(), name='customer-feedback-delete'),
+    path('feedback/create/', CustomerFeedbackCreateAPIView.as_view(), name='customer-feedback-create'),
+    path('feedback/<int:pk>/update/', CustomerFeedbackUpdateAPIView.as_view(), name='customer-feedback-update'),
+    path('feedback/<int:pk>/delete/', CustomerFeedbackDestroyAPIView.as_view(), name='customer-feedback-delete'),
 ]
