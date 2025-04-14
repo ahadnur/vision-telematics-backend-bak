@@ -17,6 +17,7 @@ admin.site.register(CustomerAddress)
 @admin.register(CustomerFeedback)
 class CustomerFeedbackAdmin(admin.ModelAdmin):
     list_display = ('id', 'customer', 'product', 'rating', 'status', 'created_at')
+    list_display_links = ('id', 'customer', 'product')
     list_filter = ('status', 'rating', 'created_at', 'product')
     search_fields = ('customer__name', 'product__name', 'feedback')
     readonly_fields = ('created_at',)

@@ -62,7 +62,7 @@ class CustomerFeedbackListAPIView(ListAPIView):
         responses={
             status.HTTP_200_OK: openapi.Response(
                 description='List of filtered customer feedbacks',
-                schema=customer_list_response_schema,
+                schema=CustomerFeedbackSerializer,
             ),
             status.HTTP_400_BAD_REQUEST: "Bad request"
         }
@@ -77,7 +77,7 @@ class CustomerFeedbackListAPIView(ListAPIView):
 class CustomerFeedbackRetrieveAPIView(RetrieveAPIView):
     queryset = CustomerFeedback.active_objects.all()
     serializer_class = CustomerFeedbackSerializer
-    lookup_field = 'id'
+    lookup_field = 'pk'
 
     @swagger_auto_schema(
         tags=['Customer Feedback'],
