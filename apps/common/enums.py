@@ -62,3 +62,9 @@ class SubscriptionStatusChoices(models.TextChoices):
     ACTIVE = 'active', 'Active'
     EXPIRED = 'expired', 'Expired'
     CANCELED = 'canceled', 'Canceled'
+
+
+class CustomerFeedbackStatusChouces(models.TextChoices):
+    PENDING = 'pending', 'Pending'
+    REVIEWED = 'reviewed', 'Reviewed'
+    FLAGGED = 'flagged', 'Flagged'

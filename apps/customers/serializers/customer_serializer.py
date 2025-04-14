@@ -4,7 +4,7 @@ from django.db import transaction, IntegrityError
 from rest_framework import serializers
 
 from apps.accounts.models import Account, Company
-from apps.customers.models import Customer, CustomerAddress, CustomerVehicle
+from apps.customers.models import Customer, CustomerAddress, CustomerVehicle, CustomerFeedback
 
 logger = logging.getLogger(__name__)
 
@@ -84,3 +84,22 @@ class CustomerDropdownSerializer(serializers.ModelSerializer):
         model = Customer
         fields = ['id', 'contact_name']
 
+
+class CustomerFeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomerFeedback
+        fields = [
+            'id', 'customer', 'product',
+            'rating', 'feedback', 'status',
+            'order_referance', 'created_at',
+            ]
+
+
+class CustomerFeedbackCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomerFeedback
+        fields = [
+            'customer', 'product',
+            'rating', 'feedback',
+            'order_referance',
+        ]

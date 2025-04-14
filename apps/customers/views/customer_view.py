@@ -4,9 +4,11 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.views import APIView
+from django.utils.dateparse import parse_date
+from django.db.models import Q
 
-from apps.customers.models import Customer
-from apps.customers.serializers import CustomerWriteSerializer, GetCustomerSerializer
+from apps.customers.models import Customer, CustomerFeedback
+from apps.customers.serializers import CustomerWriteSerializer, GetCustomerSerializer, CustomerFeedbackSerializer
 from apps.customers.schemas import customer_list_response_schema, customer_create_response_schema
 import logging
 

@@ -1,5 +1,6 @@
 from django.db import models
 from apps.utilities.models import BaseModel, VehicleMake, VehicleType, VehicleModel
+from apps.common.enums import CustomerFeedbackStatusChouces
 
 
 class Customer(BaseModel):
@@ -171,3 +172,37 @@ class Credit(BaseModel):
 
     def __str__(self):
         return self.credit_note_number
+
+
+class CustomerFeedback(BaseModel):
+    customer = models.ForeignKey('customers.Customer', on_delete=models.CASCADE, related_name='feedbacks')
+    product = models.ForeignKey('products.ProductSKU', on_delete=models.CASCADE, related_name='feedbacks')
+    rating = models.PositiveSmallIntegerField() # 1-10 or 1-5
+    feedback = models.TextField(blank=True)
+    status = models.CharField(
+        max_length=20, 
+        choices=CustomerFeedbackStatusChouces.choices, 
+        default=CustomerFeedbackStatusChouces.PENDING
+    )
+    order_referance = models.ForeignKey(
+        'orders.Order', 
+        on_delete=models.SET_NULL, 
+        null=True, blank=True, 
+        related_name='feedbacks'
+    )
+
+    def __str__(self):
+        return f'Feedback by {self.customer} on {self.product} ({self.rating}⭐)'
+
+    class Meta:
+        ordering = ['-created_at']
+        # unique_together = ('customer', 'product')
+        db_table = 'customer_feedback'
+        indexes = [
+            models.Index(fields=['customer']),
+            models.Index(fields=['product']),
+            models.Index(fields=['rating']),
+            models.Index(fields=['status']),
+            models.Index(fields=['order_referance']),
+            models.Index(fields=['-created_at']),
+        ]
