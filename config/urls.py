@@ -46,4 +46,5 @@ urlpatterns = [
     path('api/configuration/', include('apps.utilities.urls')),
 ]
 
-urlpatterns += swagger_url_patterns
+if settings.DEBUG and swagger_url_patterns:
+    urlpatterns += swagger_url_patterns
