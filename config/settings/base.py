@@ -201,9 +201,7 @@ JAZZMIN_SETTINGS = {
 
 
 CORS_ALLOWED_ORIGINS = [
-    "https://example.com",
-    "http://localhost:3000",  # If your frontend is running on localhost
-    "http://127.0.0.1:8000",  # Django dev server
+    "*"
 ]
 
 # Optional settings

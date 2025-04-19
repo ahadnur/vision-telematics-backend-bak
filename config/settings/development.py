@@ -3,10 +3,10 @@ import json
 from .base import *
 
 
-DEBUG = True
+DEBUG = env.bool('DEBUG', default=True)
 
 
-ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', '13.61.51.161']
 
 # THIRD_PARTY_APPS.append('rest_framework_swagger')
 
