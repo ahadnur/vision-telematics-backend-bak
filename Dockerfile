@@ -36,4 +36,4 @@ RUN mkdir -p /staticfiles
 RUN apk del gcc musl-dev libffi-dev curl-dev
 
 # Set the default command to run Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "apps.config.wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "config.wsgi:application"]
