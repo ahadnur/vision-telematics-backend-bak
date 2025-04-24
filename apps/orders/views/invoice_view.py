@@ -1,3 +1,5 @@
+from django.db import transaction
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView, UpdateAPIView, DestroyAPIView, ListAPIView, RetrieveAPIView
@@ -20,29 +22,31 @@ logger = logging.getLogger(__name__)
 class CustomerInvoiceListAPIView(ListAPIView):
     serializer_class = CustomerInvoiceListSerializer
 
-    @swagger_auto_schema(manual_parameters=[
-        openapi.Parameter(
-            'invoice_date_from', openapi.IN_QUERY,
-            description="Filter invoices with invoice_date ≥ this date (YYYY-MM-DD)",
-            type=openapi.TYPE_STRING, format=openapi.FORMAT_DATE
-        ),
-        openapi.Parameter(
-            'invoice_date_to', openapi.IN_QUERY,
-            description="Filter invoices with invoice_date ≤ this date (YYYY-MM-DD)",
-            type=openapi.TYPE_STRING, format=openapi.FORMAT_DATE
-        ),
-        openapi.Parameter(
-            'payment_status', openapi.IN_QUERY,
-            description="Filter by payment status",
-            type=openapi.TYPE_STRING,
-            enum=[status for status, _ in CustomerPaymentStatusType.choices]
-        ),
+    @swagger_auto_schema(
+        tags=['Customer Invoice'],
+        manual_parameters=[
+            openapi.Parameter(
+                'invoice_date_from', openapi.IN_QUERY,
+                description="Filter invoices with invoice_date ≥ this date (YYYY-MM-DD)",
+                type=openapi.TYPE_STRING, format=openapi.FORMAT_DATE
+            ),
+            openapi.Parameter(
+                'invoice_date_to', openapi.IN_QUERY,
+                description="Filter invoices with invoice_date ≤ this date (YYYY-MM-DD)",
+                type=openapi.TYPE_STRING, format=openapi.FORMAT_DATE
+            ),
+            openapi.Parameter(
+                'payment_status', openapi.IN_QUERY,
+                description="Filter by payment status",
+                type=openapi.TYPE_STRING,
+                enum=[status for status, _ in CustomerPaymentStatusType.choices]
+            ),
     ])
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        qs = CustomerInvoice.active_objects.all()
+        queryset = CustomerInvoice.active_objects.all()
         params = self.request.query_params
 
         # filter by invoice_date range
@@ -50,17 +54,111 @@ class CustomerInvoiceListAPIView(ListAPIView):
         if date_from:
             d = parse_date(date_from)
             if d:
-                qs = qs.filter(invoice_date__date__gte=d)
+                queryset = queryset.filter(invoice_date__date__gte=d)
 
         date_to = params.get('invoice_date_to')
         if date_to:
             d = parse_date(date_to)
             if d:
-                qs = qs.filter(invoice_date__date__lte=d)
+                queryset = queryset.filter(invoice_date__date__lte=d)
 
         # filter by payment_status
         status = params.get('payment_status')
         if status in dict(CustomerPaymentStatusType.choices):
-            qs = qs.filter(payment_status=status)
+            queryset = queryset.filter(payment_status=status)
 
-        return qs.order_by('-invoice_date')
+        return queryset.order_by('-invoice_date')
+
+
+class CustomerInvoiceDetailsAPIView(RetrieveAPIView):
+    queryset = CustomerInvoice.active_objects.all()
+    lookup_field = 'pk'
+    serializer_class = CustomerInvoiceSerializer
+
+    @swagger_auto_schema(
+        tags=['Customer Invoice'],
+        responses={
+            status.HTTP_200_OK : openapi.Response(
+                description='Customer Invoice Details', 
+                schema=CustomerInvoiceSerializer
+            ),
+            status.HTTP_404_NOT_FOUND: openapi.Response(
+                description='Customer Invoice Not Found',
+            )
+        }
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+
+class CustomerInvoiceCreateAPIView(CreateAPIView):
+    queryset = CustomerInvoice.active_objects.all()
+    serializer_class = CustomerInvoiceSerializer
+
+    @swagger_auto_schema(
+        tags=['Customer Invoice'],
+        request_body=CustomerInvoiceSerializer,
+        responses={
+            status.HTTP_201_CREATED: openapi.Response(
+                description='Customer invoice created',
+                schema=CustomerInvoiceSerializer
+            ),
+            status.HTTP_400_BAD_REQUEST: openapi.Response('An error occurred'),
+        }
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+
+class CustomerInvoiceUpdateAPIView(UpdateAPIView):
+    http_method_names = ['put']
+
+    @swagger_auto_schema(
+        tags=['Customer Invoice'],
+        request_body=CustomerInvoiceSerializer,
+        responses={
+            status.HTTP_200_OK: openapi.Response(
+                description='Customer invoice update success',
+                schema=CustomerInvoiceSerializer(),
+            ),
+            status.HTTP_400_BAD_REQUEST: openapi.Response('An error occurred')
+        }
+    )
+    def put(self, request, pk, *args, **kwargs):
+        try:
+            invoice = get_object_or_404(
+                CustomerInvoice, 
+                pk=pk, is_active=True, 
+                is_deleted=False
+            )
+
+            serializer = CustomerInvoiceSerializer(invoice, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            validated_data = serializer.validated_data
+            serializer.save()
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        except CustomerInvoice.DoesNotExist:
+            return Response({'error':'An error occurred'})
+
+
+class CustomerInvoiceDestroyAPIView(DestroyAPIView):
+    queryset = CustomerInvoice.active_objects.all()
+    serializer_class = CustomerInvoiceSerializer
+    lookup_field = 'pk'
+
+    @swagger_auto_schema(
+        tags=['Customer Invoice'],
+        responses={
+            status.HTTP_204_NO_CONTENT: 'Successfully deleted',
+        }
+    )
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        with transaction.atomic():
+            invoice_instance = self.get_object()
+            invoice_instance.is_active = False
+            invoice_instance.is_deleted = True
+            invoice_instance.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)

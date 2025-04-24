@@ -26,7 +26,19 @@ from apps.orders.views import (
 	BookingDetailsAPIView,
 	BookingCreateAPIView,
 	BookingDestroyAPIView,
-	BookingUpdateAPIView
+	BookingUpdateAPIView,
+
+	CustomerInvoiceListAPIView,
+	CustomerInvoiceDetailsAPIView,
+	CustomerInvoiceCreateAPIView,
+	CustomerInvoiceDestroyAPIView,
+	CustomerInvoiceUpdateAPIView,
+
+	# EngineerInvoiceListAPIView,
+	# EngineerInvoiceDetailsAPIView,
+	# EngineerInvoiceCreateAPIView,
+	# EngineerInvoiceDestroyAPIView,
+	# EngineerInvoiceUpdateAPIView,
 )
 
 
@@ -64,4 +76,18 @@ urlpatterns = [
 	path('booking/create/', BookingCreateAPIView.as_view(), name='booking-create'),
 	path('booking/update/<int:pk>/', BookingUpdateAPIView.as_view(), name='booking-update'),
 	path('booking/delete/<int:pk>/', BookingDestroyAPIView.as_view(), name='booking-delete'),
+
+	# customer invoice
+	path('customer-invoice/list/', CustomerInvoiceListAPIView.as_view(), name='customer-invoice-list'),
+	path('customer-invoice/<int:pk>/', CustomerInvoiceDetailsAPIView.as_view(), name='customer-invoice-retrieve'),
+	path('customer-invoice/create/', CustomerInvoiceCreateAPIView.as_view(), name='customer-invoice-create'),
+	path('customer-invoice/update/<int:pk>/', CustomerInvoiceUpdateAPIView.as_view(), name='customer-invoice-update'),
+	path('customer-invoice/delete/<int:pk>/', CustomerInvoiceDestroyAPIView.as_view(), name='customer-invoice-delete'),
+
+	# engineer invoice
+	# path('engineer-invoice/list/', EngineerInvoiceListAPIView.as_view(), name='engineer-invoice-list'),
+	# path('engineer-invoice/<int:pk>/', EngineerInvoiceDetailsAPIView.as_view(), name='engineer-invoice-retrieve'),
+	# path('engineer-invoice/create/', EngineerInvoiceCreateAPIView.as_view(), name='engineer-invoice-create'),
+	# path('engineer-invoice/update/<int:pk>/', EngineerInvoiceUpdateAPIView.as_view(), name='engineer-invoice-update'),
+	# path('engineer-invoice/delete/<int:pk>/', EngineerInvoiceDestroyAPIView.as_view(), name='engineer-invoice-delete'),
 ]

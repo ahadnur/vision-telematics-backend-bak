@@ -229,7 +229,7 @@ class CustomerInvoice(BaseModel):
     tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0.0, help_text="Tax rate in percentage (e.g., 18.5%)") # new field
     tax_amount = models.DecimalField(max_digits=20, decimal_places=2, default=0.0) # new field
     shipping_charge = models.DecimalField(max_digits=20, decimal_places=2, default=0.0)
-    total_amount = models.DecimalField(max_digits=20, decimal_places=2)
+    total_amount = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     billing_address = models.JSONField(default=dict, null=True, blank=True)
     shipping_address = models.JSONField(default=dict, null=True, blank=True) # new field
     payment_status = models.CharField(max_length=10, choices=CustomerPaymentStatusType.choices)
