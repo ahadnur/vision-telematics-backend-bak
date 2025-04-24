@@ -217,3 +217,51 @@ class ReturnItem(BaseModel):
                 self.order_item.price * self.quantity - (self.order_item.discount or 0)
             )
         super().save(*args, **kwargs)
+
+
+class CustomerInvoice(BaseModel):
+    order = models.OneToOneField(Order, related_name='customer_invoice', on_delete=models.CASCADE)
+    invoice_number = models.CharField(max_length=100, unique=True)
+    invoice_date = models.DateTimeField(auto_now_add=True)
+    due_date = models.DateField(null=True, blank=True)  # New field
+    subtotal = models.DecimalField(max_digits=20, decimal_places=2, default=0.0, help_text="Amount before discounts/taxes") # new field
+    total_discount = models.DecimalField(max_digits=20, decimal_places=2, default=0.0)
+    tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0.0, help_text="Tax rate in percentage (e.g., 18.5%)") # new field
+    tax_amount = models.DecimalField(max_digits=20, decimal_places=2, default=0.0) # new field
+    shipping_charge = models.DecimalField(max_digits=20, decimal_places=2, default=0.0)
+    total_amount = models.DecimalField(max_digits=20, decimal_places=2)
+    billing_address = models.JSONField(default=dict, null=True, blank=True)
+    shipping_address = models.JSONField(default=dict, null=True, blank=True) # new field
+    payment_status = models.CharField(max_length=10, choices=CustomerPaymentStatusType.choices)
+
+    class Meta:
+        db_table = 'customer_invoices'
+        ordering = ['-invoice_date']
+
+    def __str__(self):
+        return f"Invoice {self.invoice_number} amount({self.total_amount})"
+
+    def save(self, *args, **kwargs):
+        """Auto-calculate total_amount if not provided"""
+        if not self.total_amount:
+            self.total_amount = (
+                self.subtotal - self.total_discount + self.tax_amount + self.shipping_charge
+            )
+        super().save(*args, **kwargs)
+
+
+class EngineerInvoice(BaseModel):
+    order = models.OneToOneField(Order, related_name='engineer_invoice', on_delete=models.CASCADE)
+    invoice_number = models.CharField(max_length=100, unique=True)
+    invoice_date = models.DateTimeField(auto_now_add=True)
+    due_date = models.DateField(null=True, blank=True)  # New field
+    service_date = models.DateField(null=True, blank=True) # new field
+    total_amount = models.DecimalField(max_digits=20, decimal_places=2)
+    notes = models.TextField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'engineer_invoices'
+        ordering = ['-invoice_date']
+
+    def __str__(self):
+        return f"Engineer Invoice {self.invoice_number} amount({self.total_amount})"
