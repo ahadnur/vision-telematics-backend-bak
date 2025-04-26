@@ -29,9 +29,9 @@ from .invoice_view import (
 	CustomerInvoiceDestroyAPIView,
 	CustomerInvoiceUpdateAPIView,
 
-	# EngineerInvoiceListAPIView,
-	# EngineerInvoiceDetailsAPIView,
-	# EngineerInvoiceCreateAPIView,
-	# EngineerInvoiceDestroyAPIView,
-	# EngineerInvoiceUpdateAPIView,
+	EngineerInvoiceListAPIView,
+	EngineerInvoiceDetailsAPIView,
+	EngineerInvoiceCreateAPIView,
+	EngineerInvoiceDestroyAPIView,
+	EngineerInvoiceUpdateAPIView,
 )

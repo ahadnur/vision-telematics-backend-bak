@@ -34,11 +34,11 @@ from apps.orders.views import (
 	CustomerInvoiceDestroyAPIView,
 	CustomerInvoiceUpdateAPIView,
 
-	# EngineerInvoiceListAPIView,
-	# EngineerInvoiceDetailsAPIView,
-	# EngineerInvoiceCreateAPIView,
-	# EngineerInvoiceDestroyAPIView,
-	# EngineerInvoiceUpdateAPIView,
+	EngineerInvoiceListAPIView,
+	EngineerInvoiceDetailsAPIView,
+	EngineerInvoiceCreateAPIView,
+	EngineerInvoiceDestroyAPIView,
+	EngineerInvoiceUpdateAPIView,
 )
 
 
@@ -85,9 +85,9 @@ urlpatterns = [
 	path('customer-invoice/delete/<int:pk>/', CustomerInvoiceDestroyAPIView.as_view(), name='customer-invoice-delete'),
 
 	# engineer invoice
-	# path('engineer-invoice/list/', EngineerInvoiceListAPIView.as_view(), name='engineer-invoice-list'),
-	# path('engineer-invoice/<int:pk>/', EngineerInvoiceDetailsAPIView.as_view(), name='engineer-invoice-retrieve'),
-	# path('engineer-invoice/create/', EngineerInvoiceCreateAPIView.as_view(), name='engineer-invoice-create'),
-	# path('engineer-invoice/update/<int:pk>/', EngineerInvoiceUpdateAPIView.as_view(), name='engineer-invoice-update'),
-	# path('engineer-invoice/delete/<int:pk>/', EngineerInvoiceDestroyAPIView.as_view(), name='engineer-invoice-delete'),
+	path('engineer-invoice/list/', EngineerInvoiceListAPIView.as_view(), name='engineer-invoice-list'),
+	path('engineer-invoice/<int:pk>/', EngineerInvoiceDetailsAPIView.as_view(), name='engineer-invoice-retrieve'),
+	path('engineer-invoice/create/', EngineerInvoiceCreateAPIView.as_view(), name='engineer-invoice-create'),
+	path('engineer-invoice/update/<int:pk>/', EngineerInvoiceUpdateAPIView.as_view(), name='engineer-invoice-update'),
+	path('engineer-invoice/delete/<int:pk>/', EngineerInvoiceDestroyAPIView.as_view(), name='engineer-invoice-delete'),
 ]
