@@ -17,7 +17,11 @@ from apps.common.enums import (
 
 
 class Order(BaseModel):
-    order_status = models.CharField(max_length=20, choices=OrderStatusChoice.choices, default='created')
+    order_status = models.CharField(
+        max_length=20, 
+        choices=OrderStatusChoice.choices, 
+        default=OrderStatusChoice.CREATED
+    )
     order_ref_number = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=255, null=True, blank=True)
     shipping_address = models.JSONField(default=dict, null=True, blank=True)
@@ -54,15 +58,9 @@ class Order(BaseModel):
     def set_status(self, new_status):
         """Update the order status."""
         if new_status not in dict(OrderStatusChoice.choices).keys():
-            raise ValueError(f"Invalid status: {new_status}")
-        self.status = new_status
+            raise ValidationError(f"Invalid status: {new_status}")
+        self.order_status = new_status
         self.save()
-
-    def total_price(self):
-        return sum(item.total_price() for item in self.item_orders.filter(is_active=True, is_deleted=False))
-
-    def total_quantity(self):
-        return sum(item.quantity for item in self.item_orders.filter(is_active=True, is_deleted=False))
 
 
 class OrderItem(BaseModel):
@@ -90,15 +88,16 @@ class OrderItem(BaseModel):
 
     def save(self, *args, **kwargs):
         if self.quantity > self.product_sku.qty:
-            raise ValueError("Ordered quantity exceeds available stock.")
+            raise ValidationError("Ordered quantity exceeds available stock.")
         super().save(*args, **kwargs)
 
     def set_status(self, new_status):
         """Update the item status."""
         if new_status not in dict(OrderItemStatusChoice.choices).keys():
-            raise ValueError(f"Invalid status: {new_status}")
+            raise ValidationError(f"Invalid status: {new_status}")
         self.status = new_status
         self.save()
+
 
 class Booking(BaseModel):
     order = models.OneToOneField(Order, on_delete=models.CASCADE)
