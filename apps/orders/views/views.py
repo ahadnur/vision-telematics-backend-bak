@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 
 from apps.accounts.models import Account
 from apps.customers.models import CustomerVehicle
-from apps.orders.models import Order, OrderItem, OrderOptionsData, OrderPaymentOptions, Booking
+from apps.orders.models import Order, OrderItem, OrderOptionsData, OrderPaymentOptions, Booking, CustomerInvoice
 from apps.orders.serializers import OrderSerializer, OptionDataSerializer, PaymentDataSerializer
 from apps.orders.swagger_schema import order_list_schema
 from apps.products.models import ProductSKU
@@ -354,6 +354,9 @@ class OrderStatusChangeAPIView(APIView):
 
 
     def handle_processing_transition(self, order):
+        if hasattr(order, 'customer_invoice'):
+            raise ValidationError(f"Invoice already exists for order {order.order_ref_number}")
+
         for item in order.item_orders.all():
             product_sku = item.product_sku
             if product_sku.qty < item.quantity:
@@ -365,6 +368,19 @@ class OrderStatusChangeAPIView(APIView):
             product_sku.save()
             item.status = OrderItemStatusChoice.SHIPPED
             item.save()
+        
+        CustomerInvoice.objects.create(
+            shipping_charge=order.shipping_charge or 0.0,
+            total_discount=order.total_discount or 0.0,
+            order=order,
+            invoice_number=order.order_ref_number,
+            subtotal=order.total_price(),
+            total_amount=order.total_price() - (order.total_discount or 0.0),
+            payment_status=order.customer_payment_status,
+            billing_address=order.billing_address,
+            shipping_address=order.shipping_address,
+        )
+
 
     def handle_rejection_from_processing(self, order):
         for item in order.item_orders.all():
