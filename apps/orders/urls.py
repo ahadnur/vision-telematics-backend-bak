@@ -39,8 +39,6 @@ from apps.orders.views import (
 	EngineerInvoiceCreateAPIView,
 	EngineerInvoiceDestroyAPIView,
 	EngineerInvoiceUpdateAPIView,
-
-	test
 )
 
 
@@ -92,6 +90,4 @@ urlpatterns = [
 	path('engineer-invoice/create/', EngineerInvoiceCreateAPIView.as_view(), name='engineer-invoice-create'),
 	path('engineer-invoice/update/<int:pk>/', EngineerInvoiceUpdateAPIView.as_view(), name='engineer-invoice-update'),
 	path('engineer-invoice/delete/<int:pk>/', EngineerInvoiceDestroyAPIView.as_view(), name='engineer-invoice-delete'),
-
-	path('test/', test, name='test'),
 ]

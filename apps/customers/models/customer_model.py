@@ -7,7 +7,7 @@ class Customer(BaseModel):
     customer_ref_number = models.CharField(max_length=100, unique=True)
     actinic_reference = models.CharField(max_length=100, blank=True, null=True)
     contact_name = models.CharField(max_length=100, blank=True, null=True)
-    email_address = models.EmailField(blank=True, null=True)
+    email_address = models.EmailField()
     phone_numbers = models.CharField(max_length=100, blank=True, null=True)
     multi_site_link = models.CharField(max_length=255, blank=True, null=True)
     has_multi_site_link = models.BooleanField(default=False)

@@ -12,9 +12,11 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 
 
 # beat setting
-app.conf.beat_schedule = {
-    
-}
+# app.conf.beat_schedule = {
+#     'send_order_mail' : {
+#         'task' : 'apps.orders.tasks.send_order_mail',
+#     }
+# }
 
 app.autodiscover_tasks()
 

@@ -1,11 +1,5 @@
 import logging
 
-
-from django.shortcuts import render
-from apps.orders.tasks import test_func
-from django.http import HttpResponse
-
-
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
@@ -27,11 +21,6 @@ from apps.common.enums import OrderItemStatusChoice, OrderStatusChoice, Operatio
 from apps.inventory.models import Inventory
 
 logger = logging.getLogger(__name__)
-
-
-def test(request):
-    test_func.delay()
-    return HttpResponse("Done")
 
 
 class OrderCreateAPIView(APIView):
