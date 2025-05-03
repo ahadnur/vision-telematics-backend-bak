@@ -116,6 +116,7 @@ class CustomerFeedbackUpdateAPIView(UpdateAPIView):
     serializer_class = CustomerFeedbackSerializer
     queryset = CustomerFeedback.active_objects.all()
     lookup_field = 'pk'
+    http_method_names = ['put']
 
     @swagger_auto_schema(
         tags=['Customer Feedback'],

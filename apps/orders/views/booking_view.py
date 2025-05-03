@@ -15,7 +15,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.views import APIView
 
 from apps.accounts.models import Account
-from apps.orders.models import Order, Booking
+from apps.orders.models import Order, Booking, EngineerInvoice
 from apps.orders.serializers import (
     BookingSerializer, 
     BookingDetailsSerializer,
@@ -123,8 +123,18 @@ class BookingCreateAPIView(CreateAPIView):
             )
         }
     )
-    def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
+    def perform_create(self, serializer):
+        booking = serializer.save()
+
+        # Now that booking is created, you can safely create the invoice
+        EngineerInvoice.objects.create(
+            order=booking.order,
+            notes=f"Engineer Invoice For Booking Order: {booking.order.order_ref_number}",
+            invoice_number=booking.order.order_ref_number,
+            due_date=booking.booking_date,
+            total_amount=booking.order.total_price() or 0,
+            service_date=booking.booking_date,
+        )
 
 
 class BookingUpdateAPIView(APIView):
