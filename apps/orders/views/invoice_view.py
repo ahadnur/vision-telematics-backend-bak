@@ -112,6 +112,7 @@ class CustomerInvoiceCreateAPIView(CreateAPIView):
 
 class CustomerInvoiceUpdateAPIView(UpdateAPIView):
     http_method_names = ['put']
+    queryset = CustomerInvoice.active_objects.all()
 
     @swagger_auto_schema(
         tags=['Customer Invoice'],
@@ -247,6 +248,7 @@ class EngineerInvoiceCreateAPIView(CreateAPIView):
 
 class EngineerInvoiceUpdateAPIView(UpdateAPIView):
     http_method_names = ['put']
+    queryset = EngineerInvoice.active_objects.all()
 
     @swagger_auto_schema(
         tags=['Engineer Invoice'],
