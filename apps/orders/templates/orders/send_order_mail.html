@@ -1,12 +1,140 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>{{ title }}</title>
+  <meta charset="UTF-8">
+  <title>{{ title }}</title>
 </head>
-<body>
-    <h2>Hello {{ customer_name }},</h2>
-    <p>Your order <strong>#{{ order_id }}</strong> has been {{ status_message }}.</p>
-    <p>Thank you for choosing Vision Telematics.</p>
+<body style="margin:0; padding:0; font-family: Arial, sans‑serif; background:#f4f4f4;">
+
+  <!-- Container -->
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+      <td align="center" style="padding:20px 0;">
+        <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff; border-radius:8px; overflow:hidden;">
+          
+          <!-- Header -->
+          <tr style="background:#003366; color:#ffffff;">
+            <td style="padding:20px; text-align:center;">
+              <h1 style="margin:0; font-size:24px;">{{ company_name }}</h1>
+            </td>
+          </tr>
+
+          <!-- Greeting -->
+          <tr>
+            <td style="padding:20px;">
+              <h2 style="margin-top:0; font-size:20px; color:#333333;">
+                Hello {{ customer_name }},
+              </h2>
+              <p style="font-size:16px; color:#555555;">
+                Your order <strong>#{{ order_ref }}</strong> placed on <strong>{{ order_date|date:"F j, Y, g:i A" }}</strong> has been {{ status_message }}.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Order Items Table -->
+          <tr>
+            <td style="padding:0 20px 20px;">
+              <table width="100%" cellpadding="8" cellspacing="0" border="0" role="presentation" style="border:1px solid #e0e0e0; border-radius:4px; text-align:left;">
+                <thead>
+                  <tr style="background:#f9f9f9; color:#333333;">
+                    <th align="left">Item</th>
+                    <th align="center">Qty</th>
+                    <th align="right">Unit Price</th>
+                    <th align="right">Discount</th>
+                    <th align="right">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in items %}
+                  <tr>
+                    <td>{{ item.name }} ({{ item.sku }})</td>
+                    <td align="center">{{ item.quantity }}</td>
+                    <td align="right">${{ item.unit_price }}</td>
+                    <td align="right">${{ item.discount }}</td>
+                    <td align="right">${{ item.total }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="4" align="right" style="padding-top:10px;">Subtotal:</td>
+                    <td align="right" style="padding-top:10px;">${{ subtotal }}</td>
+                  </tr>
+                  <tr>
+                    <td colspan="4" align="right">Shipping:</td>
+                    <td align="right">${{ shipping }}</td>
+                  </tr>
+                  <tr>
+                    <td colspan="4" align="right">Discount:</td>
+                    <td align="right">− ${{ discount }}</td>
+                  </tr>
+                  <tr style="font-weight:bold; border-top:1px solid #ddd;">
+                    <td colspan="4" align="right" style="padding-top:10px;">Grand Total:</td>
+                    <td align="right" style="padding-top:10px;">${{ total }}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Addresses & Payment -->
+          <tr>
+            <td style="padding:0 20px 20px;">
+              <table width="100%" cellpadding="8" cellspacing="0" role="presentation">
+                <tr>
+                  <td valign="top" width="50%">
+                    <h4 style="margin:0 0 8px; font-size:16px; color:#333333;">Shipping Address</h4>
+                    <p style="margin:0; color:#555555; font-size:14px;">
+                      {{ shipping_address }}
+                    </p>
+                  </td>
+                  <td valign="top" width="50%">
+                    <h4 style="margin:0 0 8px; font-size:16px; color:#333333;">Billing Address</h4>
+                    <p style="margin:0; color:#555555; font-size:14px;">
+                      {{ billing_address }}
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2" style="padding-top:10px;">
+                    <strong>Payment Status:</strong> {{ payment_status }}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Call to Action -->
+          <tr>
+            <td align="center" style="padding:20px;">
+              <a href="" style="
+                display:inline-block;
+                padding:12px 24px;
+                background:#0073e6;
+                color:#ffffff;
+                text-decoration:none;
+                border-radius:4px;
+                font-size:16px;
+              ">View Your Order</a>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr style="background:#f4f4f4; color:#555555;">
+            <td style="padding:20px; font-size:12px; text-align:center;">
+              <p style="margin:0;">
+                If you have any questions, email us at
+                <a href="mailto:{{ support_email }}" style="color:#0073e6;">{{ support_email }}</a>
+                or call {{ support_phone }}.
+              </p>
+              <p style="margin:5px 0 0;">© {{ company_name }} {{ now|date:"Y" }}. All rights reserved.</p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
 </body>
 </html>

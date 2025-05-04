@@ -241,3 +241,8 @@ CELERY_RESULT_BACKEND = 'django-db'
 
 # celery beat
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+
+# default contact info
+SUPPORT_EMAIL = 'test@mail.com'
+SUPPORT_PHONE = '1234567890'
