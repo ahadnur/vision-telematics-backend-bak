@@ -85,13 +85,25 @@
                   <td valign="top" width="50%">
                     <h4 style="margin:0 0 8px; font-size:16px; color:#333333;">Shipping Address</h4>
                     <p style="margin:0; color:#555555; font-size:14px;">
-                      {{ shipping_address }}
+                      <p>
+                        {{ shipping_address.street|default:"" }}<br>
+                        {{ shipping_address.city|default:"" }}<br>
+                        {{ shipping_address.state|default:"" }}<br>
+                        {{ shipping_address.postcode|default:"" }}<br>
+                        {{ shipping_address.country|default:"" }}
+                      </p>
                     </p>
                   </td>
                   <td valign="top" width="50%">
                     <h4 style="margin:0 0 8px; font-size:16px; color:#333333;">Billing Address</h4>
                     <p style="margin:0; color:#555555; font-size:14px;">
-                      {{ billing_address }}
+                      <p>
+                        {{ billing_address.street|default:"" }}<br>
+                        {{ billing_address.city|default:"" }}<br>
+                        {{ billing_address.state|default:"" }}<br>
+                        {{ billing_address.postcode|default:"" }}<br>
+                        {{ billing_address.country|default:"" }}
+                      </p>
                     </p>
                   </td>
                 </tr>

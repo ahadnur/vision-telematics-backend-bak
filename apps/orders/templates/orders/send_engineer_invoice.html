@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; }
+        .container { max-width: 700px; margin: auto; padding: 20px; border: 1px solid #eee; }
+        h2 { color: #004085; }
+        .section { margin-bottom: 20px; }
+        .label { font-weight: bold; }
+        .footer { font-size: 0.9em; color: #777; margin-top: 40px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Engineer Invoice: {{ invoice_number }}</h2>
+
+        <div class="section">
+            <p><span class="label">Order Reference:</span> {{ order_ref }}</p>
+            <p><span class="label">Invoice Date:</span> {{ invoice_date }}</p>
+            <p><span class="label">Due Date:</span> {{ due_date }}</p>
+            <p><span class="label">Service Date:</span> {{ service_date }}</p>
+        </div>
+
+        <div class="section">
+            <h3>Amount & Notes</h3>
+            <p><span class="label">Total Amount:</span> <strong>${{ total }}</strong></p>
+            <p><span class="label">Notes:</span> {{ notes }}</p>
+        </div>
+
+        <div class="footer">
+            This invoice was generated automatically based on the booking. Please contact support if any details are incorrect.
+        </div>
+    </div>
+</body>
+</html>

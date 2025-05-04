@@ -1,7 +1,9 @@
 from django.dispatch import receiver
 from django.conf import settings
 from django.db.models.signals import post_save
-from apps.orders.models import Order
+from django.utils.timezone import now
+from decimal import Decimal
+from apps.orders.models import Order, Booking, CustomerInvoice, EngineerInvoice
 from apps.orders.tasks import send_order_email
 
 
@@ -52,3 +54,46 @@ def order_post_save(sender, instance, created, **kwargs):
 
     recipient = instance.customer.email_address
     send_order_email.delay(subject, "orders/send_order_mail.html", context, recipient)
+
+
+@receiver(post_save, sender=CustomerInvoice)
+def send_customer_invoice_email(sender, instance, created, **kwargs):
+    if created:
+        subject = f"Your Invoice For Order {instance.order.order_ref_number}"
+        context = {
+            "invoice_number": instance.invoice_number,
+            "invoice_date": instance.invoice_date.strftime("%Y-%m-%d"),
+            "due_date": instance.due_date.strftime("%Y-%m-%d") if instance.due_date else "N/A",
+            "order_ref": instance.order.order_ref_number,
+            "subtotal": instance.subtotal,
+            "discount": instance.total_discount,
+            "tax": instance.tax_amount,
+            "shipping": instance.shipping_charge,
+            "total": instance.total_amount,
+            "billing_address": instance.billing_address,
+            "shipping_address": instance.shipping_address,
+            "status": instance.payment_status,
+            "customer_email": instance.order.customer.email,
+        }
+
+        recipient = instance.order.customer.email_address
+        send_order_email.delay(subject, "orders/send_customer_invoice_mail.html", context, recipient)
+
+
+@receiver(post_save, sender=EngineerInvoice)
+def send_engineer_invoice_email(sender, instance, created, **kwargs):
+    if created:
+        subject = f"Your Invoice For Booking Order: {instance.booking.order.order_ref_number}"
+        context = {
+            "invoice_number": instance.invoice_number,
+            "invoice_date": instance.invoice_date.strftime("%Y-%m-%d"),
+            "due_date": instance.due_date.strftime("%Y-%m-%d") if instance.due_date else "N/A",
+            "service_date": instance.service_date.strftime("%Y-%m-%d") if instance.service_date else "N/A",
+            "total": instance.total_amount,
+            "notes": instance.notes if instance.notes else "N/A",
+            "engineer_email": instance.booking.engineer.email_address,
+            "order_ref": instance.booking.order.order_ref_number,
+        }
+        
+        recipient = instance.booking.engineer.email_address
+        send_order_email.delay(subject, "orders/send_engineer_invoice_mail.html", context, recipient)

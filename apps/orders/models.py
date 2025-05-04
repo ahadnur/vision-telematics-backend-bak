@@ -222,15 +222,15 @@ class CustomerInvoice(BaseModel):
     order = models.OneToOneField(Order, related_name='customer_invoice', on_delete=models.CASCADE)
     invoice_number = models.CharField(max_length=100, unique=True)
     invoice_date = models.DateTimeField(auto_now_add=True)
-    due_date = models.DateField(null=True, blank=True)  # New field
-    subtotal = models.DecimalField(max_digits=20, decimal_places=2, default=0.0, help_text="Amount before discounts/taxes") # new field
+    due_date = models.DateField(null=True, blank=True)
+    subtotal = models.DecimalField(max_digits=20, decimal_places=2, default=0.0, help_text="Amount before discounts/taxes")
     total_discount = models.DecimalField(max_digits=20, decimal_places=2, default=0.0)
-    tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0.0, help_text="Tax rate in percentage (e.g., 18.5%)") # new field
-    tax_amount = models.DecimalField(max_digits=20, decimal_places=2, default=0.0) # new field
+    tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0.0, help_text="Tax rate in percentage (e.g., 18.5%)")
+    tax_amount = models.DecimalField(max_digits=20, decimal_places=2, default=0.0)
     shipping_charge = models.DecimalField(max_digits=20, decimal_places=2, default=0.0)
     total_amount = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     billing_address = models.JSONField(default=dict, null=True, blank=True)
-    shipping_address = models.JSONField(default=dict, null=True, blank=True) # new field
+    shipping_address = models.JSONField(default=dict, null=True, blank=True)
     payment_status = models.CharField(max_length=10, choices=CustomerPaymentStatusType.choices)
 
     class Meta:
@@ -250,11 +250,11 @@ class CustomerInvoice(BaseModel):
 
 
 class EngineerInvoice(BaseModel):
-    order = models.OneToOneField(Order, related_name='engineer_invoice', on_delete=models.CASCADE)
+    booking = models.OneToOneField(Booking, related_name='engineer_invoice', on_delete=models.CASCADE)
     invoice_number = models.CharField(max_length=100, unique=True)
     invoice_date = models.DateTimeField(auto_now_add=True)
-    due_date = models.DateField(null=True, blank=True)  # New field
-    service_date = models.DateField(null=True, blank=True) # new field
+    due_date = models.DateField(null=True, blank=True)
+    service_date = models.DateField(null=True, blank=True)
     total_amount = models.DecimalField(max_digits=20, decimal_places=2)
     notes = models.TextField(null=True, blank=True)
 
