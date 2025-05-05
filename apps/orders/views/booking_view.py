@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.db.models import Prefetch, F, Q, ExpressionWrapper, DateTimeField, Value
 from django.db.models.functions import Concat, Cast
+from django.utils.timezone import now
 
 from rest_framework import status
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView
@@ -126,11 +127,10 @@ class BookingCreateAPIView(CreateAPIView):
     def perform_create(self, serializer):
         booking = serializer.save()
 
-        # Now that booking is created, you can safely create the invoice
         EngineerInvoice.objects.create(
-            order=booking.order,
+            booking=booking,
             notes=f"Engineer Invoice For Booking Order: {booking.order.order_ref_number}",
-            invoice_number=booking.order.order_ref_number,
+            invoice_number=f"EINV-{booking.order.order_ref_number}-{now().strftime('%Y%m%d%H%M%S')}",
             due_date=booking.booking_date,
             total_amount=booking.order.total_price() or 0,
             service_date=booking.booking_date,

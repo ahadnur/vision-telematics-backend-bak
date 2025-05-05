@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Engineer Invoice: {{ invoice_number }}</title>
+</head>
+<body style="margin:0; padding:0; font-family: Arial, sans‑serif; background:#f4f4f4;">
+
+  <!-- Container -->
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+      <td align="center" style="padding:20px 0;">
+        <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff; border-radius:8px; overflow:hidden;">
+          
+          <!-- Header -->
+          <tr style="background:#003366; color:#ffffff;">
+            <td style="padding:20px; text-align:center;">
+              <h1 style="margin:0; font-size:24px;">Engineer Invoice: {{ invoice_number }}</h1>
+            </td>
+          </tr>
+
+          <!-- Invoice Details -->
+          <tr>
+            <td style="padding:20px;">
+              <h2 style="margin-top:0; font-size:20px; color:#333333;">Invoice Details</h2>
+              <p style="font-size:16px; color:#555555; margin:4px 0;">
+                <strong>Order Reference:</strong> {{ order_ref }}
+              </p>
+              <p style="font-size:16px; color:#555555; margin:4px 0;">
+                <strong>Invoice Date:</strong> {{ invoice_date }}
+              </p>
+              <p style="font-size:16px; color:#555555; margin:4px 0;">
+                <strong>Due Date:</strong> {{ due_date }}
+              </p>
+              <p style="font-size:16px; color:#555555; margin:4px 0;">
+                <strong>Service Date:</strong> {{ service_date }}
+              </p>
+            </td>
+          </tr>
+
+          <!-- Amount & Notes -->
+          <tr>
+            <td style="padding:0 20px 20px;">
+              <h3 style="font-size:18px; color:#333333; margin:10px 0;">Amount &amp; Notes</h3>
+              <table width="100%" cellpadding="8" cellspacing="0" border="0" role="presentation" style="border:1px solid #e0e0e0; border-radius:4px; text-align:left;">
+                <tbody>
+                  <tr style="border-bottom:1px solid #e0e0e0;">
+                    <td><strong>Total Amount:</strong></td>
+                    <td align="right"><strong>${{ total }}</strong></td>
+                  </tr>
+                  <tr>
+                    <td colspan="2" style="padding-top:10px; font-size:14px; color:#555555;">
+                      <strong>Notes:</strong><br>
+                      {{ notes }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr style="background:#f4f4f4; color:#555555;">
+            <td style="padding:20px; font-size:12px; text-align:center;">
+              <p style="margin:0;">
+                This invoice was generated automatically based on the booking. Please contact support if any details are incorrect.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

@@ -30,7 +30,7 @@ class EngineerInvoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = EngineerInvoice
         fields = [
-            'id', 'order', 'invoice_number',
+            'id', 'booking', 'invoice_number',
             'invoice_date', 'due_date', 'service_date',
             'total_amount', 'notes'
         ]

@@ -35,9 +35,9 @@ class CustomerInvoiceAdmin(admin.ModelAdmin):
 @admin.register(EngineerInvoice)
 class EngineerInvoiceAdmin(admin.ModelAdmin):
     list_display = (
-        'invoice_number', 'order', 'invoice_date',
+        'invoice_number', 'booking', 'invoice_date',
         'service_date', 'total_amount'
     )
     list_filter = ('invoice_date', 'due_date', 'service_date')
-    search_fields = ('invoice_number', 'order__id')
+    search_fields = ('invoice_number', 'booking__id')
     ordering = ('-invoice_date',)

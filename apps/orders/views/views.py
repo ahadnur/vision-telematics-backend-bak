@@ -3,6 +3,7 @@ import logging
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from django.utils.timezone import now
 from django.db.models import Prefetch
 from rest_framework import status
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView
@@ -373,7 +374,7 @@ class OrderStatusChangeAPIView(APIView):
             shipping_charge=order.shipping_charge or 0.0,
             total_discount=order.total_discount or 0.0,
             order=order,
-            invoice_number=order.order_ref_number,
+            invoice_number=f"CINV-{order.order_ref_number}-{now().strftime('%Y%m%d%H%M%S')}",
             subtotal=order.total_price(),
             total_amount=order.total_price() - (order.total_discount or 0.0),
             payment_status=order.customer_payment_status,
