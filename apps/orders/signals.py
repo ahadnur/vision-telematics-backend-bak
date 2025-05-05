@@ -70,10 +70,10 @@ def send_customer_invoice_email(sender, instance, created, **kwargs):
             "tax": instance.tax_amount,
             "shipping": instance.shipping_charge,
             "total": instance.total_amount,
-            "billing_address": instance.billing_address,
-            "shipping_address": instance.shipping_address,
+            "billing_address": instance.billing_address if instance.billing_address else "N/A",
+            "shipping_address": instance.shipping_address if instance.shipping_address else "N/A",
             "status": instance.payment_status,
-            "customer_email": instance.order.customer.email,
+            "customer_email": instance.order.customer.email_address,
         }
 
         recipient = instance.order.customer.email_address
@@ -96,4 +96,4 @@ def send_engineer_invoice_email(sender, instance, created, **kwargs):
         }
         
         recipient = instance.booking.engineer.email_address
-        send_order_email.delay(subject, "orders/send_engineer_invoice_mail.html", context, recipient)
+        send_order_email.delay(subject, "orders/send_engineer_invoice.html", context, recipient)

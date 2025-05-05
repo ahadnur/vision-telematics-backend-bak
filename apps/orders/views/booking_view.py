@@ -128,7 +128,7 @@ class BookingCreateAPIView(CreateAPIView):
         booking = serializer.save()
 
         EngineerInvoice.objects.create(
-            order=booking.order,
+            booking=booking,
             notes=f"Engineer Invoice For Booking Order: {booking.order.order_ref_number}",
             invoice_number=f"EINV-{booking.order.order_ref_number}-{now().strftime('%Y%m%d%H%M%S')}",
             due_date=booking.booking_date,

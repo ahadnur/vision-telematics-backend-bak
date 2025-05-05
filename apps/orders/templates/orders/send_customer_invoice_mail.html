@@ -1,46 +1,122 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; }
-        .container { max-width: 700px; margin: auto; padding: 20px; border: 1px solid #eee; }
-        h2 { color: #004085; }
-        .section { margin-bottom: 20px; }
-        .label { font-weight: bold; }
-        .value { margin-left: 5px; }
-        .footer { font-size: 0.9em; color: #777; margin-top: 40px; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Customer Invoice: {{ invoice_number }}</title>
 </head>
-<body>
-    <div class="container">
-        <h2>Customer Invoice: {{ invoice_number }}</h2>
+<body style="margin:0; padding:0; font-family: Arial, sans‑serif; background:#f4f4f4;">
 
-        <div class="section">
-            <p><span class="label">Order Reference:</span> {{ order_ref }}</p>
-            <p><span class="label">Invoice Date:</span> {{ invoice_date }}</p>
-            <p><span class="label">Due Date:</span> {{ due_date }}</p>
-            <p><span class="label">Payment Status:</span> {{ status }}</p>
-        </div>
+  <!-- Container -->
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+      <td align="center" style="padding:20px 0;">
+        <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff; border-radius:8px; overflow:hidden;">
+          
+          <!-- Header -->
+          <tr style="background:#003366; color:#ffffff;">
+            <td style="padding:20px; text-align:center;">
+              <h1 style="margin:0; font-size:24px;">Customer Invoice: {{ invoice_number }}</h1>
+            </td>
+          </tr>
 
-        <div class="section">
-            <h3>Billing Summary</h3>
-            <p><span class="label">Subtotal:</span> ${{ subtotal }}</p>
-            <p><span class="label">Discount:</span> ${{ discount }}</p>
-            <p><span class="label">Tax:</span> ${{ tax }}</p>
-            <p><span class="label">Shipping:</span> ${{ shipping }}</p>
-            <p><strong><span class="label">Total Amount:</span> ${{ total }}</strong></p>
-        </div>
+          <!-- Invoice Details -->
+          <tr>
+            <td style="padding:20px;">
+              <h2 style="margin-top:0; font-size:20px; color:#333333;">Invoice Details</h2>
+              <p style="font-size:16px; color:#555555; margin:4px 0;">
+                <strong>Order Reference:</strong> {{ order_ref }}
+              </p>
+              <p style="font-size:16px; color:#555555; margin:4px 0;">
+                <strong>Invoice Date:</strong> {{ invoice_date }}
+              </p>
+              <p style="font-size:16px; color:#555555; margin:4px 0;">
+                <strong>Due Date:</strong> {{ due_date }}
+              </p>
+              <p style="font-size:16px; color:#555555; margin:4px 0;">
+                <strong>Payment Status:</strong> {{ status }}
+              </p>
+            </td>
+          </tr>
 
-        <div class="section">
-            <h3>Addresses</h3>
-            <p><span class="label">Billing Address:</span> {{ billing_address }}</p>
-            <p><span class="label">Shipping Address:</span> {{ shipping_address }}</p>
-        </div>
+          <!-- Billing Summary Table -->
+          <tr>
+            <td style="padding:0 20px 20px;">
+              <h3 style="font-size:18px; color:#333333; margin:10px 0;">Billing Summary</h3>
+              <table width="100%" cellpadding="8" cellspacing="0" border="0" role="presentation" style="border:1px solid #e0e0e0; border-radius:4px; text-align:left;">
+                <tbody>
+                  <tr>
+                    <td><strong>Subtotal:</strong></td>
+                    <td align="right">${{ subtotal }}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Discount:</strong></td>
+                    <td align="right">− ${{ discount }}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Tax:</strong></td>
+                    <td align="right">${{ tax }}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Shipping:</strong></td>
+                    <td align="right">${{ shipping }}</td>
+                  </tr>
+                  <tr style="font-weight:bold; border-top:1px solid #ddd;">
+                    <td style="padding-top:10px;">Total Amount:</td>
+                    <td align="right" style="padding-top:10px;">${{ total }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
 
-        <div class="footer">
-            Thank you for choosing our service. Please contact us if you have any questions regarding your invoice.
-        </div>
-    </div>
+          <!-- Addresses -->
+          <tr>
+            <td style="padding:0 20px 20px;">
+              <h3 style="font-size:18px; color:#333333; margin:10px 0;">Addresses</h3>
+              <table width="100%" cellpadding="8" cellspacing="0" role="presentation">
+                <tr>
+                  <td valign="top" width="50%" style="font-size:14px; color:#555555;">
+                    <strong>Billing Address:</strong><br>
+                    <p style="margin:0; color:#555555; font-size:14px;">
+                        <p>
+                          {{ billing_address.street|default:"" }}<br>
+                          {{ billing_address.city|default:"" }}<br>
+                          {{ billing_address.state|default:"" }}<br>
+                          {{ billing_address.postcode|default:"" }}<br>
+                          {{ billing_address.country|default:"" }}
+                        </p>
+                      </p>
+                  </td>
+                  <td valign="top" width="50%" style="font-size:14px; color:#555555;">
+                    <strong>Shipping Address:</strong><br>
+                    <p style="margin:0; color:#555555; font-size:14px;">
+                        <p>
+                          {{ shipping_address.street|default:"" }}<br>
+                          {{ shipping_address.city|default:"" }}<br>
+                          {{ shipping_address.state|default:"" }}<br>
+                          {{ shipping_address.postcode|default:"" }}<br>
+                          {{ shipping_address.country|default:"" }}
+                        </p>
+                      </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr style="background:#f4f4f4; color:#555555;">
+            <td style="padding:20px; font-size:12px; text-align:center;">
+              <p style="margin:0;">
+                Thank you for choosing our service. Please contact us if you have any questions regarding your invoice.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
 </body>
 </html>
