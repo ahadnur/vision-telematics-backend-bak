@@ -51,7 +51,10 @@ class CustomerCreateAPIView(APIView):
         tags=['Customer'],
         request_body=CustomerWriteSerializer,
         responses={
-            status.HTTP_201_CREATED: customer_create_response_schema
+            status.HTTP_201_CREATED: openapi.Response(
+                description='Customer created successfully.',
+                schema=CustomerWriteSerializer(),
+            )
         }
     )
     def post(self, request, *args, **kwargs):

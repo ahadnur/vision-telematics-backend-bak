@@ -91,7 +91,7 @@ class CustomerFeedbackSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'customer', 'product',
             'rating', 'feedback', 'status',
-            'order_referance', 'created_at',
+            'order', 'created_at',
             ]
 
 
@@ -101,5 +101,5 @@ class CustomerFeedbackCreateSerializer(serializers.ModelSerializer):
         fields = [
             'customer', 'product',
             'rating', 'feedback',
-            'order_referance',
+            'order',
         ]
