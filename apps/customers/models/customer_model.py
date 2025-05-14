@@ -184,7 +184,7 @@ class CustomerFeedback(BaseModel):
         choices=CustomerFeedbackStatusChouces.choices, 
         default=CustomerFeedbackStatusChouces.PENDING
     )
-    order_referance = models.ForeignKey(
+    order = models.ForeignKey(
         'orders.Order', 
         on_delete=models.SET_NULL, 
         null=True, blank=True, 
@@ -203,6 +203,6 @@ class CustomerFeedback(BaseModel):
             models.Index(fields=['product']),
             models.Index(fields=['rating']),
             models.Index(fields=['status']),
-            models.Index(fields=['order_referance']),
+            models.Index(fields=['order']),
             models.Index(fields=['-created_at']),
         ]

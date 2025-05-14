@@ -26,7 +26,7 @@ class CustomerFeedbackListAPIView(ListAPIView):
         product = params.get('product')
         rating = params.get('rating')
         status_ = params.get('status')
-        order_reference = params.get('order_referance')
+        order = params.get('order')
         created_from = params.get('created_from')
         created_to = params.get('created_to')
 
@@ -38,8 +38,8 @@ class CustomerFeedbackListAPIView(ListAPIView):
             queryset = queryset.filter(rating=rating)
         if status_:
             queryset = queryset.filter(status=status_)
-        if order_reference:
-            queryset = queryset.filter(order_referance_id=order_reference)
+        if order:
+            queryset = queryset.filter(order=order)
         if created_from:
             queryset = queryset.filter(created_at__gte=parse_date(created_from))
         if created_to:
@@ -55,7 +55,7 @@ class CustomerFeedbackListAPIView(ListAPIView):
             openapi.Parameter('product', openapi.IN_QUERY, description="Filter by product ID", type=openapi.TYPE_INTEGER),
             openapi.Parameter('rating', openapi.IN_QUERY, description="Filter by rating (1-10 or 1-5)", type=openapi.TYPE_INTEGER),
             openapi.Parameter('status', openapi.IN_QUERY, description="Filter by status", type=openapi.TYPE_STRING),
-            openapi.Parameter('order_referance', openapi.IN_QUERY, description="Filter by order ID", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('order', openapi.IN_QUERY, description="Filter by order ID", type=openapi.TYPE_INTEGER),
             openapi.Parameter('created_from', openapi.IN_QUERY, description="Filter feedbacks created from date (YYYY-MM-DD)", type=openapi.TYPE_STRING, format='date'),
             openapi.Parameter('created_to', openapi.IN_QUERY, description="Filter feedbacks created up to date (YYYY-MM-DD)", type=openapi.TYPE_STRING, format='date'),
         ],

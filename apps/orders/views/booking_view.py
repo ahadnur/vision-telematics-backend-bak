@@ -124,6 +124,9 @@ class BookingCreateAPIView(CreateAPIView):
             )
         }
     )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
     def perform_create(self, serializer):
         booking = serializer.save()
 
