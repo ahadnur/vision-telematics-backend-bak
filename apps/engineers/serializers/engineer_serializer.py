@@ -53,7 +53,7 @@ class EngineerReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Engineer
         fields = [
-            'contact_name', 'company', 'engineer_id', 'address', 'contact_number', 'office_number',
+            'id', 'contact_name', 'company', 'engineer_id', 'address', 'contact_number', 'office_number',
             'email_address', 'website', 'postcode_coverage', 'comments', 'insurance_expiration',
             'current_sla', 'performance_rating', 'engineer_priority', 'job',
             'is_telematics', 'is_dash_cam', 'is_dvs', 'is_dvr', 'is_adr_tanker',
