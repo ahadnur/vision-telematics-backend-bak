@@ -18,7 +18,7 @@ urlpatterns = [
     path('get-vehicle-info/', GetVehicleInfoAPIView.as_view(), name='customer-get-vehicle-info'),
     path('customer-dropdown-list/', CustomerDropdownListAPIView.as_view(), name='customer-dropdown-list'),
     path('customer-vehicle-list/', CustomerVehicleListAPIView.as_view(), name='customer-vehicle-list'),
-    path('custmer-specifiv-vehicle-list/<customer_id>/', CustomerSpecificVehicleListAPIView.as_view(),
+    path('customer-specific-vehicle-list/<customer_id>/', CustomerSpecificVehicleListAPIView.as_view(),
          name='customer-specific-vehicle-list'),
 
     # feedbacks
