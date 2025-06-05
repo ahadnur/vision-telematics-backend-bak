@@ -73,11 +73,11 @@ class VehicleMake(BaseModel):
 
 
 class VehicleModel(BaseModel):
-    name = models.CharField(max_length=50, unique=True, null=True, blank=True)
+    model_name = models.CharField(max_length=50, unique=True, null=True, blank=True)
     vehicle_make = models.ForeignKey(VehicleMake, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return self.model_name
 
 
 class PhoneModel(BaseModel):

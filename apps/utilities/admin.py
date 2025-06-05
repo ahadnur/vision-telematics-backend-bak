@@ -15,7 +15,7 @@ class VehicleTypeAdmin(admin.ModelAdmin):
 
 @admin.register(VehicleModel)
 class VehicleModelAdmin(admin.ModelAdmin):
-    list_display = ['name', 'id']
+    list_display = ['model_name', 'id']
 
 
 admin.site.register(OrderType)

@@ -74,7 +74,7 @@ class CustomerSpecificVehicleListAPIView(APIView):
 		try:
 			queryset = CustomerVehicle.active_objects.filter(
 				customer_id=customer_id,
-			).select_related('vehicle_model', 'vehicle_make', 'vehicle_type')
+			).select_related('vehicle_make', 'vehicle_model', 'vehicle_type')
 			serializer = CustomerSpecificVehicleSerializer(queryset, many=True)
 			return Response(serializer.data)
 		except CustomerVehicle.DoesNotExist:

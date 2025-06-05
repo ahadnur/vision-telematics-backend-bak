@@ -43,21 +43,32 @@ class VehicleCustomer(serializers.ModelSerializer):
 class VehicleMakeSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = VehicleMake
-		fields = ['id', 'vehicle_make']
+		fields = ['id', 'make_name']
 
 class VehicleModelSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = VehicleModel
-		fields = ['id', 'vehicle_model']
+		fields = ['id', 'model_name']
 
 class VehicleTypeSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = VehicleType
-		fields = ['id', 'vehicle_type']
+		fields = ['id', 'type_name']
 
 
-class CustomerSpecificVehicleSerializer(serializers.Serializer):
-	vehicle_make = serializers.CharField(read_only=True, required=False)
-	vehicle_model = serializers.CharField(read_only=True, required=False)
-	vehicle_type = serializers.CharField(read_only=True, required=False)
-	customer = serializers.PrimaryKeyRelatedField(queryset=Customer.objects.all())
+class CustomerSpecificVehicleSerializer(serializers.ModelSerializer):
+    customer = serializers.PrimaryKeyRelatedField(
+        queryset=Customer.objects.all()
+    )
+    vehicle_make  = VehicleMakeSerializer(read_only=True)
+    vehicle_model = VehicleModelSerializer(read_only=True)
+    vehicle_type  = VehicleTypeSerializer(read_only=True)
+
+    class Meta:
+        model = CustomerVehicle
+        fields = [
+            'customer',
+            'vehicle_make',
+            'vehicle_model',
+            'vehicle_type'
+        ]
