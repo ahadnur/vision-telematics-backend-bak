@@ -141,7 +141,7 @@ class OrderPaymentOptions(BaseModel):
     invoice_account = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, blank=True,
                                         related_name='invoice_account')
     invoice_address = models.CharField(max_length=255, null=True, blank=True)
-    requested_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, )
+    requested_by = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, blank=True, )
     po_number = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:

@@ -26,10 +26,10 @@ class VehicleModelCreateAPIView(CreateAPIView):
         }
     )
     def post(self, request, *args, **kwargs):
-        name = request.data.get("name")
+        name = request.data.get("model_name")
         vehicle_make_id = request.data.get("vehicle_make")
 
-        existing_model = VehicleModel.objects.filter(name=name, is_deleted=True, is_active=False).first()
+        existing_model = VehicleModel.objects.filter(model_name=name, is_deleted=True, is_active=False).first()
 
         if existing_model:
             existing_model.vehicle_make_id = vehicle_make_id

@@ -99,11 +99,12 @@ class OrderCreateAPIView(APIView):
                         service=order_options.get('service'),
                     )
                 account_invoice = Account.objects.filter(id=payment_data.get('invoice_account_id')).first()
+                requested_by = Account.objects.filter(id=payment_data.get('requested_by')).first()
                 OrderPaymentOptions.objects.create(
                     order=order,
                     invoice_account=account_invoice,
                     invoice_address=payment_data.get('invoice_address'),
-                    # requested_by=payment_data.get('requested_by'),
+                    requested_by=requested_by,
                     po_number=payment_data.get('po_number'),
                 )
 
