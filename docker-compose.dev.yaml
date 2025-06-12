@@ -1,22 +1,11 @@
 services:
-  postgres:
-    image: postgres:latest
-    container_name: postgres
-    hostname: postgres
+  redis:
+    image: redis:alpine
+    container_name: redis
+    hostname: redis
     restart: unless-stopped
     ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123456
-      POSTGRES_DB: vision_telematics
-    volumes:
-      - pg_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - "6379:6379"
 
   web_app:
     build:
@@ -36,11 +25,25 @@ services:
       - ./.env
     environment:
       GUNICORN_PORT: 8000
+      CELERY_BROKER_URL: redis://redis:6379/0
     ports:
       - "8000:8000"
     depends_on:
-      postgres:
-        condition: service_healthy
+      redis:
+        condition: service_started
+
+  celery:
+    build:
+      context: .
+    container_name: celery_worker
+    command: celery -A config.celery broker -l info
+    volumes:
+      - .:/webapp
+    depends_on:
+      - web_app
+      - redis
+    env_file:
+      - .env
 
 volumes:
   pg_data:
