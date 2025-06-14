@@ -6,7 +6,7 @@ from .base import *
 DEBUG = env.bool('DEBUG', default=True)
 
 
-ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', '13.61.51.161']
+ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', '13.62.47.139']
 
 # THIRD_PARTY_APPS.append('rest_framework_swagger')
 
