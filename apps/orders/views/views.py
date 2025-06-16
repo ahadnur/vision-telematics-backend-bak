@@ -4,7 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 from rest_framework import status
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView
 from rest_framework.response import Response
@@ -241,15 +241,42 @@ class OrderRetrieveAPIView(RetrieveAPIView):
 
 
 class OrderListAPIView(ListAPIView):
-    queryset = Order.objects.filter(is_deleted=False, is_active=True).prefetch_related(
-        Prefetch("item_orders", queryset=OrderItem.objects.filter(is_active=True)),
-    ).order_by('-created_at')
     serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        queryset = Order.objects.filter(is_deleted=False, is_active=True).prefetch_related(
+            Prefetch("item_orders", queryset=OrderItem.objects.filter(is_active=True))
+        ).order_by('-created_at')
+
+        customer_id = self.request.query_params.get("customer")
+        order_status = self.request.query_params.get("order_status")
+
+        if customer_id:
+            queryset = queryset.filter(customer=customer_id)
+
+        if order_status:
+            queryset = queryset.filter(order_status=order_status)
+
+        return queryset.distinct()
 
     @swagger_auto_schema(
         tags=['Orders'],
+        manual_parameters=[
+            openapi.Parameter(
+                'customer', openapi.IN_QUERY,
+                description='Filter orders by customer id',
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                'order_status', openapi.IN_QUERY,
+                description='Filter orders by order status: [ created, processing, delivered, rejected ]',
+                type=openapi.TYPE_STRING,
+            )
+        ],
         responses={
-            status.HTTP_200_OK: order_list_schema
+            status.HTTP_200_OK: order_list_schema,
+            status.HTTP_404_NOT_FOUND: "Order is not found",
+            status.HTTP_400_BAD_REQUEST: "An error occurred",
         }
     )
     def get(self, request, *args, **kwargs):
