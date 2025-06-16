@@ -4,6 +4,7 @@ from apps.customers.models import Customer, CustomerVehicle, CustomerAddress
 from apps.orders.models import Order, OrderOptionsData
 from apps.settings.models import InstallType
 from apps.utilities.models import VehicleMake, VehicleModel, VehicleType
+from .serializers import OrderItemReadSerializer
 
 
 class OrderProductSKUSerializer(serializers.Serializer):
@@ -50,8 +51,27 @@ class OrderSerializer(serializers.ModelSerializer):
     order_product_skus = OrderProductSKUSerializer(many=True, required=False)
     customer_vehicle_info = OrderCustomerVehicleSerializer(source='vehicle', allow_null=False)
     order_options = OptionDataSerializer(required=False)
+    item_orders = OrderItemReadSerializer(many=True, read_only=True)
+    total_price = serializers.SerializerMethodField()
+    total_quantity = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
-        fields = ['id', 'customer', 'order_status', 'purchasing_notes', 'engineer_notes', 'order_options', 'customer_vehicle_info',
-                  'order_product_skus', 'payment_data', 'shipping_charge', 'shipping_address', 'billing_address', 'order_ref_number']
+        fields = [
+            'id', 'customer', 'order_status', 
+            'item_orders', 'purchasing_notes', 
+            'engineer_notes', 'order_options', 
+            'customer_vehicle_info',
+            'order_product_skus', 'payment_data', 
+            'shipping_charge', 'shipping_address', 
+            'billing_address', 'order_ref_number', 
+            'total_price', 'total_quantity', 'created_at'
+        ]
+
+    @staticmethod
+    def get_total_price(obj):
+        return obj.total_price()
+
+    @staticmethod
+    def get_total_quantity(obj):
+        return obj.total_quantity()

@@ -89,15 +89,19 @@ class OrderWriteSerializer(serializers.ModelSerializer):
 
 class OrderItemReadSerializer(serializers.ModelSerializer):
     total_price = serializers.SerializerMethodField()
-
+    product_sku = serializers.SerializerMethodField()
+    
     class Meta:
         model = OrderItem
-        fields = ['id', 'order', 'product_sku', 'price', 'quantity', 'discount', 'description', 'returned',
-                  'credit_note', 'total_price']
+        fields = ['id', 'order', 'product_sku', 'price', 'quantity', 'discount', 'returned', 'total_price']
 
     @staticmethod
     def get_total_price(obj):
         return obj.total_price()
+
+    @staticmethod
+    def get_product_sku(obj):
+        return obj.product_sku.sku_code
 
 
 class OrderReadSerializer(serializers.ModelSerializer):
